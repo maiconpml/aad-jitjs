@@ -1,6 +1,8 @@
 #include "Solver.hpp"
 #include "Instance.hpp"
 #include "Util.hpp"
+#include <iostream>
+#include <stdexcept>
 #include <vector>
 
 Solver::Solver(const Parameters &parameters) : params(parameters) {}
@@ -23,4 +25,12 @@ bool Solver::validate_state(const State &state) const {
   }
 
   return true;
+}
+
+State Solver::solve() {
+  giffler_thompson(best);
+  if (!validate_state(best)) {
+    throw runtime_error("Invalid State!!!");
+  }
+  return best;
 }
