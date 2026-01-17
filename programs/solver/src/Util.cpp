@@ -8,7 +8,9 @@ bool Util::topo_sort(const vector<unsigned int> &job,
                      const vector<unsigned int> &_job,
                      const vector<unsigned int> &_mach,
                      vector<unsigned int> &topo) {
-  assert(job.size() == mach.size() == _job.size() == _mach.size());
+  assert(job.size() == mach.size());
+  assert(mach.size() == _job.size());
+  assert(_job.size() == _mach.size());
 
   topo.clear();
 
