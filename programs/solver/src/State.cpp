@@ -2,7 +2,7 @@
 #include "Instance.hpp"
 
 double State::calc_penalties() {
-  Instance &inst = Instance::getInstance();
+  const Instance &inst = Instance::getInstance();
   int curTard, curEarl;
   tPenalty = 0;
   ePenalty = 0;

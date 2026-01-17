@@ -6,7 +6,7 @@
 Solver::Solver(const Parameters &parameters) : params(parameters) {}
 
 bool Solver::validate_state(const State &state) {
-  Instance &inst = Instance::getInstance();
+  const Instance &inst = Instance::getInstance();
 
   vector<unsigned> topo(inst.O - 1);
 
