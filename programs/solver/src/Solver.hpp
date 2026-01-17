@@ -5,11 +5,9 @@
 #include "State.hpp"
 
 class Solver {
-  Solver(const Instance &instance, const Parameters &parameters);
+  Solver(const Parameters &parameters);
 
 private:
-  // current instance being resolved
-  Instance inst;
   // current execution parameters
   Parameters params;
   // current best solution found

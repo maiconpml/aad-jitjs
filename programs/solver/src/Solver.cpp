@@ -1,4 +1,6 @@
 #include "Solver.hpp"
+#include "Instance.hpp"
+#include <vector>
 
-Solver::Solver(const Instance &instance, const Parameters &parameters)
-    : inst(instance), params(parameters) {}
+Solver::Solver(const Parameters &parameters) : params(parameters) {}
+
