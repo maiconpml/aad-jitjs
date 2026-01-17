@@ -38,11 +38,12 @@ void Instance::parse(const string &filePath) {
   _job.push_back(0);
   operToJ.push_back(UINT_MAX);
   operToM.push_back(UINT_MAX);
-  jmToOper.resize(extents[J][M]);
   O = 1;
 
   stream >> J;
   stream >> M;
+
+  jmToOper.resize(extents[J][M]);
 
   for (unsigned j = 0; j < J; ++j) {
     _job.push_back(0);
