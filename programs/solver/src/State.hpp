@@ -22,4 +22,8 @@ public:
   double ePenalty;
   // ePenalty + tPenalty for simplicity
   double penalties;
+
+  // returns the total penalties of current schedule. Also updates the
+  // corresponding attributes with the new penalties values
+  double calc_penalties();
 };
