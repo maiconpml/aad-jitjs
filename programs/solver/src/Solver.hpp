@@ -12,4 +12,6 @@ private:
   Parameters params;
   // current best solution found
   State best;
+  // verify if state satisfy the problem's constraints
+  bool validate_state(const State &state);
 };
