@@ -70,7 +70,7 @@ void Instance::parse(const string &filePath) {
         _job.push_back(O - 1);
       ++O;
       if (m < (M - 1))
-        job.push_back(O - 1);
+        job.push_back(O);
     }
     leafs.push_back(O - 1);
     job.push_back(0);
