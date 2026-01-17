@@ -1,4 +1,5 @@
-build/
+build_release/
+build_debug/
 .cache/
 compile_commands.json
 .vscode/
