@@ -5,7 +5,10 @@
 #include "State.hpp"
 
 class Solver {
+public:
   Solver(const Parameters &parameters);
+
+  State solve();
 
 private:
   // current execution parameters

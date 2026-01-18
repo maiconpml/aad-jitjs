@@ -1,7 +1,6 @@
 #include "Solver.hpp"
 #include "Instance.hpp"
 #include "Util.hpp"
-#include <iostream>
 #include <stdexcept>
 #include <vector>
 
