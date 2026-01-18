@@ -1,6 +1,7 @@
 #include "src/Instance.hpp"
 #include "src/Parameters.hpp"
 #include "src/Solver.hpp"
+#include "src/Random.hpp"
 #include <boost/program_options.hpp>
 #include <iostream>
 
@@ -41,6 +42,8 @@ int main(int argc, char *argv[]) {
     param.maxMilli = vm["maxMilli"].as<unsigned>();
     param.seed = vm["seed"].as<unsigned>();
     param.initialSolution = GT;
+
+    Random::initialize(param.seed);
 
     Instance::getInstance().parse(param.instPath);
 
