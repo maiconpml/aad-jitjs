@@ -19,7 +19,11 @@ int main(int argc, char *argv[]) {
         "maxMilli", po::value<unsigned>()->default_value(60000),
         "maximum time in milliseconds")(
         "seed", po::value<unsigned>()->default_value(13),
-        "random number generator seed");
+        "random number generator seed")(
+        "initialSolution", po::value<string>()->default_value("GT"),
+        "initial solution algorithm (GT, CONSTR)")(
+        "dispatchingRule", po::value<string>()->default_value("EDD"),
+        "dispatching rule (EDD, ACS, RAND)");
     po::positional_options_description pod;
     pod.add("instPath", 1); // instance is positional as well
     po::variables_map vm;
@@ -41,7 +45,26 @@ int main(int argc, char *argv[]) {
     param.instPath = vm["instPath"].as<string>();
     param.maxMilli = vm["maxMilli"].as<unsigned>();
     param.seed = vm["seed"].as<unsigned>();
-    param.initialSolution = GT;
+
+    string initSolStr = vm["initialSolution"].as<string>();
+    if (initSolStr == "GT") {
+      param.initialSolution = Parameters::InitialSolution::GT;
+    } else if (initSolStr == "CONSTR") {
+      param.initialSolution = Parameters::InitialSolution::CONSTR;
+    } else {
+      throw string("Invalid initial solution: " + initSolStr);
+    }
+
+    string dispRuleStr = vm["dispatchingRule"].as<string>();
+    if (dispRuleStr == "EDD") {
+      param.dispatchingRule = Parameters::DispatchingRule::EDD;
+    } else if (dispRuleStr == "ACS") {
+      param.dispatchingRule = Parameters::DispatchingRule::ACS;
+    } else if (dispRuleStr == "RAND") {
+      param.dispatchingRule = Parameters::DispatchingRule::RAND;
+    } else {
+      throw string("Invalid dispatching rule: " + dispRuleStr);
+    }
 
     Random::initialize(param.seed);
 

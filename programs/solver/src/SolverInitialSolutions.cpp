@@ -1,4 +1,5 @@
 #include "Instance.hpp"
+#include "Parameters.hpp"
 #include "Random.hpp"
 #include "Solver.hpp"
 
@@ -8,7 +9,8 @@
 #include <utility>
 #include <vector>
 
-void Solver::giffler_thompson(State &state) const {
+void Solver::giffler_thompson(
+    State &state, const Parameters::DispatchingRule dispatching_choosed) const {
   const Instance &inst = Instance::getInstance();
 
   vector<unsigned> ready0(inst.roots);
@@ -24,6 +26,22 @@ void Solver::giffler_thompson(State &state) const {
   state.starts.resize(inst.O, 0);
   state.mach.resize(inst.O, 0);
   state._mach.resize(inst.O, 0);
+
+  using DispatchPtr = unsigned (Solver::*)(
+      const State &, const vector<unsigned> &, const unsigned) const;
+  DispatchPtr dispatching_rule;
+
+  switch (dispatching_choosed) {
+  case Parameters::DispatchingRule::EDD:
+    dispatching_rule = &Solver::dispatch_edd;
+    break;
+  case Parameters::DispatchingRule::ACS:
+    dispatching_rule = &Solver::dispatch_all_cr_spt;
+    break;
+  case Parameters::DispatchingRule::RAND:
+    dispatching_rule = &Solver::dispatch_random;
+    break;
+  }
 
   while (!ready0.empty()) {
 
@@ -65,7 +83,8 @@ void Solver::giffler_thompson(State &state) const {
 
     assert(ready2.size());
 
-    unsigned choosedOpIdx = dispatch_edd(state, ready2, machCompTime);
+    unsigned choosedOpIdx =
+        (this->*dispatching_rule)(state, ready2, machCompTime);
     unsigned choosedOp = ready2[choosedOpIdx];
 
     unsigned jobCompTime =
@@ -87,6 +106,109 @@ void Solver::giffler_thompson(State &state) const {
 
     if (inst.job[choosedOp]) {
       ready0.push_back(inst.job[choosedOp]);
+    }
+  }
+
+  state.calc_penalties();
+}
+
+void Solver::construct_by_dispatch(
+    State &state, const Parameters::DispatchingRule dispatching_choosed) const {
+  const Instance &inst = Instance::getInstance();
+
+  // machLeafs[m] is last operation scheduled on machine m
+  vector<unsigned> machLeafs(inst.M, 0);
+  // events to be treated
+  priority_queue<pair<unsigned, unsigned>, vector<pair<unsigned, unsigned>>,
+                 greater<pair<unsigned, unsigned>>>
+      events;
+  // opsAvailablePerMach[m] is the list of operations that already can be
+  // scheduled at machine m
+  vector<vector<unsigned>> opsAvailablePerMach(inst.M, vector<unsigned>());
+  // machines that have no events to be treated
+  vector<bool> eventlessMachines(inst.M, true);
+
+  state.starts.resize(inst.O, 0);
+  state.mach.resize(inst.O, 0);
+  state._mach.resize(inst.O, 0);
+
+  using DispatchPtr = unsigned (Solver::*)(
+      const State &, const vector<unsigned> &, const unsigned) const;
+  DispatchPtr dispatching_rule;
+
+  switch (dispatching_choosed) {
+  case Parameters::DispatchingRule::EDD:
+    dispatching_rule = &Solver::dispatch_edd;
+    break;
+  case Parameters::DispatchingRule::ACS:
+    dispatching_rule = &Solver::dispatch_all_cr_spt;
+    break;
+  case Parameters::DispatchingRule::RAND:
+    dispatching_rule = &Solver::dispatch_random;
+    break;
+  }
+
+  // set an event for each machine that process any job's first operation at
+  // time 0
+  unsigned curMach;
+  for (unsigned op : inst.roots) {
+    curMach = inst.operToM[op];
+    if (!opsAvailablePerMach[curMach].size()) {
+      events.push(make_pair(0, curMach));
+      eventlessMachines[curMach] = false;
+    }
+    opsAvailablePerMach[curMach].push_back(op);
+  }
+
+  // while exists on event to treat
+  while (!events.empty()) {
+    assert(events.size() <= inst.M);
+    pair<unsigned, unsigned> curEv = events.top();
+    events.pop();
+    curMach = curEv.second;
+
+    // verify if there is operations to be processed in this machine
+    if (opsAvailablePerMach[curMach].size()) {
+      // get operation by dispath rule
+      unsigned machineStartTime =
+          state.starts[machLeafs[curMach]] + inst.P[machLeafs[curMach]];
+      unsigned selOpIdx = (this->*dispatching_rule)(
+          state, opsAvailablePerMach[curMach], machineStartTime);
+      unsigned op = opsAvailablePerMach[curMach][selOpIdx];
+
+      // remove selected operation of available
+      opsAvailablePerMach[curMach][selOpIdx] =
+          opsAvailablePerMach[curMach].back();
+      opsAvailablePerMach[curMach].pop_back();
+
+      // schedules selected operation
+      state.starts[op] = max(machineStartTime, state.starts[inst._job[op]] +
+                                                   inst.P[inst._job[op]]);
+      state.mach[machLeafs[curMach]] = op;
+      state._mach[op] = machLeafs[curMach];
+      machLeafs[curMach] = op;
+
+      // set event for when scheduled operation finish
+      events.push(make_pair(state.starts[op] + inst.P[op], curMach));
+
+      if (inst.job[op]) {
+        // next operation in job now is available to be processed
+        opsAvailablePerMach[inst.operToM[inst.job[op]]].push_back(inst.job[op]);
+
+        // verify if the machine of next operation was eventless
+        if (eventlessMachines[inst.operToM[inst.job[op]]]) {
+          // set an event when scheduled operation finish on machine of next
+          // operation
+          events.push(make_pair(state.starts[op] + inst.P[op],
+                                inst.operToM[inst.job[op]]));
+          eventlessMachines[inst.operToM[inst.job[op]]] = false;
+        }
+      }
+    } else {
+      // if no operation is available to be processed in this machine set it as
+      // eventless
+      assert(!eventlessMachines[curMach]);
+      eventlessMachines[curMach] = true;
     }
   }
 

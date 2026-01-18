@@ -1,5 +1,6 @@
 #include "Solver.hpp"
 #include "Instance.hpp"
+#include "Parameters.hpp"
 #include "Util.hpp"
 #include <stdexcept>
 #include <vector>
@@ -27,7 +28,15 @@ bool Solver::validate_state(const State &state) const {
 }
 
 State Solver::solve() {
-  giffler_thompson(best);
+
+  switch (params.initialSolution) {
+  case Parameters::InitialSolution::GT:
+    giffler_thompson(best, params.dispatchingRule);
+    break;
+  case Parameters::InitialSolution::CONSTR:
+    construct_by_dispatch(best, params.dispatchingRule);
+    break;
+  }
   if (!validate_state(best)) {
     throw runtime_error("Invalid State!!!");
   }
