@@ -31,10 +31,10 @@ State Solver::solve() {
 
   switch (params.initialSolution) {
   case Parameters::InitialSolution::GT:
-    giffler_thompson(best, params.dispatchingRule);
+    initial_gt(best, params.dispatchingRule);
     break;
   case Parameters::InitialSolution::CONSTR:
-    construct_by_dispatch(best, params.dispatchingRule);
+    initial_constr_dispatch(best, params.dispatchingRule);
     break;
   }
   if (!validate_state(best)) {

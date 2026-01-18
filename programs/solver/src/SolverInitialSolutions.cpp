@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-void Solver::giffler_thompson(
+void Solver::initial_gt(
     State &state, const Parameters::DispatchingRule dispatching_choosed) const {
   const Instance &inst = Instance::getInstance();
 
@@ -112,7 +112,7 @@ void Solver::giffler_thompson(
   state.calc_penalties();
 }
 
-void Solver::construct_by_dispatch(
+void Solver::initial_constr_dispatch(
     State &state, const Parameters::DispatchingRule dispatching_choosed) const {
   const Instance &inst = Instance::getInstance();
 
