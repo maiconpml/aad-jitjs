@@ -1,7 +1,12 @@
 #include "Instance.hpp"
+#include "Random.hpp"
 #include "Solver.hpp"
 
 #include <climits>
+#include <functional>
+#include <queue>
+#include <utility>
+#include <vector>
 
 void Solver::giffler_thompson(State &state) const {
   const Instance &inst = Instance::getInstance();
@@ -16,9 +21,9 @@ void Solver::giffler_thompson(State &state) const {
   unsigned selMach = 0;
   unsigned auxStartTime;
 
-  state.starts.resize(inst.O);
-  state.mach.resize(inst.O);
-  state._mach.resize(inst.O);
+  state.starts.resize(inst.O, 0);
+  state.mach.resize(inst.O, 0);
+  state._mach.resize(inst.O, 0);
 
   while (!ready0.empty()) {
 
@@ -29,9 +34,10 @@ void Solver::giffler_thompson(State &state) const {
 
     for (unsigned op : ready0) {
       assert(op < inst.O);
-      unsigned jobCompTime = state.starts[inst._job[op]] + inst.P[inst._job[op]];
+      unsigned jobCompTime =
+          state.starts[inst._job[op]] + inst.P[inst._job[op]];
       unsigned machCompTime = state.starts[machLeafs[inst.operToM[op]]] +
-                         inst.P[machLeafs[inst.operToM[op]]];
+                              inst.P[machLeafs[inst.operToM[op]]];
       compTime = max(jobCompTime, machCompTime) + inst.P[op];
       if (compTime < earlComp) {
         earlComp = compTime;
@@ -49,23 +55,18 @@ void Solver::giffler_thompson(State &state) const {
         state.starts[machLeafs[selMach]] + inst.P[machLeafs[selMach]];
 
     for (unsigned op : ready1) {
-      unsigned jobCompTime = state.starts[inst._job[op]] + inst.P[inst._job[op]];
+      unsigned jobCompTime =
+          state.starts[inst._job[op]] + inst.P[inst._job[op]];
       auxStartTime = max(jobCompTime, machCompTime);
       if (auxStartTime < earlComp) {
         ready2.push_back(op);
       }
     }
 
-    assert(ready2.size() > 0);
-    unsigned minDeadline = UINT_MAX;
-    unsigned choosedOp;
+    assert(ready2.size());
 
-    for (unsigned op : ready2) {
-      if (inst.deadlines[op] < minDeadline) {
-        choosedOp = op;
-        minDeadline = inst.deadlines[op];
-      }
-    }
+    unsigned choosedOpIdx = dispatch_edd(state, ready2, machCompTime);
+    unsigned choosedOp = ready2[choosedOpIdx];
 
     unsigned jobCompTime =
         state.starts[inst._job[choosedOp]] + inst.P[inst._job[choosedOp]];
@@ -90,4 +91,69 @@ void Solver::giffler_thompson(State &state) const {
   }
 
   state.calc_penalties();
+}
+
+unsigned Solver::dispatch_edd(const State &state, const vector<unsigned> &ops,
+                              const unsigned minStartTimeMachine) const {
+  assert(ops.size());
+  const Instance &inst = Instance::getInstance();
+  unsigned bestIdx = 0;
+  for (unsigned i = 1; i < ops.size(); ++i) {
+    assert(ops[i]);
+    if (inst.deadlines[ops[i]] < inst.deadlines[ops[bestIdx]]) {
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
+}
+
+unsigned Solver::dispatch_all_cr_spt(const State &state,
+                                     const vector<unsigned> &ops,
+                                     const unsigned minStartTimeMachine) const {
+  assert(ops.size());
+  assert(ops[0]);
+  const Instance &inst = Instance::getInstance();
+
+  // gets first op as initial
+  unsigned selOpIdx = 0;
+  bool isSelOpEarly =
+      (max(minStartTimeMachine, state.starts[inst._job[ops[selOpIdx]]]) <
+       inst.deadlines[ops[selOpIdx]]);
+
+  for (unsigned i = 1; i < ops.size(); ++i) {
+    assert(ops[i]);
+    unsigned startCurOp =
+        max(minStartTimeMachine, state.starts[inst._job[ops[i]]]);
+    bool replace = false;
+
+    // if selected op is early and current op is tardy, replace selected
+    // if selected op and current op are early and selected has lesser earl
+    //    ratio, replace selected
+    // if selected op and current op are tardy and selected has bigger tard
+    //    ratio than current, replace selected
+    // if selected op is tardy and current op is early, nothing to do
+    if ((isSelOpEarly &&
+         (startCurOp >= inst.deadlines[ops[i]] ||
+          (double)inst.P[ops[i]] / inst.earlCoefs[ops[i]] >
+              (double)inst.P[ops[selOpIdx]] / inst.earlCoefs[ops[selOpIdx]])) ||
+        (!isSelOpEarly && startCurOp >= inst.deadlines[ops[i]] &&
+         (double)inst.P[ops[i]] / inst.tardCoefs[ops[i]] <
+             (double)inst.P[ops[selOpIdx]] / inst.tardCoefs[ops[selOpIdx]])) {
+      replace = true;
+    }
+
+    if (replace) {
+      selOpIdx = i;
+      isSelOpEarly = (startCurOp < inst.deadlines[ops[i]]);
+    }
+  }
+
+  return selOpIdx;
+}
+
+unsigned Solver::dispatch_random(const State &state,
+                                 const vector<unsigned> &ops,
+                                 const unsigned minStartTimeMachine) const {
+  assert(ops.size());
+  return Random::get((uint32_t)ops.size());
 }

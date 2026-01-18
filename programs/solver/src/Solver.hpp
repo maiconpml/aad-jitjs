@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Instance.hpp"
 #include "Parameters.hpp"
 #include "State.hpp"
 
@@ -15,6 +14,20 @@ private:
   Parameters params;
   // current best solution found
   State best;
+
+  // --------------------------- DISPATCHING RULES -----------------------------
+
+  // returns index of operation with earliest due date in ops
+  unsigned dispatch_edd(const State &state, const vector<unsigned> &ops,
+                        const unsigned minStartTimeMachine) const;
+
+  // returns index of operation in ops based on all + cr + spt dispatching rule
+  unsigned dispatch_all_cr_spt(const State &state, const vector<unsigned> &ops,
+                               const unsigned minStartTimeMachine) const;
+
+  // returns random index of operations in ops
+  unsigned dispatch_random(const State &state, const vector<unsigned> &ops,
+                           const unsigned minStartTimeMachine) const;
 
   // ---------------------------- INITAL SOLUTIONS -----------------------------
 
