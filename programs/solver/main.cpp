@@ -1,8 +1,10 @@
+#include "Timer.hpp"
 #include "src/Instance.hpp"
 #include "src/Parameters.hpp"
 #include "src/Solver.hpp"
 #include "src/Random.hpp"
 #include <boost/program_options.hpp>
+#include <iomanip>
 #include <iostream>
 
 namespace po = boost::program_options;
@@ -73,7 +75,10 @@ int main(int argc, char *argv[]) {
     Solver solver(param);
     State sol = solver.solve();
 
-    cout << sol.penalties << endl;
+      cout << left << setw(10) << sol.penalties << left << setw(10)
+           << sol.tPenalty << left << setw(10) << sol.ePenalty << left
+           << setw(10) << sol.millisecsFound << left << setw(10)
+           << Timer::elapsedMs() << param.instPath << endl;
 
   } catch (const string &e) {
     cout << e << endl;

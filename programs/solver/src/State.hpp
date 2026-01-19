@@ -17,7 +17,7 @@ public:
   // <Instance.O> starts[o] is start time of operation o in current State
   vector<unsigned> starts;
   // from the start of execution, milliseconds when this State was found
-  unsigned millisecsFound;
+  double millisecsFound;
   // tardiness penalty in current State
   double tPenalty;
   // earliness penalty in current State

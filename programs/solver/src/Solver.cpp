@@ -1,6 +1,7 @@
 #include "Solver.hpp"
 #include "Instance.hpp"
 #include "Parameters.hpp"
+#include "Timer.hpp"
 #include "Util.hpp"
 #include <stdexcept>
 #include <vector>
@@ -31,6 +32,7 @@ bool Solver::validate_state(const State &state) const {
 }
 
 State Solver::solve() {
+  Timer::start();
 
   switch (params.initialSolution) {
   case Parameters::InitialSolution::GT:
@@ -40,6 +42,7 @@ State Solver::solve() {
     initial_constr_dispatch(best);
     break;
   }
+  best.millisecsFound = Timer::elapsedMs();
 
 #ifndef NDEBUG
   if (!validate_state(best)) {

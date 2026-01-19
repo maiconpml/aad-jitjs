@@ -1,5 +1,6 @@
 #include "Parameters.hpp"
 #include "Solver.hpp"
+#include "Timer.hpp"
 
 void Solver::search_ls(State &initialSol) {
   Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
@@ -12,13 +13,15 @@ void Solver::search_ls(State &initialSol) {
     nhood = &Solver::nhood_swap_adjacent;
   }
   best = initialSol;
-  while (true) {
+  while (!Timer::isTimeExceeded(params.maxMilli)) {
+
     State neighbor;
 
     (this->*nhood)(best, neighbor);
 
     if (neighbor.penalties < best.penalties) {
       best = neighbor;
+      best.millisecsFound = Timer::elapsedMs();
     } else {
       break;
     }
