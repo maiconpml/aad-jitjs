@@ -1,0 +1,6 @@
+# name                 switch              type  values
+initSol                "--initSol "        c     (GT, CONSTR)
+dispatchRule           "--dispatchRule "   c     (EDD, ACS, RAND)
+searchMethod           "--searchMethod "   c     (LS)
+nhood                  "--nhood "          c     (SWAP_ADJ)
+nHoodTravers           "--nHoodTravers "   c     (BI, FI)

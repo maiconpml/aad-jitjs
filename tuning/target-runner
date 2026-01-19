@@ -1,0 +1,24 @@
+#!/bin/bash
+EXE="../build_release/programs/solver/solver"
+# Ensure the executable exists
+if [ ! -f "$EXE" ]; then
+    echo "Executable $EXE not found" >&2
+    exit 1
+fi
+
+INSTANCE=$4
+SEED=$3
+CONFIG_PARAMS=${@:5}
+
+# Run the solver and capture output
+# The output is formatted like: penalties tPenalty ePenalty millisecsFound elapsedMs instPath
+# We only want the penalties (the first value)
+RESULT=$($EXE "$INSTANCE" --seed "$SEED" --maxMilli 1000 --autoConfig $CONFIG_PARAMS)
+
+if [ $? -ne 0 ]; then
+    echo "Solver failed" >&2
+    exit 1
+fi
+
+# Print the first column of the output
+echo "$RESULT" | awk '{print $1}'
