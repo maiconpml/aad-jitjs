@@ -14,11 +14,15 @@ public:
 
   enum class NHoodTraversing { BI, FI, ELT_LIST };
 
+  enum class SearchMethod { LS, ILS, TABU };
+
   string instPath;
   InitialSolution initialSolution;
   DispatchingRule dispatchingRule;
   vector<Neighborhood> nHoods;
   vector<NHoodTraversing> nHoodsTraversings;
+  vector<SearchMethod> searchMethods;
+  unsigned currentSearchMethod;
   unsigned currentNHood;
   unsigned maxMilli;
   unsigned seed;

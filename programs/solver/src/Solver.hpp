@@ -55,9 +55,16 @@ private:
 
   void nhood_swap_adjacent(const State &sol, State &neighbor) const;
 
-  // schedule operations as early as possible based on state sequence, return
-  // true if state has a cycle
+  // ------------------------------ SEARCH METHODS -----------------------------
+  void search_ls(State &initialSol);
+
+  // -------------------------------- SCHEDULERS -------------------------------
+
+  // schedule operations as early as possible based on state sequence,
+  // return true if state has a cycle
   bool sched_max_early(State &state) const;
+
+  // --------------------------------- EXTRAS ----------------------------------
 
   // verify if state satisfy the problem's constraints
   bool validate_state(const State &state) const;

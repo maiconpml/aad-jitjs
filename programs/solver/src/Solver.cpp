@@ -37,6 +37,19 @@ State Solver::solve() {
     initial_constr_dispatch(best);
     break;
   }
+
+#ifndef NDEBUG
+  if (!validate_state(best)) {
+    throw runtime_error("Invalid State!!!");
+  }
+#endif // NDEBUG
+
+  switch (params.searchMethods[params.currentSearchMethod]) {
+  case Parameters::SearchMethod::LS:
+    search_ls(best);
+    break;
+  }
+
   if (!validate_state(best)) {
     throw runtime_error("Invalid State!!!");
   }
