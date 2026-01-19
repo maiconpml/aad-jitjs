@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <vector>
 
+vector<unsigned> Solver::indeg;
+vector<unsigned> Solver::q;
+
 Solver::Solver(const Parameters &parameters) : params(parameters) {}
 
 bool Solver::validate_state(const State &state) const {
