@@ -15,6 +15,9 @@ private:
   // current best solution found
   State best;
 
+  static vector<unsigned> indeg;
+  static vector<unsigned> q;
+
   // --------------------------- DISPATCHING RULES -----------------------------
 
   // returns index of operation with earliest due date in ops
@@ -43,12 +46,16 @@ private:
   // ------------------------------ NEIGHBORHOODS ------------------------------
 
   // swap operation op1 with operation op2
-  void swap_opers(State &state, const unsigned op1, const unsigned op2);
+  void swap_opers(State &state, const unsigned op1, const unsigned op2) const;
 
   // insert operation op1 in front of operation op2. If op2 equals 0, op1 will
   // be put at the beginning of the sequance
   void rm_insert_oper_after(State &state, const unsigned op1,
                             const unsigned op2);
+  // schedule operations as early as possible based on state sequence, return
+  // true if state has a cycle
+  bool sched_max_early(State &state) const;
+
   // verify if state satisfy the problem's constraints
   bool validate_state(const State &state) const;
 };
