@@ -2,7 +2,6 @@
 #include "Instance.hpp"
 #include "Parameters.hpp"
 #include "Timer.hpp"
-#include "Util.hpp"
 #include <stdexcept>
 #include <vector>
 
@@ -14,9 +13,9 @@ Solver::Solver(const Parameters &parameters) : params(parameters) {}
 bool Solver::validate_state(const State &state) const {
   const Instance &inst = Instance::getInstance();
 
-  vector<unsigned> topo(inst.O - 1);
+  vector<unsigned> topo;
 
-  if (Util::topo_sort(inst.job, state.mach, inst._job, state._mach, topo)) {
+  if (topo_sort(state, topo)) {
     return false;
   }
 
@@ -60,4 +59,57 @@ State Solver::solve() {
     throw runtime_error("Invalid State!!!");
   }
   return best;
+}
+
+bool Solver::topo_sort(const State &state, vector<unsigned int> &topo) {
+  const Instance &inst = Instance::getInstance();
+
+  if (indeg.size() < inst.O) {
+    indeg.resize(inst.O);
+  }
+  fill(indeg.begin(), indeg.end(), 0);
+
+  if (q.capacity() < inst.O) {
+    q.reserve(inst.O);
+  }
+  q.clear();
+
+  unsigned curOp;
+  unsigned newOp;
+  unsigned head = 0;
+
+  for (unsigned o = 1; o < inst.job.size(); o++) {
+    if (inst._job[o] != 0)
+      ++indeg[o];
+    if (state._mach[o] != 0)
+      ++indeg[o];
+    if (indeg[o] == 0) {
+      q.push_back(o);
+    }
+  }
+  assert(!q.empty());
+
+  while (!q.empty()) {
+    curOp = q[head++];
+
+    newOp = inst.job[curOp];
+    if (newOp) {
+      assert(indeg[newOp]);
+      --indeg[newOp];
+      if (!indeg[newOp])
+        q.push_back(newOp);
+    }
+
+    newOp = state.mach[curOp];
+    if (newOp) {
+      assert(indeg[newOp]);
+      --indeg[newOp];
+      if (!indeg[newOp])
+        q.push_back(newOp);
+    }
+  }
+
+  assert(topo.size() <= inst.job.size() - 1);
+
+  return topo.size() < inst.job.size() - 1;
 }

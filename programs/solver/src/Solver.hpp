@@ -56,6 +56,7 @@ private:
   void nhood_swap_adjacent(const State &sol, State &neighbor) const;
 
   // ------------------------------ SEARCH METHODS -----------------------------
+
   void search_ls(State &initialSol);
 
   // -------------------------------- SCHEDULERS -------------------------------
@@ -68,4 +69,8 @@ private:
 
   // verify if state satisfy the problem's constraints
   bool validate_state(const State &state) const;
+
+  // fills topo with topological sort and returns a boolean indicating if the
+  // current graph has one or more cycles
+  static bool topo_sort(const State &state, vector<unsigned int> &topo);
 };
