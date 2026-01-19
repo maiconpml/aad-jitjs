@@ -33,16 +33,12 @@ private:
 
   // generate a schedule using Giffler Thompson (1960) algorithm usin
   // dispatching rule dispatching
-  void
-  initial_gt(State &state,
-                   const Parameters::DispatchingRule dispatching_choosed) const;
+  void initial_gt(State &state) const;
 
   // constructs a solution based on dispatching rule in dispatching. At the end
   // of processing of each operation, uses the dispatching rule to selects next
   // operation for that machine.
-  void initial_constr_dispatch(
-      State &state,
-      const Parameters::DispatchingRule dispatching_choosed) const;
+  void initial_constr_dispatch(State &state) const;
 
   // ------------------------------ NEIGHBORHOODS ------------------------------
 

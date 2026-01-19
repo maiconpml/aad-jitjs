@@ -9,8 +9,7 @@
 #include <utility>
 #include <vector>
 
-void Solver::initial_gt(
-    State &state, const Parameters::DispatchingRule dispatching_choosed) const {
+void Solver::initial_gt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
   vector<unsigned> ready0(inst.roots);
@@ -31,7 +30,9 @@ void Solver::initial_gt(
       const State &, const vector<unsigned> &, const unsigned) const;
   DispatchPtr dispatching_rule;
 
-  switch (dispatching_choosed) {
+  Parameters::DispatchingRule paramDispatch = params.dispatchingRule;
+
+  switch (paramDispatch) {
   case Parameters::DispatchingRule::EDD:
     dispatching_rule = &Solver::dispatch_edd;
     break;
@@ -112,8 +113,7 @@ void Solver::initial_gt(
   state.calc_penalties();
 }
 
-void Solver::initial_constr_dispatch(
-    State &state, const Parameters::DispatchingRule dispatching_choosed) const {
+void Solver::initial_constr_dispatch(State &state) const {
   const Instance &inst = Instance::getInstance();
 
   // machLeafs[m] is last operation scheduled on machine m
@@ -136,7 +136,9 @@ void Solver::initial_constr_dispatch(
       const State &, const vector<unsigned> &, const unsigned) const;
   DispatchPtr dispatching_rule;
 
-  switch (dispatching_choosed) {
+  Parameters::DispatchingRule paramDispatch = params.dispatchingRule;
+
+  switch (paramDispatch) {
   case Parameters::DispatchingRule::EDD:
     dispatching_rule = &Solver::dispatch_edd;
     break;

@@ -31,10 +31,10 @@ State Solver::solve() {
 
   switch (params.initialSolution) {
   case Parameters::InitialSolution::GT:
-    initial_gt(best, params.dispatchingRule);
+    initial_gt(best);
     break;
   case Parameters::InitialSolution::CONSTR:
-    initial_constr_dispatch(best, params.dispatchingRule);
+    initial_constr_dispatch(best);
     break;
   }
   if (!validate_state(best)) {
