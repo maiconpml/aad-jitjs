@@ -1,5 +1,8 @@
 #include "State.hpp"
 #include "Instance.hpp"
+#include <cfloat>
+
+State::State() : penalties(DBL_MAX) {}
 
 double State::calc_penalties() {
   const Instance &inst = Instance::getInstance();

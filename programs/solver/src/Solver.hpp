@@ -51,7 +51,10 @@ private:
   // insert operation op1 in front of operation op2. If op2 equals 0, op1 will
   // be put at the beginning of the sequance
   void rm_insert_oper_after(State &state, const unsigned op1,
-                            const unsigned op2);
+                            const unsigned op2) const;
+
+  void nhood_swap_adjacent(const State &sol, State &neighbor) const;
+
   // schedule operations as early as possible based on state sequence, return
   // true if state has a cycle
   bool sched_max_early(State &state) const;

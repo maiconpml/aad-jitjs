@@ -6,6 +6,8 @@ using namespace std;
 
 class State {
 public:
+  State();
+
   // <Instance.O> mach[o] is next operation of operation o in its machine in
   // current State
   vector<unsigned> mach;
