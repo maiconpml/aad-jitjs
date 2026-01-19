@@ -43,6 +43,16 @@ private:
   void initial_constr_dispatch(
       State &state,
       const Parameters::DispatchingRule dispatching_choosed) const;
+
+  // ------------------------------ NEIGHBORHOODS ------------------------------
+
+  // swap operation op1 with operation op2
+  void swap_opers(State &state, const unsigned op1, const unsigned op2);
+
+  // insert operation op1 in front of operation op2. If op2 equals 0, op1 will
+  // be put at the beginning of the sequance
+  void rm_insert_oper_after(State &state, const unsigned op1,
+                            const unsigned op2);
   // verify if state satisfy the problem's constraints
   bool validate_state(const State &state) const;
 };
