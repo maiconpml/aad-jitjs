@@ -26,4 +26,5 @@ public:
   unsigned currentNHood;
   unsigned maxMilli;
   unsigned seed;
+  bool autoConfig;
 };
