@@ -70,9 +70,10 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
       j = curState.mach[o];
       if (j) {
         swap_opers(curState, i, j);
-        sched_max_early(curState);
-        if (curState.penalties < bestNeighbor.penalties) {
-          bestNeighbor = curState;
+        if (!sched_max_early(curState)) {
+          if (curState.penalties < bestNeighbor.penalties) {
+            bestNeighbor = curState;
+          }
         }
         swap_opers(curState, j, i);
       }
@@ -88,9 +89,11 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
     shuffle(neighborsMoves.begin(), neighborsMoves.end(), Random::getEngine());
     for (pair<unsigned, unsigned> move : neighborsMoves) {
       swap_opers(curState, move.first, move.second);
-      sched_max_early(curState);
-      if (curState.penalties < bestNeighbor.penalties) {
-        bestNeighbor = curState;
+      if (!sched_max_early(curState)) {
+        if (curState.penalties < state.penalties) {
+          neighbor = curState;
+          return;
+        }
       }
       swap_opers(curState, move.first, move.second);
     }
