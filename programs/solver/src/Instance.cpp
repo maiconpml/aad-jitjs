@@ -43,6 +43,9 @@ void Instance::parse(const string &filePath) {
   stream >> J;
   stream >> M;
 
+  jobOpers.resize(J, vector<unsigned>());
+  machOpers.resize(M, vector<unsigned>());
+
   jmToOper.resize(extents[J][M]);
 
   for (unsigned j = 0; j < J; ++j) {
@@ -50,9 +53,11 @@ void Instance::parse(const string &filePath) {
     roots.push_back(O);
     for (unsigned m = 0; m < M; ++m) {
       operToJ.push_back(j);
+      jobOpers[j].push_back(O);
       stream >> buffer;
       jmToOper[j][buffer] = O;
       operToM.push_back(buffer);
+      machOpers[buffer].push_back(O);
       stream >> buffer;
       assert(buffer != 0);
       P.push_back(buffer);

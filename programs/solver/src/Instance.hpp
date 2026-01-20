@@ -34,6 +34,10 @@ public:
   vector<unsigned> roots;
   // <J> roots[j] is last operation of job j
   vector<unsigned> leafs;
+  // <J> jobOpers[j] is list of operations of job j
+  vector<vector<unsigned>> jobOpers;
+  // <M> machOpers[m] is list of operations of machine m
+  vector<vector<unsigned>> machOpers;
   // <O> deadlines[o] is the due time of operation of operation o
   vector<unsigned> deadlines;
   // <O> earlCoefs[o] is the earliness coefficient of operation o
