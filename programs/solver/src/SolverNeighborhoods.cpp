@@ -102,5 +102,22 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
     break;
   }
 
-  neighbor = bestNeighbor;
+void Solver::nhood_swap_random(const State &state, State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  State curState = state;
+  unsigned nMoves = 2 * inst.O;
+  unsigned op1, op2;
+  while (--nMoves) {
+    op1 = Random::get(1, inst.O - 1);
+    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
+    swap_opers(curState, op1, op2);
+    if (!sched_max_early(curState)) {
+      if (curState.penalties < state.penalties) {
+        neighbor = curState;
+        return;
+      }
+    }
+    swap_opers(curState, op1, op2);
+  }
 }

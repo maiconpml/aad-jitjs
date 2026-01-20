@@ -55,6 +55,8 @@ private:
 
   void nhood_swap_adjacent(const State &sol, State &neighbor) const;
 
+  void nhood_swap_random(const State &sol, State &neighbor) const;
+
   // ------------------------------ SEARCH METHODS -----------------------------
 
   void search_ls(State &initialSol);
