@@ -28,4 +28,7 @@ public:
   // returns the total penalties of current schedule. Also updates the
   // corresponding attributes with the new penalties values
   double calc_penalties();
+
+  // only compare the machine ordering
+  bool operator==(const State &s);
 };

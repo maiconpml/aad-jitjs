@@ -1,12 +1,13 @@
 #include "State.hpp"
 #include "Instance.hpp"
+#include "Solver.hpp"
 #include <cfloat>
 
 State::State() : penalties(DBL_MAX) {}
 
 double State::calc_penalties() {
   const Instance &inst = Instance::getInstance();
-  int curTard, curEarl;
+  unsigned curTard, curEarl;
   tPenalty = 0;
   ePenalty = 0;
   for (unsigned o = 1; o < starts.size(); ++o) {
@@ -20,4 +21,13 @@ double State::calc_penalties() {
 
   penalties = ePenalty + tPenalty;
   return penalties;
+}
+
+bool State::operator==(const State &s) {
+  for (unsigned o = 1; o < mach.size(); ++o) {
+    if (mach[o] != s.mach[o] || _mach[o] != s._mach[o])
+      return false;
+  }
+
+  return true;
 }

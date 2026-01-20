@@ -123,5 +123,28 @@ void Solver::nhood_swap_random(const State &state, State &neighbor) const {
       }
     }
     swap_opers(curState, op1, op2);
+    assert(curState == state);
+  }
+}
+
+void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  State curState = state;
+  unsigned nMoves = 2 * inst.O;
+  unsigned op1, op2, prevOp2;
+  while (--nMoves) {
+    op1 = Random::get(inst.O);
+    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
+    prevOp2 = curState._mach[op2];
+    rm_insert_oper_after(curState, op2, op1);
+    if (!sched_max_early(curState)) {
+      if (curState.penalties < state.penalties) {
+        neighbor = curState;
+        return;
+      }
+    }
+    rm_insert_oper_after(curState, op2, prevOp2);
+    assert(curState == state);
   }
 }

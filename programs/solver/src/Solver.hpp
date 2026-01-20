@@ -57,6 +57,8 @@ private:
 
   void nhood_swap_random(const State &sol, State &neighbor) const;
 
+  void nhood_rm_insert_random(const State &state, State &neighbor) const;
+
   // ------------------------------ SEARCH METHODS -----------------------------
 
   void search_ls(State &initialSol);
