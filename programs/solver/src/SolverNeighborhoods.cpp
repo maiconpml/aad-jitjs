@@ -4,6 +4,7 @@
 #include "Solver.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <queue>
 #include <utility>
 
@@ -147,4 +148,86 @@ void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
     rm_insert_oper_after(curState, op2, prevOp2);
     assert(curState == state);
   }
+}
+
+void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  Parameters::NHoodTraversing paramTravers =
+      params.nHoodsTraversings[params.currentNHood];
+
+  State curState = state;
+  State bestState;
+
+  // checked[o] == true means that operation o was already verified and if it
+  // was possible this swap has already been tested
+  vector<bool> checked(inst.O, false);
+  // store the operations that not have been picked by the rng, these operations
+  // may or may not be checked
+  vector<unsigned> notSelected;
+  notSelected.reserve(inst.O);
+
+  // operations on time don't need to be verified
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] == inst.deadlines[o])
+      checked[o] = true;
+    else
+      notSelected.push_back(o);
+  }
+
+  while (!notSelected.empty()) {
+    // pick an random operation and remove it from notSelected
+    unsigned curOpIdx = Random::get((uint32_t)notSelected.size());
+    unsigned curOp = notSelected[curOpIdx];
+    notSelected[curOpIdx] = notSelected.back();
+    notSelected.pop_back();
+
+    bool isCurOpEarly =
+        state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
+
+    // while operation exists and is not checked
+    while (curOp && !checked[curOp]) {
+      checked[curOp] = true;
+
+      // if operation is early (tardy) and it's machine successor (predecessor)
+      // exists and is adjecent with curOp, that is, starts (ends) exactly when
+      // curOp ends (starts), choose successor (predecessor) as swap candidate
+      unsigned swapOpCand = 0;
+      if (isCurOpEarly && state.mach[curOp] &&
+          state.starts[curOp] + inst.P[curOp] ==
+              state.starts[state.mach[curOp]]) {
+        swapOpCand = state.mach[curOp];
+      } else if (state._mach[curOp] &&
+                 state.starts[curOp] == state.starts[state._mach[curOp]] +
+                                            inst.P[state._mach[curOp]]) {
+        swapOpCand = state._mach[curOp];
+      }
+
+      // if swap candidate was selected, execute swap, verify improvement on
+      // generated neighbor and undo de swap movement
+      if (swapOpCand) {
+        swap_opers(curState, curOp, swapOpCand);
+        sched_max_early(curState);
+        if (curState.penalties < bestState.penalties) {
+          if (paramTravers == Parameters::NHoodTraversing::FI &&
+              curState.penalties < state.penalties) {
+            neighbor = curState;
+            return;
+          }
+          bestState = curState;
+        }
+        swap_opers(curState, curOp, swapOpCand);
+        break;
+      }
+
+      // follow job sequence to find a swap candidate
+      if (isCurOpEarly) {
+        curOp = inst.job[curOp];
+      } else {
+        curOp = inst._job[curOp];
+      }
+    }
+  }
+
+  neighbor = bestState;
 }

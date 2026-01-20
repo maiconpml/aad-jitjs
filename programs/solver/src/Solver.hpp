@@ -59,6 +59,8 @@ private:
 
   void nhood_rm_insert_random(const State &state, State &neighbor) const;
 
+  void nhood_swap_earl_late(const State &state, State &neighbor) const;
+
   // ------------------------------ SEARCH METHODS -----------------------------
 
   void search_ls(State &initialSol);
