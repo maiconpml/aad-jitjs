@@ -12,20 +12,29 @@
 void Solver::initial_gt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
-  vector<unsigned> ready0(inst.roots);
+  // ready0[m] contains all operations available to be scheduled on machine m
+  vector<vector<unsigned>> ready0(inst.M, vector<unsigned>());
+  // contains operations filtred from ready0 during execution
   vector<unsigned> ready1;
-  vector<unsigned> ready2;
+  // <inst.M> machLeafs[m] is last operation scheduled on machine m
   vector<unsigned> machLeafs(inst.M, 0);
 
   unsigned compTime;
   unsigned earlComp;
   unsigned selMach = 0;
   unsigned auxStartTime;
+  unsigned numScheduled = 0;
+
+  // at start, all job's first operations are available to be processed
+  for (unsigned o : inst.roots) {
+    ready0[inst.operToM[o]].push_back(o);
+  }
 
   state.starts.resize(inst.O, 0);
   state.mach.resize(inst.O, 0);
   state._mach.resize(inst.O, 0);
 
+  // Selecting dispatching rule for scheduling
   using DispatchPtr = unsigned (Solver::*)(
       const State &, const vector<unsigned> &, const unsigned) const;
   DispatchPtr dispatching_rule;
@@ -44,69 +53,74 @@ void Solver::initial_gt(State &state) const {
     break;
   }
 
-  while (!ready0.empty()) {
+  while (numScheduled < inst.O) {
 
     earlComp = UINT_MAX;
 
     ready1.clear();
-    ready2.clear();
 
-    for (unsigned op : ready0) {
-      assert(op < inst.O);
-      unsigned jobCompTime =
-          state.starts[inst._job[op]] + inst.P[inst._job[op]];
-      unsigned machCompTime = state.starts[machLeafs[inst.operToM[op]]] +
-                              inst.P[machLeafs[inst.operToM[op]]];
-      compTime = max(jobCompTime, machCompTime) + inst.P[op];
-      if (compTime < earlComp) {
-        earlComp = compTime;
-        selMach = inst.operToM[op];
-      }
-    }
-
-    for (unsigned op : ready0) {
-      if (inst.operToM[op] == selMach) {
-        ready1.push_back(op);
+    // find earliest completion time among schedulable operations
+    for (const vector<unsigned> &ops : ready0) {
+      for (unsigned op : ops) {
+        assert(op < inst.O);
+        unsigned jobCompTime =
+            state.starts[inst._job[op]] + inst.P[inst._job[op]];
+        unsigned machCompTime = state.starts[machLeafs[inst.operToM[op]]] +
+                                inst.P[machLeafs[inst.operToM[op]]];
+        compTime = max(jobCompTime, machCompTime) + inst.P[op];
+        if (compTime < earlComp) {
+          earlComp = compTime;
+          selMach = inst.operToM[op];
+        }
       }
     }
 
     unsigned machCompTime =
         state.starts[machLeafs[selMach]] + inst.P[machLeafs[selMach]];
 
-    for (unsigned op : ready1) {
+    // select operations that can start its processing before completion time of
+    // selected operation in previous loop and will be executed in same machine
+    for (unsigned op : ready0[selMach]) {
       unsigned jobCompTime =
           state.starts[inst._job[op]] + inst.P[inst._job[op]];
       auxStartTime = max(jobCompTime, machCompTime);
       if (auxStartTime < earlComp) {
-        ready2.push_back(op);
+        ready1.push_back(op);
       }
     }
 
-    assert(ready2.size());
+    assert(ready1.size());
 
+    // select operation by dispatching rule
     unsigned choosedOpIdx =
-        (this->*dispatching_rule)(state, ready2, machCompTime);
-    unsigned choosedOp = ready2[choosedOpIdx];
+        (this->*dispatching_rule)(state, ready1, machCompTime);
+    unsigned choosedOp = ready1[choosedOpIdx];
 
+    // set operation start time
     unsigned jobCompTime =
         state.starts[inst._job[choosedOp]] + inst.P[inst._job[choosedOp]];
     state.starts[choosedOp] = max(jobCompTime, machCompTime);
 
+    // add operation to machine ordering
     if (machLeafs[selMach]) {
       state.mach[machLeafs[selMach]] = choosedOp;
       state._mach[choosedOp] = machLeafs[selMach];
     }
 
+    // update last scheduled operation in selMach
     machLeafs[selMach] = choosedOp;
 
-    auto it = find(ready0.begin(), ready0.end(), choosedOp);
-    if (it != ready0.end() - 1) {
-      *it = ready0.back();
+    // remove scheduled operation from schedulable operations
+    auto it = find(ready0[selMach].begin(), ready0[selMach].end(), choosedOp);
+    if (it != ready0[selMach].end() - 1) {
+      *it = ready0[selMach].back();
     }
-    ready0.pop_back();
+    ready0[selMach].pop_back();
+    ++numScheduled;
 
+    // next operation on job is now available for processing if it exists
     if (inst.job[choosedOp]) {
-      ready0.push_back(inst.job[choosedOp]);
+      ready0[inst.operToM[inst.job[choosedOp]]].push_back(inst.job[choosedOp]);
     }
   }
 
