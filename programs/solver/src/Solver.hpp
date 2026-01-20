@@ -53,9 +53,9 @@ private:
   void rm_insert_oper_after(State &state, const unsigned op1,
                             const unsigned op2) const;
 
-  void nhood_swap_adjacent(const State &sol, State &neighbor) const;
+  void nhood_swap_adjacent(const State &state, State &neighbor) const;
 
-  void nhood_swap_random(const State &sol, State &neighbor) const;
+  void nhood_swap_random(const State &state, State &neighbor) const;
 
   void nhood_rm_insert_random(const State &state, State &neighbor) const;
 
