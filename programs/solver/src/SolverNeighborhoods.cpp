@@ -58,12 +58,10 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
-  vector<pair<unsigned, unsigned>> neighborsMoves;
-
-  State bestNeighbor;
   State curState = state;
   switch (paramTraversing) {
-  case Parameters::NHoodTraversing::BI:
+  case Parameters::NHoodTraversing::BI: {
+    State bestNeighbor;
     unsigned i, j;
     for (unsigned o = 1; o < state.mach.size(); ++o) {
       i = o;
@@ -78,16 +76,20 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
         swap_opers(curState, j, i);
       }
     }
+    neighbor = bestNeighbor;
     break;
-  case Parameters::NHoodTraversing::FI:
-    neighborsMoves.reserve(state.mach.size());
+  }
+  case Parameters::NHoodTraversing::FI: {
+    vector<pair<unsigned, unsigned>> neighborhoodMoves;
+    neighborhoodMoves.reserve(state.mach.size());
     for (unsigned o = 1; o < state.mach.size(); ++o) {
       if (curState.mach[o]) {
-        neighborsMoves.push_back(make_pair(o, curState.mach[o]));
+        neighborhoodMoves.push_back(make_pair(o, curState.mach[o]));
       }
     }
-    shuffle(neighborsMoves.begin(), neighborsMoves.end(), Random::getEngine());
-    for (pair<unsigned, unsigned> move : neighborsMoves) {
+    shuffle(neighborhoodMoves.begin(), neighborhoodMoves.end(),
+            Random::getEngine());
+    for (pair<unsigned, unsigned> move : neighborhoodMoves) {
       swap_opers(curState, move.first, move.second);
       if (!sched_max_early(curState)) {
         if (curState.penalties < state.penalties) {
@@ -98,9 +100,11 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
       swap_opers(curState, move.first, move.second);
     }
     break;
+  }
   case Parameters::NHoodTraversing::ELT_LIST:
     break;
   }
+}
 
 void Solver::nhood_swap_random(const State &state, State &neighbor) const {
   const Instance &inst = Instance::getInstance();
