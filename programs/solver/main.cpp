@@ -29,9 +29,10 @@ int main(int argc, char *argv[]) {
         "searchMethod", po::value<string>()->default_value("LS"),
         "search method (LS, ILS, TABU)")(
         "nhood", po::value<string>()->default_value("SWAP_ADJ"),
-        "neighborhood structure (SWAP_ADJ)")(
-        "nHoodTravers", po::value<string>()->default_value("BI"),
-        "neighborhood traversing (BI, FI, ELT_LIST)")(
+        "neighborhood structure (SWAP_ADJS, WAP_RAND, INSERT_RAND, SWAP_PENAL, "
+        "INSERT_PENAL)")("nHoodTravers",
+                         po::value<string>()->default_value("BI"),
+                         "neighborhood traversing (BI, FI, ELT_LIST)")(
         "autoConfig", po::bool_switch()->default_value(false),
         "print only the result for automatic configuration");
     po::positional_options_description pod;
@@ -92,6 +93,14 @@ int main(int argc, char *argv[]) {
     string nhoodStr = vm["nhood"].as<string>();
     if (nhoodStr == "SWAP_ADJ") {
       param.nHoods.push_back(Parameters::Neighborhood::SWAP_ADJ);
+    } else if (nhoodStr == "SWAP_RAND") {
+      param.nHoods.push_back(Parameters::Neighborhood::SWAP_RAND);
+    } else if (nhoodStr == "INSERT_RAND") {
+      param.nHoods.push_back(Parameters::Neighborhood::INSERT_RAND);
+    } else if (nhoodStr == "SWAP_PENAL") {
+      param.nHoods.push_back(Parameters::Neighborhood::SWAP_PENAL);
+    } else if (nhoodStr == "INSERT_PENAL") {
+      param.nHoods.push_back(Parameters::Neighborhood::INSERT_PENAL);
     } else {
       throw string("Invalid neighborhood: " + nhoodStr);
     }

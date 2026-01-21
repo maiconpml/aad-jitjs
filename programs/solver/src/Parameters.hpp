@@ -10,7 +10,13 @@ public:
 
   enum class DispatchingRule { EDD, ACS, RAND };
 
-  enum class Neighborhood { SWAP_ADJ, SWAP_RAND, INSERT_RAND };
+  enum class Neighborhood {
+    SWAP_ADJ,
+    SWAP_RAND,
+    INSERT_RAND,
+    SWAP_PENAL,
+    INSERT_PENAL
+  };
 
   enum class NHoodTraversing { BI, FI, ELT_LIST };
 

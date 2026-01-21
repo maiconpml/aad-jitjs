@@ -11,6 +11,19 @@ void Solver::search_ls(State &initialSol) {
   switch (paramNHood) {
   case Parameters::Neighborhood::SWAP_ADJ:
     nhood = &Solver::nhood_swap_adjacent;
+    break;
+  case Parameters::Neighborhood::SWAP_PENAL:
+    nhood = &Solver::nhood_swap_earl_late;
+    break;
+  case Parameters::Neighborhood::SWAP_RAND:
+    nhood = &Solver::nhood_swap_random;
+    break;
+  case Parameters::Neighborhood::INSERT_RAND:
+    nhood = &Solver::nhood_rm_insert_random;
+    break;
+  case Parameters::Neighborhood::INSERT_PENAL:
+    nhood = &Solver::nhood_insert_earl_late;
+    break;
   }
   best = initialSol;
   while (!Timer::isTimeExceeded(params.maxMilli)) {
