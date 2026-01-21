@@ -17,42 +17,71 @@ void Solver::swap_opers(State &state, const unsigned op1,
   assert(op2 < inst.O);
 #endif // NDEBUG
   assert(op1 * op2);
+  if (op1 == op2)
+    return;
   if (state.mach[op1] == op2) {
     rm_insert_oper_after(state, op1, op2);
   } else if (state.mach[op2] == op1) {
     rm_insert_oper_after(state, op2, op1);
   } else {
-    unsigned _machOp1 = state._mach[op1];
+    unsigned _machOp1 = state._mach[op1], machOp1 = state.mach[op1];
     rm_insert_oper_after(state, op1, op2);
-    rm_insert_oper_after(state, op2, _machOp1);
+    if (_machOp1)
+      rm_insert_oper_after(state, op2, _machOp1);
+    else {
+      rm_insert_oper_befor(state, op2, machOp1);
+    }
   }
-  // TODO: assert if schedule stills valid. There's no scheduler in the project
-  // yet.
 }
 
 void Solver::rm_insert_oper_after(State &state, const unsigned op1,
                                   const unsigned op2) const {
 #ifndef NDEBUG
   const Instance &inst = Instance::getInstance();
-  assert(inst.operToM[op1] == inst.operToM[op2] || op2 == 0);
+  assert(inst.operToM[op1] == inst.operToM[op2]);
   assert(op1 < inst.O);
   assert(op2 < inst.O);
 #endif // NDEBUG
   assert(op1);
-  unsigned machOp1 = state.mach[op1], _machOp1 = state._mach[op1],
-           machOp2 = state.mach[op2];
+  assert(op2);
+  if (op1 == op2)
+    return;
+  unsigned machOp1 = state.mach[op1], _machOp1 = state._mach[op1], machOp2;
   if (machOp1)
     state._mach[machOp1] = _machOp1;
   if (_machOp1)
     state.mach[_machOp1] = machOp1;
+  machOp2 = state.mach[op2];
   if (machOp2)
     state._mach[machOp2] = op1;
-  if (op2)
-    state.mach[op2] = op1;
+  state.mach[op2] = op1;
   state._mach[op1] = op2;
   state.mach[op1] = machOp2;
-  // TODO: assert if schedule stills valid. There's no scheduler in the project
-  // yet.
+}
+
+void Solver::rm_insert_oper_befor(State &state, const unsigned op1,
+                                  const unsigned op2) const {
+#ifndef NDEBUG
+  const Instance &inst = Instance::getInstance();
+  assert(inst.operToM[op1] == inst.operToM[op2]);
+  assert(op1 < inst.O);
+  assert(op2 < inst.O);
+#endif // NDEBUG
+  assert(op1);
+  assert(op2);
+  if (op1 == op2)
+    return;
+  unsigned machOp1 = state.mach[op1], _machOp1 = state._mach[op1],
+           _machOp2 = state._mach[op2];
+  if (machOp1)
+    state._mach[machOp1] = _machOp1;
+  if (_machOp1)
+    state.mach[_machOp1] = machOp1;
+  if (_machOp2)
+    state.mach[_machOp2] = op1;
+  state._mach[op2] = op1;
+  state.mach[op1] = op2;
+  state._mach[op1] = _machOp2;
 }
 
 void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {

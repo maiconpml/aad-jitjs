@@ -48,9 +48,12 @@ private:
   // swap operation op1 with operation op2
   void swap_opers(State &state, const unsigned op1, const unsigned op2) const;
 
-  // insert operation op1 in front of operation op2. If op2 equals 0, op1 will
-  // be put at the beginning of the sequance
+  // insert operation op1 after operation op2.
   void rm_insert_oper_after(State &state, const unsigned op1,
+                            const unsigned op2) const;
+
+  // insert operation op1 before operation op2.
+  void rm_insert_oper_befor(State &state, const unsigned op1,
                             const unsigned op2) const;
 
   void nhood_swap_adjacent(const State &state, State &neighbor) const;
