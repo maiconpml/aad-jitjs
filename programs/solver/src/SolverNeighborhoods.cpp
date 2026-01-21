@@ -231,3 +231,121 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
 
   neighbor = bestState;
 }
+
+void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  Parameters::NHoodTraversing paramTravers =
+      params.nHoodsTraversings[params.currentNHood];
+
+  // machBlocks[b] are operations of block b sorted by start time
+  vector<vector<unsigned>> machBlocks;
+  // opToBlock[o] is block wich contain operation o
+  vector<unsigned> opToBlock(inst.O, 0);
+
+  State curState = state;
+  State bestState;
+
+  vector<unsigned> ops;
+  ops.reserve(inst.O - 1);
+
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] != inst.deadlines[o])
+      ops.push_back(o);
+  }
+  if (paramTravers == Parameters::NHoodTraversing::FI) {
+    shuffle(ops.begin(), ops.end(), Random::getEngine());
+  }
+
+  // initialize machBlocks and opToBlock with state blocks of operations
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (!state._mach[o]) {
+      unsigned curOp = o;
+      opToBlock[o] = (unsigned)machBlocks.size();
+      machBlocks.push_back(vector<unsigned>(1, o));
+      unsigned machCurOp = state.mach[curOp];
+      while (curOp) {
+        machCurOp = state.mach[curOp];
+        if (machCurOp) {
+          if (state.starts[curOp] + inst.P[curOp] == state.starts[machCurOp]) {
+            opToBlock[machCurOp] = (unsigned)machBlocks.size() - 1;
+            machBlocks.back().push_back(machCurOp);
+          } else {
+            opToBlock[machCurOp] = (unsigned)machBlocks.size();
+            machBlocks.push_back(vector<unsigned>(1, machCurOp));
+          }
+        }
+        curOp = machCurOp;
+      }
+    }
+  }
+
+  // check each operation for remove/insertion procedure
+  for (unsigned i = 0; i < ops.size(); ++i) {
+    unsigned curOp = ops[i];
+
+    bool isCurOpEarly =
+        state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
+
+    // impossible to perform any move
+    if (machBlocks[opToBlock[curOp]].size() == 1)
+      continue;
+
+    unsigned insertOpCand;
+    if (isCurOpEarly) {
+      insertOpCand = machBlocks[opToBlock[curOp]].back();
+      // if operation has a job successor and the last operation of current
+      // block starts after this job successor, search for first operation on
+      // block that starts before JS from last until curOp
+      if (inst.job[curOp] &&
+          state.starts[insertOpCand] > state.starts[inst.job[curOp]]) {
+        int j = machBlocks[opToBlock[curOp]].size() - 1;
+        // TODO: it's possible to perform binary search
+        while (machBlocks[opToBlock[curOp]][j] != curOp &&
+               state.starts[machBlocks[opToBlock[curOp]][j]] >
+                   state.starts[inst.job[curOp]]) {
+          insertOpCand = machBlocks[opToBlock[curOp]][j--];
+        }
+      }
+    } else {
+      insertOpCand = machBlocks[opToBlock[curOp]].front();
+      // if operation has a job predecessor and the first operation of current
+      // block ends before this job successor, search for first operation on
+      // block that starts before JS from first until curOp
+      if (inst._job[curOp] &&
+          state.starts[insertOpCand] + inst.P[insertOpCand] <
+              state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
+        int j = 0;
+        // TODO: it's possible to perform binary search
+        while (machBlocks[opToBlock[curOp]][j] != curOp &&
+               state.starts[machBlocks[opToBlock[curOp]][j]] +
+                       inst.P[machBlocks[opToBlock[curOp]][j]] <
+                   state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
+          insertOpCand = machBlocks[opToBlock[curOp]][j++];
+        }
+      }
+      insertOpCand = state._mach[insertOpCand];
+    }
+
+    // neighbor == state
+    if (insertOpCand == state._mach[curOp])
+      continue;
+
+    // perform remove/insertion, verify improvement on neighbor and undo
+    // remove/insertion
+    unsigned prevCurOp = inst._job[curOp];
+    rm_insert_oper_after(curState, curOp, insertOpCand);
+    sched_max_early(curState);
+    if (curState.penalties < bestState.penalties) {
+      if (paramTravers == Parameters::NHoodTraversing::FI &&
+          curState.penalties < state.penalties) {
+        neighbor = curState;
+        return;
+      }
+      bestState = curState;
+    }
+    rm_insert_oper_after(curState, curOp, prevCurOp);
+  }
+
+  neighbor = bestState;
+}
