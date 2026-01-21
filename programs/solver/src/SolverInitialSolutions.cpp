@@ -201,7 +201,8 @@ void Solver::initial_constr_dispatch(State &state) const {
       // schedules selected operation
       state.starts[op] = max(machineStartTime, state.starts[inst._job[op]] +
                                                    inst.P[inst._job[op]]);
-      state.mach[machLeafs[curMach]] = op;
+      if (machLeafs[curMach])
+        state.mach[machLeafs[curMach]] = op;
       state._mach[op] = machLeafs[curMach];
       machLeafs[curMach] = op;
 
