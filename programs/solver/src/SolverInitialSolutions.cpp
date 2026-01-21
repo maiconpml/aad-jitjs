@@ -53,7 +53,7 @@ void Solver::initial_gt(State &state) const {
     break;
   }
 
-  while (numScheduled < inst.O) {
+  while (numScheduled < inst.O - 1) {
 
     earlComp = UINT_MAX;
 
@@ -75,6 +75,7 @@ void Solver::initial_gt(State &state) const {
       }
     }
 
+    assert(ready0[selMach].size());
     unsigned machCompTime =
         state.starts[machLeafs[selMach]] + inst.P[machLeafs[selMach]];
 
