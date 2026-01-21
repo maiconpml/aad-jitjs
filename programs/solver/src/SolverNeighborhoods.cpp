@@ -34,7 +34,7 @@ void Solver::rm_insert_oper_after(State &state, const unsigned op1,
                                   const unsigned op2) const {
 #ifndef NDEBUG
   const Instance &inst = Instance::getInstance();
-  assert(inst.operToM[op1] == inst.operToM[op2]);
+  assert(inst.operToM[op1] == inst.operToM[op2] || op2 == 0);
   assert(op1 < inst.O);
   assert(op2 < inst.O);
 #endif // NDEBUG
