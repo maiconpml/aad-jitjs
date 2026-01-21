@@ -162,19 +162,24 @@ void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
 
   State curState = state;
   unsigned nMoves = 2 * inst.O;
-  unsigned op1, op2, prevOp2;
+  unsigned op1, op2, machOp1, _machOp1;
   while (--nMoves) {
-    op1 = Random::get(inst.O);
+    op1 = Random::get(1, inst.O - 1);
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
-    prevOp2 = curState._mach[op2];
-    rm_insert_oper_after(curState, op2, op1);
-    if (!sched_max_early(curState)) {
+    _machOp1 = curState._mach[op1];
+    machOp1 = curState.mach[op1];
+    rm_insert_oper_after(curState, op1, op2);
+    if (curState.mach[op2] != op1 && !sched_max_early(curState)) {
+      assert(validate_state(curState));
       if (curState.penalties < state.penalties) {
         neighbor = curState;
         return;
       }
     }
-    rm_insert_oper_after(curState, op2, prevOp2);
+    if (_machOp1)
+      rm_insert_oper_after(curState, op1, _machOp1);
+    else
+      rm_insert_oper_befor(curState, op1, machOp1);
     assert(curState == state);
   }
 }
