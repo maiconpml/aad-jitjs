@@ -6,7 +6,7 @@ State::State() : penalties(DBL_MAX) {}
 
 double State::calc_penalties() {
   const Instance &inst = Instance::getInstance();
-  unsigned curTard, curEarl;
+  int curTard, curEarl;
   tPenalty = 0;
   ePenalty = 0;
   for (unsigned o = 1; o < starts.size(); ++o) {
