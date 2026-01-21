@@ -17,6 +17,7 @@ RESULT=$($EXE "$INSTANCE" --seed "$SEED" --maxMilli 1000 --autoConfig $CONFIG_PA
 
 if [ $? -ne 0 ]; then
     echo "Solver failed" >&2
+    echo "$RESULT" >&2
     exit 1
 fi
 

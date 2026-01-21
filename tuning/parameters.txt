@@ -2,5 +2,5 @@
 initSol                "--initSol "        c     (GT, CONSTR)
 dispatchRule           "--dispatchRule "   c     (EDD, ACS, RAND)
 searchMethod           "--searchMethod "   c     (LS)
-nhood                  "--nhood "          c     (SWAP_ADJ)
-nHoodTravers           "--nHoodTravers "   c     (BI, FI)
+nhood                  "--nhood "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL)
+nHoodTravers           "--nHoodTravers "   c     (BI, FI) | nhood %in% c("SWAP_ADJ", "SWAP_PENAL", "INSERT_PENAL")
