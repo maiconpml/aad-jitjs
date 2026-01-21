@@ -80,5 +80,5 @@ private:
 
   // fills topo with topological sort and returns a boolean indicating if the
   // current graph has one or more cycles
-  static bool topo_sort(const State &state, vector<unsigned int> &topo);
+  static bool topo_sort(const State &state);
 };

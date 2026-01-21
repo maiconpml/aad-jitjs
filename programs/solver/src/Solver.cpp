@@ -13,13 +13,11 @@ Solver::Solver(const Parameters &parameters) : params(parameters) {}
 bool Solver::validate_state(const State &state) const {
   const Instance &inst = Instance::getInstance();
 
-  vector<unsigned> topo;
-
-  if (topo_sort(state, topo)) {
+  if (topo_sort(state)) {
     return false;
   }
 
-  for (unsigned o : topo) {
+  for (unsigned o : q) {
     if (inst.job[o] && state.starts[o] + inst.P[o] > state.starts[inst.job[o]])
       return false;
     if (state.mach[o] &&
@@ -45,7 +43,7 @@ State Solver::solve() {
 
 #ifndef NDEBUG
   if (!validate_state(best)) {
-    throw runtime_error("Invalid State!!!");
+    throw runtime_error("Invalid Initial State!!!");
   }
 #endif // NDEBUG
 
@@ -61,7 +59,7 @@ State Solver::solve() {
   return best;
 }
 
-bool Solver::topo_sort(const State &state, vector<unsigned int> &topo) {
+bool Solver::topo_sort(const State &state) {
   const Instance &inst = Instance::getInstance();
 
   if (indeg.size() < inst.O) {
@@ -89,7 +87,7 @@ bool Solver::topo_sort(const State &state, vector<unsigned int> &topo) {
   }
   assert(!q.empty());
 
-  while (!q.empty()) {
+  while (head < q.size()) {
     curOp = q[head++];
 
     newOp = inst.job[curOp];
@@ -109,7 +107,7 @@ bool Solver::topo_sort(const State &state, vector<unsigned int> &topo) {
     }
   }
 
-  assert(topo.size() <= inst.job.size() - 1);
+  assert(head <= inst.O);
 
-  return topo.size() < inst.job.size() - 1;
+  return head < inst.O - 1;
 }
