@@ -122,6 +122,7 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
     for (pair<unsigned, unsigned> move : neighborhoodMoves) {
       swap_opers(curState, move.first, move.second);
       if (!sched_max_early(curState)) {
+        assert(validate_state(curState));
         if (curState.penalties < state.penalties) {
           neighbor = curState;
           return;
@@ -147,6 +148,7 @@ void Solver::nhood_swap_random(const State &state, State &neighbor) const {
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
     swap_opers(curState, op1, op2);
     if (!sched_max_early(curState)) {
+      assert(validate_state(curState));
       if (curState.penalties < state.penalties) {
         neighbor = curState;
         return;
@@ -241,14 +243,16 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
       // generated neighbor and undo de swap movement
       if (swapOpCand) {
         swap_opers(curState, curOp, swapOpCand);
-        sched_max_early(curState);
-        if (curState.penalties < bestState.penalties) {
-          if (paramTravers == Parameters::NHoodTraversing::FI &&
-              curState.penalties < state.penalties) {
-            neighbor = curState;
-            return;
+        if (!sched_max_early(curState)) {
+          assert(validate_state(curState));
+          if (curState.penalties < bestState.penalties) {
+            if (paramTravers == Parameters::NHoodTraversing::FI &&
+                curState.penalties < state.penalties) {
+              neighbor = curState;
+              return;
+            }
+            bestState = curState;
           }
-          bestState = curState;
         }
         swap_opers(curState, curOp, swapOpCand);
         break;
