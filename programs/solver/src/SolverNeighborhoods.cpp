@@ -304,6 +304,8 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
     if (machBlocks[opToBlock[curOp]].size() == 1)
       continue;
 
+    unsigned _machCurOp, machCurOp;
+
     unsigned insertOpCand;
     if (isCurOpEarly) {
       insertOpCand = machBlocks[opToBlock[curOp]].back();
@@ -320,6 +322,9 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
           insertOpCand = machBlocks[opToBlock[curOp]][j--];
         }
       }
+      machCurOp = curState.mach[curOp];
+      _machCurOp = curState._mach[curOp];
+      rm_insert_oper_after(curState, curOp, insertOpCand);
     } else {
       insertOpCand = machBlocks[opToBlock[curOp]].front();
       // if operation has a job predecessor and the first operation of current
@@ -337,27 +342,30 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
           insertOpCand = machBlocks[opToBlock[curOp]][j++];
         }
       }
-      insertOpCand = state._mach[insertOpCand];
+      machCurOp = curState.mach[curOp];
+      _machCurOp = curState._mach[curOp];
+      rm_insert_oper_befor(curState, curOp, insertOpCand);
     }
 
-    // neighbor == state
-    if (insertOpCand == state._mach[curOp])
+    if (curOp == insertOpCand)
       continue;
 
-    // perform remove/insertion, verify improvement on neighbor and undo
-    // remove/insertion
-    unsigned prevCurOp = inst._job[curOp];
-    rm_insert_oper_after(curState, curOp, insertOpCand);
-    sched_max_early(curState);
-    if (curState.penalties < bestState.penalties) {
-      if (paramTravers == Parameters::NHoodTraversing::FI &&
-          curState.penalties < state.penalties) {
-        neighbor = curState;
-        return;
+    // verify improvement on neighbor and undo remove/insertion
+    if (!sched_max_early(curState)) {
+      assert(validate_state(curState));
+      if (curState.penalties < bestState.penalties) {
+        if (paramTravers == Parameters::NHoodTraversing::FI &&
+            curState.penalties < curState.penalties) {
+          neighbor = curState;
+          return;
+        }
+        bestState = curState;
       }
-      bestState = curState;
     }
-    rm_insert_oper_after(curState, curOp, prevCurOp);
+    if (_machCurOp)
+      rm_insert_oper_after(curState, curOp, _machCurOp);
+    else
+      rm_insert_oper_befor(curState, curOp, machCurOp);
   }
 
   neighbor = bestState;
