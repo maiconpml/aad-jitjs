@@ -257,28 +257,7 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
     shuffle(ops.begin(), ops.end(), Random::getEngine());
   }
 
-  // initialize machBlocks and opToBlock with state blocks of operations
-  for (unsigned o = 1; o < inst.O; ++o) {
-    if (!state._mach[o]) {
-      unsigned curOp = o;
-      opToBlock[o] = (unsigned)machBlocks.size();
-      machBlocks.push_back(vector<unsigned>(1, o));
-      unsigned machCurOp = state.mach[curOp];
-      while (curOp) {
-        machCurOp = state.mach[curOp];
-        if (machCurOp) {
-          if (state.starts[curOp] + inst.P[curOp] == state.starts[machCurOp]) {
-            opToBlock[machCurOp] = (unsigned)machBlocks.size() - 1;
-            machBlocks.back().push_back(machCurOp);
-          } else {
-            opToBlock[machCurOp] = (unsigned)machBlocks.size();
-            machBlocks.push_back(vector<unsigned>(1, machCurOp));
-          }
-        }
-        curOp = machCurOp;
-      }
-    }
-  }
+  state.find_blocks(machBlocks, opToBlock);
 
   // check each operation for remove/insertion procedure
   for (unsigned i = 0; i < ops.size(); ++i) {
