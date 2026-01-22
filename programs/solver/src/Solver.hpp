@@ -69,6 +69,8 @@ private:
 
   void nhood_oper_critical(const State &state, State &neighbor) const;
 
+  void nhood_oper_critical_alt(const State &state, State &neighbor) const;
+
   // ------------------------------ SEARCH METHODS -----------------------------
 
   void search_ls(State &initialSol);

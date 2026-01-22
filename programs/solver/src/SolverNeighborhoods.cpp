@@ -450,3 +450,73 @@ void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
   }
 }
 
+void Solver::nhood_oper_critical_alt(const State &state,
+                                     State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  Parameters::NHoodTraversing paramTravers =
+      params.nHoodsTraversings[params.currentNHood];
+
+  SchedPtr sched = get_sched_by_param();
+
+  // machBlocks[b] are operations of block b sorted by start time
+  vector<vector<unsigned>> machBlocks;
+  // opToBlock[o] is block wich contain operation o
+  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
+
+  State curState = state;
+  State bestState;
+
+  vector<unsigned> ops;
+  ops.reserve(inst.O - 1);
+
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] > inst.deadlines[o])
+      ops.push_back(o);
+  }
+  if (paramTravers == Parameters::NHoodTraversing::FI) {
+    shuffle(ops.begin(), ops.end(), Random::getEngine());
+  }
+
+  state.find_blocks(machBlocks, opToBlock);
+
+  for (unsigned i = 0; i < ops.size(); ++i) {
+    unsigned curOp = ops[i];
+
+    vector<unsigned> opCritic;
+    vector<pair<unsigned, unsigned>> cands;
+
+    opCritic.push_back(curOp);
+    while (inst._job[curOp] != 0 || state._mach[curOp] != 0) {
+
+      while (state._mach[curOp] &&
+             state.starts[state._mach[curOp]] + inst.P[state._mach[curOp]] >
+                 state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
+        opCritic.push_back(state._mach[curOp]);
+        curOp = state._mach[curOp];
+      }
+      if (opCritic.size() > 1)
+        cands.push_back(make_pair(opCritic[0], opCritic[1]));
+      if (opCritic.size() > 2)
+        cands.push_back(make_pair(opCritic[opCritic.size() - 1],
+                                  opCritic[opCritic.size() - 2]));
+
+      for (pair<unsigned, unsigned> cand : cands) {
+        swap_opers(curState, cand.first, cand.second);
+        if (!(this->*sched)(curState)) {
+          assert(validate_state(curState));
+          if (curState.penalties < state.penalties) {
+            neighbor = curState;
+            return;
+          }
+        }
+        swap_opers(curState, cand.first, cand.second);
+        assert(curState == state);
+      }
+
+      curOp = inst._job[curOp];
+      opCritic.clear();
+      cands.clear();
+    }
+  }
+}
