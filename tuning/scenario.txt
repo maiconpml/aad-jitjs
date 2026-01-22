@@ -1,7 +1,7 @@
 parameterFile = "parameters.txt"
 trainInstancesFile = "train-instances.txt"
 targetRunner = "./target-runner"
-maxExperiments = 10000
+maxExperiments = 50000
 testNbElites = 1
 deterministic = 1
 parallel = 8
