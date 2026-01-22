@@ -383,3 +383,70 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
 
   neighbor = bestState;
 }
+
+void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
+  const Instance &inst = Instance::getInstance();
+
+  Parameters::NHoodTraversing paramTravers =
+      params.nHoodsTraversings[params.currentNHood];
+
+  SchedPtr sched = get_sched_by_param();
+
+  // machBlocks[b] are operations of block b sorted by start time
+  vector<vector<unsigned>> machBlocks;
+  // opToBlock[o] is block wich contain operation o
+  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
+
+  State curState = state;
+  State bestState;
+
+  vector<unsigned> ops;
+  ops.reserve(inst.O - 1);
+
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] > inst.deadlines[o])
+      ops.push_back(o);
+  }
+  if (paramTravers == Parameters::NHoodTraversing::FI) {
+    shuffle(ops.begin(), ops.end(), Random::getEngine());
+  }
+
+  state.find_blocks(machBlocks, opToBlock);
+
+  vector<bool> isBlockChecked(machBlocks.size(), false);
+
+  vector<pair<unsigned, unsigned>> cands;
+  for (unsigned i = 0; i < ops.size(); ++i) {
+    unsigned curOp = ops[i];
+
+    unsigned curBlock;
+    unsigned curOpPos;
+    while (state._mach[curOp] || inst._job[curOp]) {
+      curBlock = opToBlock[curOp].first;
+      curOpPos = opToBlock[curOp].second;
+      if (curOpPos > 0)
+        cands.push_back(make_pair(machBlocks[curBlock][curOpPos],
+                                  machBlocks[curBlock][curOpPos - 1]));
+      if (curOpPos > 1)
+        cands.push_back(
+            make_pair(machBlocks[curBlock][0], machBlocks[curBlock][1]));
+
+      for (pair<unsigned, unsigned> cand : cands) {
+        swap_opers(curState, cand.first, cand.second);
+        if (!(this->*sched)(curState)) {
+          assert(validate_state(curState));
+          if (curState.penalties < state.penalties) {
+            neighbor = curState;
+            return;
+          }
+        }
+        swap_opers(curState, cand.first, cand.second);
+        assert(curState == state);
+      }
+
+      curOp = inst._job[machBlocks[curBlock][0]];
+      cands.clear();
+    }
+  }
+}
+

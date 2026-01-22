@@ -67,6 +67,8 @@ private:
 
   void nhood_insert_earl_late(const State &state, State &neighbor) const;
 
+  void nhood_oper_critical(const State &state, State &neighbor) const;
+
   // ------------------------------ SEARCH METHODS -----------------------------
 
   void search_ls(State &initialSol);
