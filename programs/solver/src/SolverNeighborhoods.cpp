@@ -71,12 +71,12 @@ void Solver::rm_insert_oper_befor(State &state, const unsigned op1,
   assert(op2);
   if (op1 == op2)
     return;
-  unsigned machOp1 = state.mach[op1], _machOp1 = state._mach[op1],
-           _machOp2 = state._mach[op2];
+  unsigned machOp1 = state.mach[op1], _machOp1 = state._mach[op1], _machOp2;
   if (machOp1)
     state._mach[machOp1] = _machOp1;
   if (_machOp1)
     state.mach[_machOp1] = machOp1;
+  _machOp2 = state._mach[op2];
   if (_machOp2)
     state.mach[_machOp2] = op1;
   state._mach[op2] = op1;
