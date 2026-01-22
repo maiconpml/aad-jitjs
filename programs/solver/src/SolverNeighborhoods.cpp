@@ -88,6 +88,20 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
+  Parameters::Scheduler paramSched = params.sched;
+
+  using SchedPtr = bool (Solver::*)(State &) const;
+  SchedPtr sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    sched = &Solver::sched_max_early;
+    break;
+  case Parameters::Scheduler::CPLEX:
+    sched = &Solver::sched_cplex;
+    break;
+  }
+
   State curState = state;
   switch (paramTraversing) {
   case Parameters::NHoodTraversing::BI: {
@@ -98,7 +112,7 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
       j = curState.mach[o];
       if (j) {
         swap_opers(curState, i, j);
-        if (!sched_max_early(curState)) {
+        if (!(this->*sched)(curState)) {
           if (curState.penalties < bestNeighbor.penalties) {
             bestNeighbor = curState;
           }
@@ -121,7 +135,7 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
             Random::getEngine());
     for (pair<unsigned, unsigned> move : neighborhoodMoves) {
       swap_opers(curState, move.first, move.second);
-      if (!sched_max_early(curState)) {
+      if (!(this->*sched)(curState)) {
         assert(validate_state(curState));
         if (curState.penalties < state.penalties) {
           neighbor = curState;
@@ -140,6 +154,19 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
 void Solver::nhood_swap_random(const State &state, State &neighbor) const {
   const Instance &inst = Instance::getInstance();
 
+  Parameters::Scheduler paramSched = params.sched;
+
+  using SchedPtr = bool (Solver::*)(State &) const;
+  SchedPtr sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    sched = &Solver::sched_max_early;
+    break;
+  case Parameters::Scheduler::CPLEX:
+    sched = &Solver::sched_cplex;
+    break;
+  }
   State curState = state;
   unsigned nMoves = 2 * inst.O;
   unsigned op1, op2;
@@ -147,7 +174,7 @@ void Solver::nhood_swap_random(const State &state, State &neighbor) const {
     op1 = Random::get(1, inst.O - 1);
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
     swap_opers(curState, op1, op2);
-    if (!sched_max_early(curState)) {
+    if (!(this->*sched)(curState)) {
       assert(validate_state(curState));
       if (curState.penalties < state.penalties) {
         neighbor = curState;
@@ -162,6 +189,20 @@ void Solver::nhood_swap_random(const State &state, State &neighbor) const {
 void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
   const Instance &inst = Instance::getInstance();
 
+  Parameters::Scheduler paramSched = params.sched;
+
+  using SchedPtr = bool (Solver::*)(State &) const;
+  SchedPtr sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    sched = &Solver::sched_max_early;
+    break;
+  case Parameters::Scheduler::CPLEX:
+    sched = &Solver::sched_cplex;
+    break;
+  }
+
   State curState = state;
   unsigned nMoves = 2 * inst.O;
   unsigned op1, op2, machOp1, _machOp1;
@@ -171,7 +212,7 @@ void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
     _machOp1 = curState._mach[op1];
     machOp1 = curState.mach[op1];
     rm_insert_oper_after(curState, op1, op2);
-    if (curState.mach[op2] != op1 && !sched_max_early(curState)) {
+    if (curState.mach[op2] != op1 && !(this->*sched)(curState)) {
       assert(validate_state(curState));
       if (curState.penalties < state.penalties) {
         neighbor = curState;
@@ -191,6 +232,20 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
+
+  Parameters::Scheduler paramSched = params.sched;
+
+  using SchedPtr = bool (Solver::*)(State &) const;
+  SchedPtr sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    sched = &Solver::sched_max_early;
+    break;
+  case Parameters::Scheduler::CPLEX:
+    sched = &Solver::sched_cplex;
+    break;
+  }
 
   State curState = state;
   State bestState;
@@ -243,7 +298,7 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
       // generated neighbor and undo de swap movement
       if (swapOpCand) {
         swap_opers(curState, curOp, swapOpCand);
-        if (!sched_max_early(curState)) {
+        if (!(this->*sched)(curState)) {
           assert(validate_state(curState));
           if (curState.penalties < bestState.penalties) {
             if (paramTravers == Parameters::NHoodTraversing::FI &&
@@ -275,6 +330,20 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
+
+  Parameters::Scheduler paramSched = params.sched;
+
+  using SchedPtr = bool (Solver::*)(State &) const;
+  SchedPtr sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    sched = &Solver::sched_max_early;
+    break;
+  case Parameters::Scheduler::CPLEX:
+    sched = &Solver::sched_cplex;
+    break;
+  }
 
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
@@ -355,7 +424,7 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
       continue;
 
     // verify improvement on neighbor and undo remove/insertion
-    if (!sched_max_early(curState)) {
+    if (!(this->*sched)(curState)) {
       assert(validate_state(curState));
       if (curState.penalties < bestState.penalties) {
         if (paramTravers == Parameters::NHoodTraversing::FI &&

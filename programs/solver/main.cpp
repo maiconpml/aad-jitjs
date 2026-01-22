@@ -33,6 +33,8 @@ int main(int argc, char *argv[]) {
         "INSERT_PENAL)")("nHoodTravers",
                          po::value<string>()->default_value("BI"),
                          "neighborhood traversing (BI, FI, ELT_LIST)")(
+        "sched", po::value<string>()->default_value("EARLY"),
+        "scheduler (EARLY, CPLEX)")(
         "autoConfig", po::bool_switch()->default_value(false),
         "print only the result for automatic configuration");
     po::positional_options_description pod;
@@ -115,6 +117,15 @@ int main(int argc, char *argv[]) {
       param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::ELT_LIST);
     } else {
       throw string("Invalid neighborhood traversing: " + nhoodTravStr);
+    }
+
+    string sched = vm["sched"].as<string>();
+    if (sched == "EARLY") {
+      param.sched = Parameters::Scheduler::EARLY;
+    } else if (sched == "CPLEX") {
+      param.sched = Parameters::Scheduler::CPLEX;
+    } else {
+      throw string("Invalid scheduler: " + sched);
     }
 
     Random::initialize(param.seed);

@@ -22,12 +22,15 @@ public:
 
   enum class SearchMethod { LS, ILS, TABU };
 
+  enum class Scheduler { EARLY, CPLEX };
+
   string instPath;
   InitialSolution initialSolution;
   DispatchingRule dispatchingRule;
   vector<Neighborhood> nHoods;
   vector<NHoodTraversing> nHoodsTraversings;
   vector<SearchMethod> searchMethods;
+  Scheduler sched;
   unsigned currentSearchMethod;
   unsigned currentNHood;
   unsigned maxMilli;
