@@ -24,7 +24,14 @@ void Solver::search_ls(State &initialSol) {
   case Parameters::Neighborhood::INSERT_PENAL:
     nhood = &Solver::nhood_insert_earl_late;
     break;
+  case Parameters::Neighborhood::CRITICAL_OPER:
+    nhood = &Solver::nhood_oper_critical;
+    break;
+  case Parameters::Neighborhood::CRITICAL_OPER_ALT:
+    nhood = &Solver::nhood_oper_critical_alt;
+    break;
   }
+
   best = initialSol;
   while (!Timer::isTimeExceeded(params.maxMilli)) {
 

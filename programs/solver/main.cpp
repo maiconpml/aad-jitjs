@@ -30,9 +30,9 @@ int main(int argc, char *argv[]) {
         "search method (LS, ILS, TABU)")(
         "nhood", po::value<string>()->default_value("SWAP_ADJ"),
         "neighborhood structure (SWAP_ADJS, WAP_RAND, INSERT_RAND, SWAP_PENAL, "
-        "INSERT_PENAL)")("nHoodTravers",
-                         po::value<string>()->default_value("BI"),
-                         "neighborhood traversing (BI, FI, ELT_LIST)")(
+        "INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT)")(
+        "nHoodTravers", po::value<string>()->default_value("BI"),
+        "neighborhood traversing (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
         "scheduler (EARLY, CPLEX)")(
         "autoConfig", po::bool_switch()->default_value(false),
@@ -103,6 +103,10 @@ int main(int argc, char *argv[]) {
       param.nHoods.push_back(Parameters::Neighborhood::SWAP_PENAL);
     } else if (nhoodStr == "INSERT_PENAL") {
       param.nHoods.push_back(Parameters::Neighborhood::INSERT_PENAL);
+    } else if (nhoodStr == "CRITICAL_OPER") {
+      param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER);
+    } else if (nhoodStr == "CRITICAL_OPER_ALT") {
+      param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER_ALT);
     } else {
       throw string("Invalid neighborhood: " + nhoodStr);
     }
