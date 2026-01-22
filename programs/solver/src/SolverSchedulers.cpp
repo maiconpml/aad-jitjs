@@ -160,3 +160,15 @@ bool Solver::sched_cplex(State &state) const {
 
   return false;
 }
+
+Solver::SchedPtr Solver::get_sched_by_param() const {
+
+  Parameters::Scheduler paramSched = params.sched;
+
+  switch (paramSched) {
+  case Parameters::Scheduler::EARLY:
+    return &Solver::sched_max_early;
+  case Parameters::Scheduler::CPLEX:
+    return &Solver::sched_cplex;
+  }
+}

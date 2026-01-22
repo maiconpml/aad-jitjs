@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <queue>
 #include <utility>
 
 void Solver::swap_opers(State &state, const unsigned op1,
@@ -88,19 +87,7 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
-  Parameters::Scheduler paramSched = params.sched;
-
-  using SchedPtr = bool (Solver::*)(State &) const;
-  SchedPtr sched;
-
-  switch (paramSched) {
-  case Parameters::Scheduler::EARLY:
-    sched = &Solver::sched_max_early;
-    break;
-  case Parameters::Scheduler::CPLEX:
-    sched = &Solver::sched_cplex;
-    break;
-  }
+  SchedPtr sched = get_sched_by_param();
 
   State curState = state;
   switch (paramTraversing) {
@@ -154,19 +141,8 @@ void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
 void Solver::nhood_swap_random(const State &state, State &neighbor) const {
   const Instance &inst = Instance::getInstance();
 
-  Parameters::Scheduler paramSched = params.sched;
+  SchedPtr sched = get_sched_by_param();
 
-  using SchedPtr = bool (Solver::*)(State &) const;
-  SchedPtr sched;
-
-  switch (paramSched) {
-  case Parameters::Scheduler::EARLY:
-    sched = &Solver::sched_max_early;
-    break;
-  case Parameters::Scheduler::CPLEX:
-    sched = &Solver::sched_cplex;
-    break;
-  }
   State curState = state;
   unsigned nMoves = 2 * inst.O;
   unsigned op1, op2;
@@ -189,19 +165,7 @@ void Solver::nhood_swap_random(const State &state, State &neighbor) const {
 void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
   const Instance &inst = Instance::getInstance();
 
-  Parameters::Scheduler paramSched = params.sched;
-
-  using SchedPtr = bool (Solver::*)(State &) const;
-  SchedPtr sched;
-
-  switch (paramSched) {
-  case Parameters::Scheduler::EARLY:
-    sched = &Solver::sched_max_early;
-    break;
-  case Parameters::Scheduler::CPLEX:
-    sched = &Solver::sched_cplex;
-    break;
-  }
+  SchedPtr sched = get_sched_by_param();
 
   State curState = state;
   unsigned nMoves = 2 * inst.O;
@@ -233,19 +197,7 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
-  Parameters::Scheduler paramSched = params.sched;
-
-  using SchedPtr = bool (Solver::*)(State &) const;
-  SchedPtr sched;
-
-  switch (paramSched) {
-  case Parameters::Scheduler::EARLY:
-    sched = &Solver::sched_max_early;
-    break;
-  case Parameters::Scheduler::CPLEX:
-    sched = &Solver::sched_cplex;
-    break;
-  }
+  SchedPtr sched = get_sched_by_param();
 
   State curState = state;
   State bestState;
@@ -331,19 +283,7 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
-  Parameters::Scheduler paramSched = params.sched;
-
-  using SchedPtr = bool (Solver::*)(State &) const;
-  SchedPtr sched;
-
-  switch (paramSched) {
-  case Parameters::Scheduler::EARLY:
-    sched = &Solver::sched_max_early;
-    break;
-  case Parameters::Scheduler::CPLEX:
-    sched = &Solver::sched_cplex;
-    break;
-  }
+  SchedPtr sched = get_sched_by_param();
 
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;

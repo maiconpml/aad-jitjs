@@ -18,6 +18,7 @@ private:
   static vector<unsigned> indeg;
   static vector<unsigned> q;
 
+  using SchedPtr = bool (Solver::*)(State &) const;
   // --------------------------- DISPATCHING RULES -----------------------------
 
   // returns index of operation with earliest due date in ops
@@ -78,6 +79,8 @@ private:
 
   // schedule operations using MIP solver Cplex. Optimal scheduling.
   bool sched_cplex(State &state) const;
+
+  SchedPtr get_sched_by_param() const;
 
   // --------------------------------- EXTRAS ----------------------------------
 
