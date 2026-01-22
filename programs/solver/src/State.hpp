@@ -32,7 +32,7 @@ public:
   // fills blocks with each block of operations on the same machine on this
   // state. Maps each operation to one block in opToBlock
   void find_blocks(vector<vector<unsigned>> &blocks,
-                   vector<unsigned> &opToBlock) const;
+                   vector<pair<unsigned, unsigned>> &opToBlock) const;
 
   // only compare the machine ordering
   bool operator==(const State &s);

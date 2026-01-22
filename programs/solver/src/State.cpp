@@ -32,25 +32,26 @@ bool State::operator==(const State &s) {
 }
 
 void State::find_blocks(vector<vector<unsigned>> &blocks,
-                        vector<unsigned> &opToBlock) const {
+                        vector<pair<unsigned, unsigned>> &opToBlock) const {
   const Instance &inst = Instance::getInstance();
 
   for (unsigned o = 1; o < inst.O; ++o) {
     if (!_mach[o]) {
       unsigned curOp = o;
-      opToBlock[o] = (unsigned)blocks.size();
+      opToBlock[o].first = (unsigned)blocks.size();
+      opToBlock[o].second = 0;
       blocks.push_back(vector<unsigned>(1, o));
       unsigned machCurOp = mach[curOp];
-      while (curOp) {
+      while (mach[curOp]) {
         machCurOp = mach[curOp];
-        if (machCurOp) {
-          if (starts[curOp] + inst.P[curOp] == starts[machCurOp]) {
-            opToBlock[machCurOp] = (unsigned)blocks.size() - 1;
-            blocks.back().push_back(machCurOp);
-          } else {
-            opToBlock[machCurOp] = (unsigned)blocks.size();
-            blocks.push_back(vector<unsigned>(1, machCurOp));
-          }
+        if (starts[curOp] + inst.P[curOp] == starts[machCurOp]) {
+          opToBlock[machCurOp].first = (unsigned)blocks.size() - 1;
+          opToBlock[machCurOp].second = (unsigned)blocks.back().size();
+          blocks.back().push_back(machCurOp);
+        } else {
+          opToBlock[machCurOp].first = (unsigned)blocks.size();
+          opToBlock[machCurOp].second = 0;
+          blocks.push_back(vector<unsigned>(1, machCurOp));
         }
         curOp = machCurOp;
       }

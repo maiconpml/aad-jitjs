@@ -288,7 +288,7 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
-  vector<unsigned> opToBlock(inst.O, 0);
+  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
   State curState = state;
   State bestState;
@@ -314,32 +314,32 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
         state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
 
     // impossible to perform any move
-    if (machBlocks[opToBlock[curOp]].size() == 1)
+    if (machBlocks[opToBlock[curOp].first].size() == 1)
       continue;
 
     unsigned _machCurOp, machCurOp;
 
     unsigned insertOpCand;
     if (isCurOpEarly) {
-      insertOpCand = machBlocks[opToBlock[curOp]].back();
+      insertOpCand = machBlocks[opToBlock[curOp].first].back();
       // if operation has a job successor and the last operation of current
       // block starts after this job successor, search for first operation on
       // block that starts before JS from last until curOp
       if (inst.job[curOp] &&
           state.starts[insertOpCand] > state.starts[inst.job[curOp]]) {
-        int j = machBlocks[opToBlock[curOp]].size() - 1;
+        int j = machBlocks[opToBlock[curOp].first].size() - 1;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp]][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp]][j]] >
+        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
+               state.starts[machBlocks[opToBlock[curOp].first][j]] >
                    state.starts[inst.job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp]][j--];
+          insertOpCand = machBlocks[opToBlock[curOp].first][j--];
         }
       }
       machCurOp = curState.mach[curOp];
       _machCurOp = curState._mach[curOp];
       rm_insert_oper_after(curState, curOp, insertOpCand);
     } else {
-      insertOpCand = machBlocks[opToBlock[curOp]].front();
+      insertOpCand = machBlocks[opToBlock[curOp].first].front();
       // if operation has a job predecessor and the first operation of current
       // block ends before this job successor, search for first operation on
       // block that starts before JS from first until curOp
@@ -348,11 +348,11 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
               state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
         int j = 0;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp]][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp]][j]] +
-                       inst.P[machBlocks[opToBlock[curOp]][j]] <
+        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
+               state.starts[machBlocks[opToBlock[curOp].first][j]] +
+                       inst.P[machBlocks[opToBlock[curOp].first][j]] <
                    state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp]][j++];
+          insertOpCand = machBlocks[opToBlock[curOp].first][j++];
         }
       }
       machCurOp = curState.mach[curOp];
