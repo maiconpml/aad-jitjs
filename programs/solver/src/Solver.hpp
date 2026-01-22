@@ -76,6 +76,9 @@ private:
   // return true if state has a cycle
   bool sched_max_early(State &state) const;
 
+  // schedule operations using MIP solver Cplex. Optimal scheduling.
+  bool sched_cplex(State &state) const;
+
   // --------------------------------- EXTRAS ----------------------------------
 
   // verify if state satisfy the problem's constraints

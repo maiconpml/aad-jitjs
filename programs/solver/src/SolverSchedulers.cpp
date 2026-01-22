@@ -1,6 +1,9 @@
 #include "Instance.hpp"
 #include "Solver.hpp"
 
+#include <ilcplex/cplex.h>
+#include <ilcplex/ilocplex.h>
+
 bool Solver::sched_max_early(State &state) const {
   const Instance &inst = Instance::getInstance();
 
@@ -71,4 +74,89 @@ bool Solver::sched_max_early(State &state) const {
   state.calc_penalties();
 
   return head < inst.O - 1;
+}
+
+bool Solver::sched_cplex(State &state) const {
+  const Instance &inst = Instance::getInstance();
+
+  vector<unsigned> auxJobs = inst.roots;
+  vector<vector<unsigned>> machOrder(inst.M, vector<unsigned>(0));
+
+  if (topo_sort(state))
+    return true;
+
+  state.starts.clear();
+  state.starts.push_back(0);
+
+  IloEnv jitEnv;
+  IloModel jitModel(jitEnv);
+
+  IloNumVarArray completionTimes(jitEnv, inst.O - 1, 0, IloInfinity, ILOFLOAT);
+
+  // earliness[i] >= deadlines[i] - completionTimes[i]
+  // tardiness[i] >= completionTimes[i] - deadlines[i]
+  IloNumVarArray earliness(jitEnv, inst.O - 1, 0, IloInfinity, ILOFLOAT);
+  IloNumVarArray tardiness(jitEnv, inst.O - 1, 0, IloInfinity, ILOFLOAT);
+
+  try {
+    IloExpr objExpr(jitEnv);
+    for (unsigned i = 1; i < inst.O; ++i) {
+      /* Objective: Minimize sum of weighted earliness and tardiness */
+      objExpr += (earliness[i - 1] * inst.earlCoefs[i]) +
+                 (tardiness[i - 1] * inst.tardCoefs[i]);
+
+      /* Linearization constraints for Earliness/Tardiness */
+      // E_i >= d_i - C_i  <=> E_i + C_i >= d_i
+      jitModel.add(earliness[i - 1] + completionTimes[i - 1] >=
+                   (IloNum)inst.deadlines[i]);
+      // T_i >= C_i - d_i  <=> T_i - C_i >= -d_i
+      jitModel.add(tardiness[i - 1] - completionTimes[i - 1] >=
+                   -((IloNum)inst.deadlines[i]));
+
+      /* Start time of a job's first operation must be greater than zero*/
+      if (!inst._job[i])
+        jitModel.add(completionTimes[i - 1] - inst.P[i] >= 0);
+
+      /* Machine precedence constraints*/
+      if (state.mach[i]) {
+        jitModel.add(completionTimes[i - 1] <=
+                     completionTimes[state.mach[i] - 1] -
+                         inst.P[state.mach[i]]);
+      }
+
+      /* Job precedence constraints*/
+      if (inst.job[i]) {
+        jitModel.add(completionTimes[i - 1] <=
+                     completionTimes[inst.job[i] - 1] - inst.P[inst.job[i]]);
+      }
+    }
+
+    jitModel.add(IloMinimize(jitEnv, objExpr));
+
+    IloCplex jitCplex(jitEnv);
+    // jitCplex.setParam(IloCplex::Param::TimeLimit, 0.5);
+    jitCplex.setOut(jitEnv.getNullStream());
+
+    jitCplex.extract(jitModel);
+
+    jitCplex.solve();
+
+    for (unsigned i = 1; i < inst.O; ++i) {
+      state.starts.push_back(
+          (unsigned)round(jitCplex.getValue(completionTimes[i - 1])) -
+          inst.P[i]);
+    }
+
+    state.penalties = jitCplex.getObjValue();
+  } catch (IloException &ex) {
+    cerr << "Error: " << ex << endl;
+  } catch (...) {
+    cerr << "Error" << endl;
+  }
+
+  jitEnv.end();
+
+  state.calc_penalties();
+
+  return false;
 }
