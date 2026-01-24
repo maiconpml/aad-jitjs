@@ -51,6 +51,10 @@ State Solver::solve() {
   case Parameters::SearchMethod::LS:
     search_ls(best);
     break;
+  case Parameters::SearchMethod::ILS:
+    break;
+  case Parameters::SearchMethod::TABU:
+    break;
   }
 
   if (!validate_state(best)) {
@@ -110,4 +114,28 @@ bool Solver::topo_sort(const State &state) {
   assert(head <= inst.O);
 
   return head < inst.O - 1;
+}
+
+Solver::NHoodPtr Solver::get_nhood_by_param() const {
+
+  Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
+
+  switch (paramNHood) {
+  case Parameters::Neighborhood::SWAP_ADJ:
+    return &Solver::nhood_swap_adjacent;
+  case Parameters::Neighborhood::SWAP_PENAL:
+    return &Solver::nhood_swap_earl_late;
+  case Parameters::Neighborhood::SWAP_RAND:
+    return &Solver::nhood_swap_random;
+  case Parameters::Neighborhood::INSERT_RAND:
+    return &Solver::nhood_rm_insert_random;
+  case Parameters::Neighborhood::INSERT_PENAL:
+    return &Solver::nhood_insert_earl_late;
+  case Parameters::Neighborhood::CRITICAL_OPER:
+    return &Solver::nhood_oper_critical;
+  case Parameters::Neighborhood::CRITICAL_OPER_ALT:
+    return &Solver::nhood_oper_critical_alt;
+  }
+
+  return NULL;
 }

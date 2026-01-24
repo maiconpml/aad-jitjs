@@ -18,7 +18,10 @@ private:
   static vector<unsigned> indeg;
   static vector<unsigned> q;
 
+  using NHoodPtr = void (Solver::*)(State &, pair<unsigned, unsigned> &) const;
+
   using SchedPtr = bool (Solver::*)(State &) const;
+
   // --------------------------- DISPATCHING RULES -----------------------------
 
   // returns index of operation with earliest due date in ops
@@ -57,19 +60,27 @@ private:
   void rm_insert_oper_befor(State &state, const unsigned op1,
                             const unsigned op2) const;
 
-  void nhood_swap_adjacent(const State &state, State &neighbor) const;
+  void nhood_swap_adjacent(State &state,
+                           pair<unsigned, unsigned> &chosenMove) const;
 
-  void nhood_swap_random(const State &state, State &neighbor) const;
+  void nhood_swap_random(State &state,
+                         pair<unsigned, unsigned> &chosenMov) const;
 
-  void nhood_rm_insert_random(const State &state, State &neighbor) const;
+  void nhood_rm_insert_random(State &state,
+                              pair<unsigned, unsigned> &chosenMov) const;
 
-  void nhood_swap_earl_late(const State &state, State &neighbor) const;
+  void nhood_swap_earl_late(State &state,
+                            pair<unsigned, unsigned> &chosenMov) const;
 
-  void nhood_insert_earl_late(const State &state, State &neighbor) const;
+  void nhood_insert_earl_late(State &state,
+                              pair<unsigned, unsigned> &chosenMov) const;
 
-  void nhood_oper_critical(const State &state, State &neighbor) const;
 
-  void nhood_oper_critical_alt(const State &state, State &neighbor) const;
+  void nhood_oper_critical(State &state,
+                           pair<unsigned, unsigned> &chosenMov) const;
+
+  void nhood_oper_critical_alt(State &state,
+                               pair<unsigned, unsigned> &chosenMov) const;
 
   // ------------------------------ SEARCH METHODS -----------------------------
 
@@ -85,6 +96,8 @@ private:
   bool sched_cplex(State &state) const;
 
   SchedPtr get_sched_by_param() const;
+
+  NHoodPtr get_nhood_by_param() const;
 
   // --------------------------------- EXTRAS ----------------------------------
 

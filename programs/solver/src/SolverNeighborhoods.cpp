@@ -4,6 +4,7 @@
 #include "Solver.hpp"
 #include <algorithm>
 #include <cassert>
+#include <cfloat>
 #include <cstdint>
 #include <utility>
 
@@ -83,125 +84,156 @@ void Solver::rm_insert_oper_befor(State &state, const unsigned op1,
   state._mach[op1] = _machOp2;
 }
 
-void Solver::nhood_swap_adjacent(const State &state, State &neighbor) const {
+void Solver::nhood_swap_adjacent(State &state,
+                                 pair<unsigned, unsigned> &chosenMove) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
+
   SchedPtr sched = get_sched_by_param();
 
-  State curState = state;
+  double chosenPenalties = DBL_MAX;
   switch (paramTraversing) {
   case Parameters::NHoodTraversing::BI: {
     State bestNeighbor;
     unsigned i, j;
     for (unsigned o = 1; o < state.mach.size(); ++o) {
       i = o;
-      j = curState.mach[o];
+      j = state.mach[o];
       if (j) {
-        swap_opers(curState, i, j);
-        if (!(this->*sched)(curState)) {
-          if (curState.penalties < bestNeighbor.penalties) {
-            bestNeighbor = curState;
+        swap_opers(state, i, j);
+        if (!(this->*sched)(state)) {
+          if (state.penalties < chosenPenalties) {
+            chosenMove = make_pair(i, j);
+            chosenPenalties = state.penalties;
           }
         }
-        swap_opers(curState, j, i);
+        swap_opers(state, j, i);
+        assert(state == debugState);
       }
     }
-    neighbor = bestNeighbor;
     break;
   }
   case Parameters::NHoodTraversing::FI: {
+    chosenPenalties = state.penalties;
     vector<pair<unsigned, unsigned>> neighborhoodMoves;
     neighborhoodMoves.reserve(state.mach.size());
     for (unsigned o = 1; o < state.mach.size(); ++o) {
-      if (curState.mach[o]) {
-        neighborhoodMoves.push_back(make_pair(o, curState.mach[o]));
+      if (state.mach[o]) {
+        neighborhoodMoves.push_back(make_pair(o, state.mach[o]));
       }
     }
     shuffle(neighborhoodMoves.begin(), neighborhoodMoves.end(),
             Random::getEngine());
     for (pair<unsigned, unsigned> move : neighborhoodMoves) {
-      swap_opers(curState, move.first, move.second);
-      if (!(this->*sched)(curState)) {
-        assert(validate_state(curState));
-        if (curState.penalties < state.penalties) {
-          neighbor = curState;
+      swap_opers(state, move.first, move.second);
+      if (!(this->*sched)(state)) {
+        assert(validate_state(state));
+        if (state.penalties < chosenPenalties) {
+          chosenMove = move;
           return;
         }
       }
-      swap_opers(curState, move.first, move.second);
+      swap_opers(state, move.first, move.second);
+      assert(state == debugState);
     }
     break;
   }
   case Parameters::NHoodTraversing::ELT_LIST:
     break;
   }
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_swap_random(const State &state, State &neighbor) const {
+void Solver::nhood_swap_random(State &state,
+                               pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   SchedPtr sched = get_sched_by_param();
 
-  State curState = state;
+  double chosenPenalties = state.penalties;
+  double initStatePenalties = state.penalties;
   unsigned nMoves = 2 * inst.O;
   unsigned op1, op2;
   while (--nMoves) {
     op1 = Random::get(1, inst.O - 1);
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
-    swap_opers(curState, op1, op2);
-    if (!(this->*sched)(curState)) {
-      assert(validate_state(curState));
-      if (curState.penalties < state.penalties) {
-        neighbor = curState;
-        return;
+    swap_opers(state, op1, op2);
+    if (!(this->*sched)(state)) {
+      assert(validate_state(state));
+      if (state.penalties < chosenPenalties) {
+        chosenMove = make_pair(op1, op2);
+        if (state.penalties < initStatePenalties)
+          return;
+        chosenPenalties = state.penalties;
       }
     }
-    swap_opers(curState, op1, op2);
-    assert(curState == state);
+    swap_opers(state, op1, op2);
+    assert(state == debugState);
   }
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_rm_insert_random(const State &state, State &neighbor) const {
+void Solver::nhood_rm_insert_random(
+    State &state, pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   SchedPtr sched = get_sched_by_param();
 
-  State curState = state;
+  double chosenPenalties = DBL_MAX;
+  double initStatePenalties = state.penalties;
   unsigned nMoves = 2 * inst.O;
   unsigned op1, op2, machOp1, _machOp1;
   while (--nMoves) {
     op1 = Random::get(1, inst.O - 1);
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
-    _machOp1 = curState._mach[op1];
-    machOp1 = curState.mach[op1];
-    rm_insert_oper_after(curState, op1, op2);
-    if (curState.mach[op2] != op1 && !(this->*sched)(curState)) {
-      assert(validate_state(curState));
-      if (curState.penalties < state.penalties) {
-        neighbor = curState;
-        return;
+    _machOp1 = state._mach[op1];
+    machOp1 = state.mach[op1];
+    rm_insert_oper_after(state, op1, op2);
+    if (state.mach[op2] != op1 && !(this->*sched)(state)) {
+      assert(validate_state(state));
+      if (state.penalties < chosenPenalties) {
+        chosenMove = make_pair(op1, op2);
+        if (state.penalties < initStatePenalties)
+          return;
+        chosenPenalties = state.penalties;
       }
     }
     if (_machOp1)
-      rm_insert_oper_after(curState, op1, _machOp1);
+      rm_insert_oper_after(state, op1, _machOp1);
     else
-      rm_insert_oper_befor(curState, op1, machOp1);
-    assert(curState == state);
+      rm_insert_oper_befor(state, op1, machOp1);
+    assert(state == debugState);
   }
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
+void Solver::nhood_swap_earl_late(State &state,
+                                  pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
   SchedPtr sched = get_sched_by_param();
 
-  State curState = state;
-  State bestState;
-
+  double chosenPenalties = DBL_MAX;
+  double initStatePenalties = state.penalties;
   // checked[o] == true means that operation o was already verified and if it
   // was possible this swap has already been tested
   vector<bool> checked(inst.O, false);
@@ -249,19 +281,20 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
       // if swap candidate was selected, execute swap, verify improvement on
       // generated neighbor and undo de swap movement
       if (swapOpCand) {
-        swap_opers(curState, curOp, swapOpCand);
-        if (!(this->*sched)(curState)) {
-          assert(validate_state(curState));
-          if (curState.penalties < bestState.penalties) {
+        swap_opers(state, curOp, swapOpCand);
+        if (!(this->*sched)(state)) {
+          assert(validate_state(state));
+          if (state.penalties < chosenPenalties) {
+            chosenMove = make_pair(curOp, swapOpCand);
             if (paramTravers == Parameters::NHoodTraversing::FI &&
-                curState.penalties < state.penalties) {
-              neighbor = curState;
+                state.penalties < initStatePenalties) {
               return;
             }
-            bestState = curState;
+            chosenPenalties = state.penalties;
           }
         }
-        swap_opers(curState, curOp, swapOpCand);
+        swap_opers(state, curOp, swapOpCand);
+        assert(state == debugState);
         break;
       }
 
@@ -273,25 +306,28 @@ void Solver::nhood_swap_earl_late(const State &state, State &neighbor) const {
       }
     }
   }
-
-  neighbor = bestState;
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
+void Solver::nhood_insert_earl_late(
+    State &state, pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
   SchedPtr sched = get_sched_by_param();
 
+  double chosenPenalties = DBL_MAX;
+  double initStatePenalties = state.penalties;
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
-
-  State curState = state;
-  State bestState;
 
   vector<unsigned> ops;
   ops.reserve(inst.O - 1);
@@ -335,9 +371,9 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
           insertOpCand = machBlocks[opToBlock[curOp].first][j--];
         }
       }
-      machCurOp = curState.mach[curOp];
-      _machCurOp = curState._mach[curOp];
-      rm_insert_oper_after(curState, curOp, insertOpCand);
+      machCurOp = state.mach[curOp];
+      _machCurOp = state._mach[curOp];
+      rm_insert_oper_after(state, curOp, insertOpCand);
     } else {
       insertOpCand = machBlocks[opToBlock[curOp].first].front();
       // if operation has a job predecessor and the first operation of current
@@ -355,50 +391,53 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
           insertOpCand = machBlocks[opToBlock[curOp].first][j++];
         }
       }
-      machCurOp = curState.mach[curOp];
-      _machCurOp = curState._mach[curOp];
-      rm_insert_oper_befor(curState, curOp, insertOpCand);
+      machCurOp = state.mach[curOp];
+      _machCurOp = state._mach[curOp];
+      rm_insert_oper_befor(state, curOp, insertOpCand);
     }
 
     if (curOp == insertOpCand)
       continue;
 
     // verify improvement on neighbor and undo remove/insertion
-    if (!(this->*sched)(curState)) {
-      assert(validate_state(curState));
-      if (curState.penalties < bestState.penalties) {
+    if (!(this->*sched)(state)) {
+      assert(validate_state(state));
+      if (state.penalties < chosenPenalties) {
+        chosenMove = make_pair(curOp, insertOpCand);
         if (paramTravers == Parameters::NHoodTraversing::FI &&
-            curState.penalties < state.penalties) {
-          neighbor = curState;
+            state.penalties < initStatePenalties)
           return;
-        }
-        bestState = curState;
+        chosenPenalties = state.penalties;
       }
     }
     if (_machCurOp)
-      rm_insert_oper_after(curState, curOp, _machCurOp);
+      rm_insert_oper_after(state, curOp, _machCurOp);
     else
-      rm_insert_oper_befor(curState, curOp, machCurOp);
+      rm_insert_oper_befor(state, curOp, machCurOp);
+    assert(state == debugState);
   }
-
-  neighbor = bestState;
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
+void Solver::nhood_oper_critical(State &state,
+                                 pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
   SchedPtr sched = get_sched_by_param();
 
+  double chosenPenalties = DBL_MAX;
+  double initStatePenalties = state.penalties;
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
-
-  State curState = state;
-  State bestState;
 
   vector<unsigned> ops;
   ops.reserve(inst.O - 1);
@@ -432,46 +471,47 @@ void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
             make_pair(machBlocks[curBlock][0], machBlocks[curBlock][1]));
 
       for (pair<unsigned, unsigned> cand : cands) {
-        swap_opers(curState, cand.first, cand.second);
-        if (!(this->*sched)(curState)) {
-          assert(validate_state(curState));
-          if (curState.penalties < bestState.penalties) {
+        swap_opers(state, cand.first, cand.second);
+        if (!(this->*sched)(state)) {
+          assert(validate_state(state));
+          if (state.penalties < chosenPenalties) {
+            chosenMove = make_pair(cand.first, cand.second);
             if (paramTravers == Parameters::NHoodTraversing::FI ||
-                curState.penalties < state.penalties) {
-              neighbor = curState;
+                state.penalties < initStatePenalties)
               return;
-            }
-            bestState = curState;
+            chosenPenalties = state.penalties;
           }
         }
-        swap_opers(curState, cand.first, cand.second);
-        assert(curState == state);
+        swap_opers(state, cand.first, cand.second);
+        assert(debugState == state);
       }
 
       curOp = inst._job[machBlocks[curBlock][0]];
       cands.clear();
     }
   }
-
-  neighbor = bestState;
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_oper_critical_alt(const State &state,
-                                     State &neighbor) const {
+void Solver::nhood_oper_critical_alt(
+    State &state, pair<unsigned, unsigned> &chosenMove) const {
   const Instance &inst = Instance::getInstance();
+
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
   Parameters::NHoodTraversing paramTravers =
       params.nHoodsTraversings[params.currentNHood];
 
   SchedPtr sched = get_sched_by_param();
 
+  double chosenPenalties = DBL_MAX;
+  double initStatePenalties = state.penalties;
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
-
-  State curState = state;
-  State bestState;
 
   vector<unsigned> ops;
   ops.reserve(inst.O - 1);
@@ -508,20 +548,19 @@ void Solver::nhood_oper_critical_alt(const State &state,
                                   opCritic[opCritic.size() - 2]));
 
       for (pair<unsigned, unsigned> cand : cands) {
-        swap_opers(curState, cand.first, cand.second);
-        if (!(this->*sched)(curState)) {
-          assert(validate_state(curState));
-          if (curState.penalties < bestState.penalties) {
+        swap_opers(state, cand.first, cand.second);
+        if (!(this->*sched)(state)) {
+          assert(validate_state(state));
+          if (state.penalties < chosenPenalties) {
+            chosenMove = make_pair(cand.first, cand.second);
             if (paramTravers == Parameters::NHoodTraversing::FI ||
-                curState.penalties < state.penalties) {
-              neighbor = curState;
+                state.penalties < state.penalties)
               return;
-            }
-            bestState = curState;
+            chosenPenalties = state.penalties;
           }
         }
-        swap_opers(curState, cand.first, cand.second);
-        assert(curState == state);
+        swap_opers(state, cand.first, cand.second);
+        assert(debugState == state);
       }
 
       curOp = inst._job[curOp];
@@ -529,5 +568,5 @@ void Solver::nhood_oper_critical_alt(const State &state,
       cands.clear();
     }
   }
-  neighbor = bestState;
+  swap_opers(state, chosenMove.first, chosenMove.second);
 }
