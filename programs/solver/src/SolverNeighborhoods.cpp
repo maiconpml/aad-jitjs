@@ -368,7 +368,7 @@ void Solver::nhood_insert_earl_late(const State &state, State &neighbor) const {
       assert(validate_state(curState));
       if (curState.penalties < bestState.penalties) {
         if (paramTravers == Parameters::NHoodTraversing::FI &&
-            curState.penalties < curState.penalties) {
+            curState.penalties < state.penalties) {
           neighbor = curState;
           return;
         }
@@ -435,9 +435,13 @@ void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
         swap_opers(curState, cand.first, cand.second);
         if (!(this->*sched)(curState)) {
           assert(validate_state(curState));
-          if (curState.penalties < state.penalties) {
-            neighbor = curState;
-            return;
+          if (curState.penalties < bestState.penalties) {
+            if (paramTravers == Parameters::NHoodTraversing::FI ||
+                curState.penalties < state.penalties) {
+              neighbor = curState;
+              return;
+            }
+            bestState = curState;
           }
         }
         swap_opers(curState, cand.first, cand.second);
@@ -448,6 +452,8 @@ void Solver::nhood_oper_critical(const State &state, State &neighbor) const {
       cands.clear();
     }
   }
+
+  neighbor = bestState;
 }
 
 void Solver::nhood_oper_critical_alt(const State &state,
@@ -505,9 +511,13 @@ void Solver::nhood_oper_critical_alt(const State &state,
         swap_opers(curState, cand.first, cand.second);
         if (!(this->*sched)(curState)) {
           assert(validate_state(curState));
-          if (curState.penalties < state.penalties) {
-            neighbor = curState;
-            return;
+          if (curState.penalties < bestState.penalties) {
+            if (paramTravers == Parameters::NHoodTraversing::FI ||
+                curState.penalties < state.penalties) {
+              neighbor = curState;
+              return;
+            }
+            bestState = curState;
           }
         }
         swap_opers(curState, cand.first, cand.second);
@@ -519,4 +529,5 @@ void Solver::nhood_oper_critical_alt(const State &state,
       cands.clear();
     }
   }
+  neighbor = bestState;
 }
