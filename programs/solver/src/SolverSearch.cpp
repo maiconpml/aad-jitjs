@@ -1,20 +1,23 @@
 #include "Instance.hpp"
 #include "Parameters.hpp"
 #include "Solver.hpp"
+#include "TabuCycleDetector.hpp"
+#include "TabuJumpList.hpp"
+#include "TabuList.hpp"
 #include "Timer.hpp"
 #include <utility>
 
 void Solver::search_ls(State &initialSol) {
   Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
 
-  NHoodPtr nhood = get_nhood_by_param();
+  NHoodLSPtr nhood = get_nhood_ls_by_param();
 
   best = initialSol;
   State curState = initialSol, neighbor;
   pair<unsigned, unsigned> move;
   while (!Timer::isTimeExceeded(params.maxMilli)) {
 
-    (this->*nhood)(curState, move);
+    (this->*nhood)(curState);
 
     if (neighbor.penalties < best.penalties) {
       best = neighbor;

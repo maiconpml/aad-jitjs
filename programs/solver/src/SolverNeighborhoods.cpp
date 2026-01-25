@@ -2,11 +2,17 @@
 #include "Parameters.hpp"
 #include "Random.hpp"
 #include "Solver.hpp"
+#include "State.hpp"
+#include "TabuList.hpp"
+#include "Util.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cfloat>
 #include <cstdint>
+#include <tuple>
 #include <utility>
+
+using namespace std;
 
 void Solver::swap_opers(State &state, const unsigned op1,
                         const unsigned op2) const {
@@ -84,8 +90,77 @@ void Solver::rm_insert_oper_befor(State &state, const unsigned op1,
   state._mach[op1] = _machOp2;
 }
 
-void Solver::nhood_swap_adjacent(State &state,
-                                 pair<unsigned, unsigned> &chosenMove) const {
+bool Solver::is_swap_tabu(TabuList &tList, State &state,
+                          pair<unsigned, unsigned> &move) const {
+  return tList.isTabu(state._mach[move.first], move.second) ||
+         tList.isTabu(state._mach[move.second], move.first);
+}
+
+bool Solver::is_insert_tabu(TabuList &tList, State &state,
+                            pair<unsigned, unsigned> &move,
+                            MoveType type) const {
+  switch (type) {
+  case MoveType::BEFORE:
+    return tList.isTabu(state._mach[move.second], move.first);
+  case MoveType::AFTER:
+    return tList.isTabu(move.second, move.first);
+  };
+  return false;
+}
+
+int Solver::get_swap_tabu_age(TabuList &tList, State &state,
+                              pair<unsigned, unsigned> &move) const {
+  return min(tList.age(state._mach[move.first], move.second),
+             tList.age(state._mach[move.second], move.first));
+}
+
+int Solver::get_insert_tabu_age(TabuList &tList, State &state,
+                                pair<unsigned, unsigned> &move,
+                                MoveType type) const {
+  switch (type) {
+  case MoveType::BEFORE:
+    return tList.age(state._mach[move.second], move.first);
+  case MoveType::AFTER:
+    return tList.age(move.second, move.first);
+  };
+  return -1;
+}
+
+void Solver::update_tabulist_swap(TabuList &tList, State &state,
+                                  pair<unsigned, unsigned> &move,
+                                  bool areAllMovesTabu) const {
+  unsigned _machFirst = state._mach[move.first],
+           _machSecond = state._mach[move.second];
+  swap_opers(state, move.first, move.second);
+  if (areAllMovesTabu) {
+    tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
+    tList.passTime(tList.timeToLeave(state._mach[move.second], move.second));
+  }
+  tList.insert(_machFirst, move.first);
+  tList.insert(_machSecond, move.second);
+}
+
+void Solver::update_tabulist_insert(TabuList &tList, State &state,
+                                    pair<unsigned, unsigned> &move,
+                                    MoveType type, bool areAllMovesTabu) const {
+  unsigned _machFirst = state._mach[move.first],
+           _machSecond = state._mach[move.second];
+  swap_opers(state, move.first, move.second);
+
+  if (areAllMovesTabu)
+    tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
+  switch (type) {
+  case MoveType::BEFORE:
+    tList.insert(_machSecond, move.first);
+    break;
+  case MoveType::AFTER:
+    tList.insert(_machFirst, move.first);
+    break;
+  case MoveType::SWAP:
+    break;
+  }
+}
+
 double Solver::evaluate_swap(State &state,
                              pair<unsigned, unsigned> &move) const {
   SchedPtr sched = get_sched_by_param();
@@ -101,7 +176,7 @@ double Solver::evaluate_swap(State &state,
 }
 
 double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
-                               Solver::InsertType type) const {
+                               Solver::MoveType type) const {
   SchedPtr sched = get_sched_by_param();
   unsigned i = move.first, j = move.second;
   unsigned _machOp1 = state._mach[i], machOp1 = state.mach[i];
@@ -109,10 +184,10 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
 
   // do move
   switch (type) {
-  case Solver::InsertType::BEFORE:
+  case Solver::MoveType::BEFORE:
     rm_insert_oper_befor(state, i, j);
     break;
-  case Solver::InsertType::AFTER:
+  case Solver::MoveType::AFTER:
     rm_insert_oper_after(state, i, j);
   }
   // if valid, get cost
@@ -128,6 +203,7 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   return cost;
 }
 
+void Solver::run_tabu_search_swap(State &state, TabuList &tList) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
@@ -135,480 +211,333 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   State debugState = state;
 #endif // NDEBUG
 
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = DBL_MAX;
-  switch (paramTraversing) {
-  case Parameters::NHoodTraversing::BI: {
-    State bestNeighbor;
-    unsigned i, j;
-    for (unsigned o = 1; o < state.mach.size(); ++o) {
-      i = o;
-      j = state.mach[o];
-      if (j) {
-        swap_opers(state, i, j);
-        if (!(this->*sched)(state)) {
-          if (state.penalties < chosenPenalties) {
-            chosenMove = make_pair(i, j);
-            chosenPenalties = state.penalties;
-          }
-        }
-        swap_opers(state, j, i);
-        assert(state == debugState);
-      }
-    }
-    break;
-  }
-  case Parameters::NHoodTraversing::FI: {
-    chosenPenalties = state.penalties;
-    vector<pair<unsigned, unsigned>> neighborhoodMoves;
-    neighborhoodMoves.reserve(state.mach.size());
-    for (unsigned o = 1; o < state.mach.size(); ++o) {
-      if (state.mach[o]) {
-        neighborhoodMoves.push_back(make_pair(o, state.mach[o]));
-      }
-    }
-    shuffle(neighborhoodMoves.begin(), neighborhoodMoves.end(),
-            Random::getEngine());
-    for (pair<unsigned, unsigned> move : neighborhoodMoves) {
-      swap_opers(state, move.first, move.second);
-      if (!(this->*sched)(state)) {
-        assert(validate_state(state));
-        if (state.penalties < chosenPenalties) {
-          chosenMove = move;
-          return;
-        }
-      }
-      swap_opers(state, move.first, move.second);
-      assert(state == debugState);
-    }
-    break;
-  }
-  case Parameters::NHoodTraversing::ELT_LIST:
-    break;
-  }
-  swap_opers(state, chosenMove.first, chosenMove.second);
-}
-
-void Solver::nhood_swap_random(State &state,
-                               pair<unsigned, unsigned> &chosenMove) const {
-  const Instance &inst = Instance::getInstance();
-
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
-
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = state.penalties;
   double initStatePenalties = state.penalties;
-  unsigned nMoves = 2 * inst.O;
-  unsigned op1, op2;
-  while (--nMoves) {
-    op1 = Random::get(1, inst.O - 1);
-    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
-    swap_opers(state, op1, op2);
-    if (!(this->*sched)(state)) {
-      assert(validate_state(state));
-      if (state.penalties < chosenPenalties) {
-        chosenMove = make_pair(op1, op2);
-        if (state.penalties < initStatePenalties)
-          return;
-        chosenPenalties = state.penalties;
+  pair<unsigned, unsigned> oldestTabuMove(0, 0);
+  int oldestTabuMoveAge = -1;
+  pair<unsigned, unsigned> bestMove(0, 0);
+  double bestMovePenalties = DBL_MAX;
+  unsigned chosenMoveIndex = 0;
+  pair<unsigned, unsigned> move;
+
+  if (paramTraversing == Parameters::NHoodTraversing::FI)
+    shuffle(_cands.begin(), _cands.end(), Random::getEngine());
+
+  for (unsigned i = 0; i < _cands.size(); ++i) {
+    move = make_pair(get<0>(_cands[i]), get<1>(_cands[i]));
+    double curPenal = evaluate_swap(state, move);
+
+    if (curPenal < bestMovePenalties) {
+      bool isTabu = is_swap_tabu(tList, state, move);
+      int curMoveTabuAge = get_swap_tabu_age(tList, state, move);
+      bool isAspiration = curPenal < best.penalties;
+
+      if (!isTabu || isAspiration) {
+        bestMove = move;
+        bestMovePenalties = curPenal;
+        chosenMoveIndex = i;
+
+        if (paramTraversing == Parameters::NHoodTraversing::FI &&
+            curPenal < initStatePenalties)
+          break;
+      } else if (curMoveTabuAge > oldestTabuMoveAge) {
+        oldestTabuMoveAge = curMoveTabuAge;
+        oldestTabuMove = move;
+        chosenMoveIndex = i;
       }
     }
-    swap_opers(state, op1, op2);
     assert(state == debugState);
   }
-  swap_opers(state, chosenMove.first, chosenMove.second);
+
+  if (bestMovePenalties == DBL_MAX)
+    update_tabulist_swap(tList, state, oldestTabuMove, false);
+  else
+    update_tabulist_swap(tList, state, bestMove, true);
+
+  Util::rm_element_swap(_cands, chosenMoveIndex);
 }
 
-void Solver::nhood_rm_insert_random(
-    State &state, pair<unsigned, unsigned> &chosenMove) const {
-  const Instance &inst = Instance::getInstance();
-
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
-
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = DBL_MAX;
-  double initStatePenalties = state.penalties;
-  unsigned nMoves = 2 * inst.O;
-  unsigned op1, op2, machOp1, _machOp1;
-  while (--nMoves) {
-    op1 = Random::get(1, inst.O - 1);
-    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
-    _machOp1 = state._mach[op1];
-    machOp1 = state.mach[op1];
-    rm_insert_oper_after(state, op1, op2);
-    if (state.mach[op2] != op1 && !(this->*sched)(state)) {
-      assert(validate_state(state));
-      if (state.penalties < chosenPenalties) {
-        chosenMove = make_pair(op1, op2);
-        if (state.penalties < initStatePenalties)
-          return;
-        chosenPenalties = state.penalties;
-      }
-    }
-    if (_machOp1)
-      rm_insert_oper_after(state, op1, _machOp1);
-    else
-      rm_insert_oper_befor(state, op1, machOp1);
-    assert(state == debugState);
-  }
-  swap_opers(state, chosenMove.first, chosenMove.second);
-}
-
-void Solver::nhood_swap_earl_late(State &state,
-                                  pair<unsigned, unsigned> &chosenMove) const {
-  const Instance &inst = Instance::getInstance();
-
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
-
-  Parameters::NHoodTraversing paramTravers =
+void Solver::run_tabu_search_insert(State &state, TabuList &tList) const {
+  Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
-  SchedPtr sched = get_sched_by_param();
+#ifndef NDEBUG
+  State debugState = state;
+#endif // NDEBUG
 
-  double chosenPenalties = DBL_MAX;
   double initStatePenalties = state.penalties;
-  // checked[o] == true means that operation o was already verified and if it
-  // was possible this swap has already been tested
-  vector<bool> checked(inst.O, false);
-  // store the operations that not have been picked by the rng, these operations
-  // may or may not be checked
-  vector<unsigned> notSelected;
-  notSelected.reserve(inst.O);
+  pair<unsigned, unsigned> oldestTabuMove(0, 0);
+  int oldestTabuMoveAge = -1;
+  MoveType oldestMoveType;
+  pair<unsigned, unsigned> bestMove(0, 0);
+  double bestMovePenalties = DBL_MAX;
+  MoveType bestMoveType;
+  unsigned chosenMoveIndex = 0;
+  pair<unsigned, unsigned> move;
 
-  // operations on time don't need to be verified
-  for (unsigned o = 1; o < inst.O; ++o) {
-    if (state.starts[o] + inst.P[o] == inst.deadlines[o])
-      checked[o] = true;
-    else
-      notSelected.push_back(o);
+  if (paramTraversing == Parameters::NHoodTraversing::FI)
+    shuffle(_cands.begin(), _cands.end(), Random::getEngine());
+
+  for (unsigned i = 0; i < _cands.size(); ++i) {
+    move = make_pair(get<0>(_cands[i]), get<1>(_cands[i]));
+    MoveType type = get<2>(_cands[i]);
+    double curPenal = evaluate_insert(state, move, type);
+
+    if (curPenal < bestMovePenalties) {
+      bool isTabu = is_insert_tabu(tList, state, move, type);
+      int curMoveTabuAge = get_insert_tabu_age(tList, state, move, type);
+      bool isAspiration = curPenal < best.penalties;
+
+      if (!isTabu || isAspiration) {
+        bestMove = move;
+        bestMovePenalties = curPenal;
+        bestMoveType = type;
+        chosenMoveIndex = i;
+        if (paramTraversing == Parameters::NHoodTraversing::FI &&
+            curPenal < initStatePenalties)
+          break;
+      } else if (curMoveTabuAge > oldestTabuMoveAge) {
+        oldestTabuMoveAge = curMoveTabuAge;
+        oldestTabuMove = move;
+        oldestMoveType = type;
+        chosenMoveIndex = i;
+      }
+    }
+    assert(state == debugState);
   }
 
-  while (!notSelected.empty()) {
-    // pick an random operation and remove it from notSelected
-    unsigned curOpIdx = Random::get((uint32_t)notSelected.size());
-    unsigned curOp = notSelected[curOpIdx];
-    notSelected[curOpIdx] = notSelected.back();
-    notSelected.pop_back();
+  if (bestMovePenalties == DBL_MAX)
+    update_tabulist_insert(tList, state, oldestTabuMove, oldestMoveType, false);
+  else
+    update_tabulist_insert(tList, state, bestMove, bestMoveType, true);
 
-    bool isCurOpEarly =
-        state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
+  Util::rm_element_swap(_cands, chosenMoveIndex);
+}
 
-    // while operation exists and is not checked
-    while (curOp && !checked[curOp]) {
-      checked[curOp] = true;
+void Solver::cands_swap_adjacent(State &state) const {
+  _cands.clear();
+  for (unsigned o = 1; o < state.mach.size(); ++o) {
+    if (state.mach[o])
+      _cands.push_back(make_tuple(o, state.mach[o], MoveType::SWAP));
+  }
+}
 
-      // if operation is early (tardy) and it's machine successor (predecessor)
-      // exists and is adjecent with curOp, that is, starts (ends) exactly when
-      // curOp ends (starts), choose successor (predecessor) as swap candidate
+void Solver::nhood_tabu_swap_adjacent(State &state, TabuList &tList) const {
+  run_tabu_search_swap(state, tList);
+}
+
+void Solver::cands_swap_random(State &state) {
+  const Instance &inst = Instance::getInstance();
+  _cands.clear();
+  unsigned op1, op2;
+  for (unsigned i = 0; i < 2 * state.mach.size(); ++i) {
+    op1 = Random::get(1, inst.O - 1);
+    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
+    _cands.push_back(make_tuple(op1, op2, MoveType::SWAP));
+  }
+}
+
+void Solver::nhood_tabu_swap_random(State &state, TabuList &tList) const {
+  run_tabu_search_swap(state, tList);
+}
+
+void Solver::cands_rm_insert_random(State &state) const {
+  const Instance &inst = Instance::getInstance();
+  _cands.clear();
+  unsigned op1, op2;
+  for (unsigned i = 0; i < 2 * state.mach.size(); ++i) {
+    op1 = Random::get(1, inst.O - 1);
+    op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
+    _cands.push_back(make_tuple(op1, op2, MoveType::AFTER));
+  }
+}
+
+void Solver::nhood_tabu_rm_insert_random(State &state, TabuList &tList) const {
+  run_tabu_search_insert(state, tList);
+}
+
+void Solver::cands_swap_earl_late(State &state) const {
+  const Instance &inst = Instance::getInstance();
+
+  vector<bool> checked(inst.O, false);
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] == inst.deadlines[o])
+      continue;
+
+    bool isCurOpEarly = state.starts[o] + inst.P[o] < inst.deadlines[o];
+    while (o && !checked[o]) {
+      checked[o] = true;
+
+      // if operation is early (tardy) and it's machine successor
+      // (predecessor) exists and is adjecent with o, that is, starts
+      // (ends) exactly when o ends (starts), choose successor
+      // (predecessor) as swap candidate
       unsigned swapOpCand = 0;
-      if (isCurOpEarly && state.mach[curOp] &&
-          state.starts[curOp] + inst.P[curOp] ==
-              state.starts[state.mach[curOp]]) {
-        swapOpCand = state.mach[curOp];
-      } else if (state._mach[curOp] &&
-                 state.starts[curOp] == state.starts[state._mach[curOp]] +
-                                            inst.P[state._mach[curOp]]) {
-        swapOpCand = state._mach[curOp];
+      if (isCurOpEarly && state.mach[o] &&
+          state.starts[o] + inst.P[o] == state.starts[state.mach[o]]) {
+        swapOpCand = state.mach[o];
+      } else if (!isCurOpEarly && state._mach[o] &&
+                 state.starts[o] ==
+                     state.starts[state._mach[o]] + inst.P[state._mach[o]]) {
+        swapOpCand = state._mach[o];
       }
 
-      // if swap candidate was selected, execute swap, verify improvement on
-      // generated neighbor and undo de swap movement
       if (swapOpCand) {
-        swap_opers(state, curOp, swapOpCand);
-        if (!(this->*sched)(state)) {
-          assert(validate_state(state));
-          if (state.penalties < chosenPenalties) {
-            chosenMove = make_pair(curOp, swapOpCand);
-            if (paramTravers == Parameters::NHoodTraversing::FI &&
-                state.penalties < initStatePenalties) {
-              return;
-            }
-            chosenPenalties = state.penalties;
-          }
-        }
-        swap_opers(state, curOp, swapOpCand);
-        assert(state == debugState);
+        _cands.push_back(make_tuple(o, swapOpCand, MoveType::SWAP));
         break;
       }
 
-      // follow job sequence to find a swap candidate
       if (isCurOpEarly) {
-        curOp = inst.job[curOp];
+        o = inst.job[o];
       } else {
-        curOp = inst._job[curOp];
+        o = inst._job[o];
       }
     }
   }
-  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_insert_earl_late(
-    State &state, pair<unsigned, unsigned> &chosenMove) const {
+void Solver::nhood_tabu_swap_earl_late(State &state, TabuList &tList) const {
+  run_tabu_search_swap(state, tList);
+}
+
+void Solver::cands_insert_earl_late(State &state) const {
   const Instance &inst = Instance::getInstance();
 
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
+  _cands.clear();
 
-  Parameters::NHoodTraversing paramTravers =
-      params.nHoodsTraversings[params.currentNHood];
-
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = DBL_MAX;
-  double initStatePenalties = state.penalties;
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
-  vector<unsigned> ops;
-  ops.reserve(inst.O - 1);
-
-  for (unsigned o = 1; o < inst.O; ++o) {
-    if (state.starts[o] + inst.P[o] != inst.deadlines[o])
-      ops.push_back(o);
-  }
-  if (paramTravers == Parameters::NHoodTraversing::FI) {
-    shuffle(ops.begin(), ops.end(), Random::getEngine());
-  }
-
   state.find_blocks(machBlocks, opToBlock);
 
-  // check each operation for remove/insertion procedure
-  for (unsigned i = 0; i < ops.size(); ++i) {
-    unsigned curOp = ops[i];
-
-    bool isCurOpEarly =
-        state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
+  unsigned insertOpCand;
+  for (unsigned o = 1; o < inst.O; ++o) {
+    bool isCurOpEarly = state.starts[o] + inst.P[o] < inst.deadlines[o];
 
     // impossible to perform any move
-    if (machBlocks[opToBlock[curOp].first].size() == 1)
+    if (machBlocks[opToBlock[o].first].size() == 1)
       continue;
 
-    unsigned _machCurOp, machCurOp;
-
-    unsigned insertOpCand;
     if (isCurOpEarly) {
-      insertOpCand = machBlocks[opToBlock[curOp].first].back();
+      insertOpCand = machBlocks[opToBlock[o].first].back();
       // if operation has a job successor and the last operation of current
       // block starts after this job successor, search for first operation on
-      // block that starts before JS from last until curOp
-      if (inst.job[curOp] &&
-          state.starts[insertOpCand] > state.starts[inst.job[curOp]]) {
-        int j = machBlocks[opToBlock[curOp].first].size() - 1;
+      // block that starts before JS from last until o
+      if (inst.job[o] &&
+          state.starts[insertOpCand] > state.starts[inst.job[o]]) {
+        int j = machBlocks[opToBlock[o].first].size() - 1;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp].first][j]] >
-                   state.starts[inst.job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp].first][j--];
+        while (machBlocks[opToBlock[o].first][j] != o &&
+               state.starts[machBlocks[opToBlock[o].first][j]] >
+                   state.starts[inst.job[o]]) {
+          insertOpCand = machBlocks[opToBlock[o].first][j--];
         }
       }
-      machCurOp = state.mach[curOp];
-      _machCurOp = state._mach[curOp];
-      rm_insert_oper_after(state, curOp, insertOpCand);
+      if (o == insertOpCand)
+        continue;
+      _cands.push_back(make_tuple(o, insertOpCand, MoveType::AFTER));
     } else {
-      insertOpCand = machBlocks[opToBlock[curOp].first].front();
+      insertOpCand = machBlocks[opToBlock[o].first].front();
       // if operation has a job predecessor and the first operation of current
       // block ends before this job successor, search for first operation on
-      // block that starts before JS from first until curOp
-      if (inst._job[curOp] &&
+      // block that starts before JS from first until o
+      if (inst._job[o] &&
           state.starts[insertOpCand] + inst.P[insertOpCand] <
-              state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
+              state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
         int j = 0;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp].first][j]] +
-                       inst.P[machBlocks[opToBlock[curOp].first][j]] <
-                   state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp].first][j++];
+        while (machBlocks[opToBlock[o].first][j] != o &&
+               state.starts[machBlocks[opToBlock[o].first][j]] +
+                       inst.P[machBlocks[opToBlock[o].first][j]] <
+                   state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
+          insertOpCand = machBlocks[opToBlock[o].first][j++];
         }
       }
-      machCurOp = state.mach[curOp];
-      _machCurOp = state._mach[curOp];
-      rm_insert_oper_befor(state, curOp, insertOpCand);
+      if (o == insertOpCand)
+        continue;
+      _cands.push_back(make_tuple(o, insertOpCand, MoveType::BEFORE));
     }
-
-    if (curOp == insertOpCand)
-      continue;
-
-    // verify improvement on neighbor and undo remove/insertion
-    if (!(this->*sched)(state)) {
-      assert(validate_state(state));
-      if (state.penalties < chosenPenalties) {
-        chosenMove = make_pair(curOp, insertOpCand);
-        if (paramTravers == Parameters::NHoodTraversing::FI &&
-            state.penalties < initStatePenalties)
-          return;
-        chosenPenalties = state.penalties;
-      }
-    }
-    if (_machCurOp)
-      rm_insert_oper_after(state, curOp, _machCurOp);
-    else
-      rm_insert_oper_befor(state, curOp, machCurOp);
-    assert(state == debugState);
   }
-  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_oper_critical(State &state,
-                                 pair<unsigned, unsigned> &chosenMove) const {
+void Solver::nhood_tabu_insert_earl_late(State &state, TabuList &tList) const {
+  run_tabu_search_insert(state, tList);
+}
+
+void Solver::cands_oper_critical(State &state) const {
   const Instance &inst = Instance::getInstance();
 
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
-
-  Parameters::NHoodTraversing paramTravers =
-      params.nHoodsTraversings[params.currentNHood];
-
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = DBL_MAX;
-  double initStatePenalties = state.penalties;
-  // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
-  vector<unsigned> ops;
-  ops.reserve(inst.O - 1);
-
-  for (unsigned o = 1; o < inst.O; ++o) {
-    if (state.starts[o] + inst.P[o] > inst.deadlines[o])
-      ops.push_back(o);
-  }
-  if (paramTravers == Parameters::NHoodTraversing::FI) {
-    shuffle(ops.begin(), ops.end(), Random::getEngine());
-  }
-
   state.find_blocks(machBlocks, opToBlock);
 
-  vector<bool> isBlockChecked(machBlocks.size(), false);
-
-  vector<pair<unsigned, unsigned>> cands;
-  for (unsigned i = 0; i < ops.size(); ++i) {
-    unsigned curOp = ops[i];
+  vector<bool> isOpChecked(inst.O, false);
+  for (unsigned o = 1; o < inst.O; ++o) {
+    if (state.starts[o] + inst.P[o] <= inst.deadlines[o])
+      continue;
 
     unsigned curBlock;
     unsigned curOpPos;
-    while (state._mach[curOp] || inst._job[curOp]) {
-      curBlock = opToBlock[curOp].first;
-      curOpPos = opToBlock[curOp].second;
-      if (curOpPos > 0)
-        cands.push_back(make_pair(machBlocks[curBlock][curOpPos],
-                                  machBlocks[curBlock][curOpPos - 1]));
-      if (curOpPos > 1)
-        cands.push_back(
-            make_pair(machBlocks[curBlock][0], machBlocks[curBlock][1]));
-
-      for (pair<unsigned, unsigned> cand : cands) {
-        swap_opers(state, cand.first, cand.second);
-        if (!(this->*sched)(state)) {
-          assert(validate_state(state));
-          if (state.penalties < chosenPenalties) {
-            chosenMove = make_pair(cand.first, cand.second);
-            if (paramTravers == Parameters::NHoodTraversing::FI ||
-                state.penalties < initStatePenalties)
-              return;
-            chosenPenalties = state.penalties;
-          }
-        }
-        swap_opers(state, cand.first, cand.second);
-        assert(debugState == state);
+    while (state._mach[o] || inst._job[o]) {
+      curBlock = opToBlock[o].first;
+      curOpPos = opToBlock[o].second;
+      if (isOpChecked[machBlocks[curBlock][curOpPos]])
+        break;
+      if (curOpPos > 0) {
+        _cands.push_back(make_tuple(machBlocks[curBlock][curOpPos],
+                                    machBlocks[curBlock][curOpPos - 1],
+                                    MoveType::SWAP));
+        isOpChecked[machBlocks[curBlock][curOpPos]] = true;
+      }
+      if (machBlocks[curBlock].size() > 1 &&
+          isOpChecked[machBlocks[curBlock][1]])
+        break;
+      if (curOpPos > 1) {
+        _cands.push_back(make_tuple(machBlocks[curBlock][0],
+                                    machBlocks[curBlock][1], MoveType::SWAP));
+        isOpChecked[machBlocks[curBlock][1]] = true;
       }
 
-      curOp = inst._job[machBlocks[curBlock][0]];
-      cands.clear();
+      o = inst._job[machBlocks[curBlock][0]];
     }
   }
-  swap_opers(state, chosenMove.first, chosenMove.second);
 }
 
-void Solver::nhood_oper_critical_alt(
-    State &state, pair<unsigned, unsigned> &chosenMove) const {
+void Solver::nhood_tabu_oper_critical(State &state, TabuList &tList) const {
+  run_tabu_search_swap(state, tList);
+}
+
+void Solver::cands_oper_critical_alt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
-#ifndef NDEBUG
-  State debugState = state;
-#endif // NDEBUG
-
-  Parameters::NHoodTraversing paramTravers =
-      params.nHoodsTraversings[params.currentNHood];
-
-  SchedPtr sched = get_sched_by_param();
-
-  double chosenPenalties = DBL_MAX;
-  double initStatePenalties = state.penalties;
-  // machBlocks[b] are operations of block b sorted by start time
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
-
-  vector<unsigned> ops;
-  ops.reserve(inst.O - 1);
-
   for (unsigned o = 1; o < inst.O; ++o) {
-    if (state.starts[o] + inst.P[o] > inst.deadlines[o])
-      ops.push_back(o);
-  }
-  if (paramTravers == Parameters::NHoodTraversing::FI) {
-    shuffle(ops.begin(), ops.end(), Random::getEngine());
-  }
-
-  state.find_blocks(machBlocks, opToBlock);
-
-  for (unsigned i = 0; i < ops.size(); ++i) {
-    unsigned curOp = ops[i];
-
     vector<unsigned> opCritic;
-    vector<pair<unsigned, unsigned>> cands;
 
-    opCritic.push_back(curOp);
-    while (inst._job[curOp] != 0 || state._mach[curOp] != 0) {
+    opCritic.push_back(o);
+    while (inst._job[o] != 0 || state._mach[o] != 0) {
 
-      while (state._mach[curOp] &&
-             state.starts[state._mach[curOp]] + inst.P[state._mach[curOp]] >
-                 state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
-        opCritic.push_back(state._mach[curOp]);
-        curOp = state._mach[curOp];
+      while (state._mach[o] &&
+             state.starts[state._mach[o]] + inst.P[state._mach[o]] >
+                 state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
+        opCritic.push_back(state._mach[o]);
+        o = state._mach[o];
       }
       if (opCritic.size() > 1)
-        cands.push_back(make_pair(opCritic[0], opCritic[1]));
+        _cands.push_back(make_tuple(opCritic[0], opCritic[1], MoveType::SWAP));
       if (opCritic.size() > 2)
-        cands.push_back(make_pair(opCritic[opCritic.size() - 1],
-                                  opCritic[opCritic.size() - 2]));
+        _cands.push_back(make_tuple(opCritic[opCritic.size() - 1],
+                                    opCritic[opCritic.size() - 2],
+                                    MoveType::SWAP));
 
-      for (pair<unsigned, unsigned> cand : cands) {
-        swap_opers(state, cand.first, cand.second);
-        if (!(this->*sched)(state)) {
-          assert(validate_state(state));
-          if (state.penalties < chosenPenalties) {
-            chosenMove = make_pair(cand.first, cand.second);
-            if (paramTravers == Parameters::NHoodTraversing::FI ||
-                state.penalties < state.penalties)
-              return;
-            chosenPenalties = state.penalties;
-          }
-        }
-        swap_opers(state, cand.first, cand.second);
-        assert(debugState == state);
-      }
-
-      curOp = inst._job[curOp];
+      o = inst._job[o];
       opCritic.clear();
-      cands.clear();
     }
   }
-  swap_opers(state, chosenMove.first, chosenMove.second);
+}
+
+void Solver::nhood_tabu_oper_critical_alt(State &state, TabuList &tList) const {
+  run_tabu_search_swap(state, tList);
 }

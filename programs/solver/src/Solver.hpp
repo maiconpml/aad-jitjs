@@ -2,6 +2,8 @@
 
 #include "Parameters.hpp"
 #include "State.hpp"
+#include "TabuList.hpp"
+#include <tuple>
 
 class Solver {
 public:
@@ -17,11 +19,17 @@ private:
 
   static vector<unsigned> indeg;
   static vector<unsigned> q;
+  static vector<unsigned> _ops;
 
-  using NHoodPtr = void (Solver::*)(State &, pair<unsigned, unsigned> &) const;
+  using NHoodLSPtr = void (Solver::*)(State &) const;
+
+  using NHoodTabuPtr = void (Solver::*)(State &, TabuList &) const;
 
   using SchedPtr = bool (Solver::*)(State &) const;
 
+  enum class MoveType { SWAP, BEFORE, AFTER };
+
+  static vector<tuple<unsigned, unsigned, MoveType>> _cands;
   // --------------------------- DISPATCHING RULES -----------------------------
 
   // returns index of operation with earliest due date in ops
@@ -49,38 +57,49 @@ private:
 
   // ------------------------------ NEIGHBORHOODS ------------------------------
 
-  // swap operation op1 with operation op2
-  void swap_opers(State &state, const unsigned op1, const unsigned op2) const;
+  void cands_swap_adjacent(State &state) const;
 
-  // insert operation op1 after operation op2.
-  void rm_insert_oper_after(State &state, const unsigned op1,
-                            const unsigned op2) const;
+  void cands_swap_random(State &state);
 
-  // insert operation op1 before operation op2.
-  void rm_insert_oper_befor(State &state, const unsigned op1,
-                            const unsigned op2) const;
+  void cands_rm_insert_random(State &state) const;
 
-  void nhood_swap_adjacent(State &state,
-                           pair<unsigned, unsigned> &chosenMove) const;
+  void cands_swap_earl_late(State &state) const;
 
-  void nhood_swap_random(State &state,
-                         pair<unsigned, unsigned> &chosenMov) const;
+  void cands_insert_earl_late(State &state) const;
 
-  void nhood_rm_insert_random(State &state,
-                              pair<unsigned, unsigned> &chosenMov) const;
+  void cands_oper_critical(State &state) const;
 
-  void nhood_swap_earl_late(State &state,
-                            pair<unsigned, unsigned> &chosenMov) const;
+  void cands_oper_critical_alt(State &state) const;
 
-  void nhood_insert_earl_late(State &state,
-                              pair<unsigned, unsigned> &chosenMov) const;
+  void nhood_tabu_swap_adjacent(State &state, TabuList &tList) const;
 
+  void nhood_tabu_swap_random(State &state, TabuList &tList) const;
 
-  void nhood_oper_critical(State &state,
-                           pair<unsigned, unsigned> &chosenMov) const;
+  void nhood_tabu_rm_insert_random(State &state, TabuList &tList) const;
 
-  void nhood_oper_critical_alt(State &state,
-                               pair<unsigned, unsigned> &chosenMov) const;
+  void nhood_tabu_swap_earl_late(State &state, TabuList &tList) const;
+
+  void nhood_tabu_insert_earl_late(State &state, TabuList &tList) const;
+
+  void nhood_tabu_oper_critical(State &state, TabuList &tList) const;
+
+  void nhood_tabu_oper_critical_alt(State &state, TabuList &tList) const;
+
+  void nhood_ls_swap_adjacent(State &state) const;
+
+  void nhood_ls_swap_random(State &state) const;
+
+  void nhood_ls_rm_insert_random(State &state) const;
+
+  void nhood_ls_swap_earl_late(State &state) const;
+
+  void nhood_ls_insert_earl_late(State &state) const;
+
+  void nhood_ls_relax_2(State &state) const;
+
+  void nhood_ls_oper_critical(State &state) const;
+
+  void nhood_ls_oper_critical_alt(State &state) const;
 
   // ------------------------------ SEARCH METHODS -----------------------------
 
@@ -95,9 +114,13 @@ private:
   // schedule operations using MIP solver Cplex. Optimal scheduling.
   bool sched_cplex(State &state) const;
 
+  // ---------------------- METHOD GETTERS BY PARAMETERS -----------------------
+
   SchedPtr get_sched_by_param() const;
 
-  NHoodPtr get_nhood_by_param() const;
+  NHoodLSPtr get_nhood_ls_by_param() const;
+
+  NHoodTabuPtr get_nhood_tabu_by_param() const;
 
   // --------------------------------- EXTRAS ----------------------------------
 
@@ -107,6 +130,18 @@ private:
   // fills topo with topological sort and returns a boolean indicating if the
   // current graph has one or more cycles
   static bool topo_sort(const State &state);
+
+  // swap operation op1 with operation op2
+  void swap_opers(State &state, const unsigned op1, const unsigned op2) const;
+
+  // insert operation op1 after operation op2.
+  void rm_insert_oper_after(State &state, const unsigned op1,
+                            const unsigned op2) const;
+
+  // insert operation op1 before operation op2.
+  void rm_insert_oper_befor(State &state, const unsigned op1,
+                            const unsigned op2) const;
+
   // return cost of state if swap of operation move.first with operation
   // move.second was applied
   double evaluate_swap(State &state, pair<unsigned, unsigned> &move) const;
@@ -114,5 +149,28 @@ private:
   // return cost of state if insertion of operation move.first after (or before
   // depending on type) move.second was applied
   double evaluate_insert(State &state, pair<unsigned, unsigned> &move,
-                         Solver::InsertType type) const;
+                         Solver::MoveType type) const;
+
+  void update_tabulist_swap(TabuList &tList, State &state,
+                            pair<unsigned, unsigned> &move,
+                            bool areAllMovesTabu) const;
+
+  void update_tabulist_insert(TabuList &tList, State &state,
+                              pair<unsigned, unsigned> &move, MoveType type,
+                              bool areAllMovesTabu) const;
+
+  bool is_swap_tabu(TabuList &tList, State &state,
+                    pair<unsigned, unsigned> &move) const;
+
+  bool is_insert_tabu(TabuList &tList, State &state,
+                      pair<unsigned, unsigned> &move, MoveType type) const;
+
+  int get_swap_tabu_age(TabuList &tList, State &state,
+                         pair<unsigned, unsigned> &move) const;
+
+  int get_insert_tabu_age(TabuList &tList, State &state,
+                          pair<unsigned, unsigned> &move, MoveType type) const;
+
+  void run_tabu_search_swap(State &state, TabuList &tList) const;
+  void run_tabu_search_insert(State &state, TabuList &tList) const;
 };

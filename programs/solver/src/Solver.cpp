@@ -7,6 +7,8 @@
 
 vector<unsigned> Solver::indeg;
 vector<unsigned> Solver::q;
+vector<unsigned> Solver::_ops;
+vector<tuple<unsigned, unsigned, Solver::MoveType>> Solver::_cands;
 
 Solver::Solver(const Parameters &parameters) : params(parameters) {}
 
@@ -116,26 +118,48 @@ bool Solver::topo_sort(const State &state) {
   return head < inst.O - 1;
 }
 
-Solver::NHoodPtr Solver::get_nhood_by_param() const {
+Solver::NHoodLSPtr Solver::get_nhood_ls_by_param() const {
 
   Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
 
   switch (paramNHood) {
   case Parameters::Neighborhood::SWAP_ADJ:
-    return &Solver::nhood_swap_adjacent;
+    return &Solver::nhood_ls_swap_adjacent;
   case Parameters::Neighborhood::SWAP_PENAL:
-    return &Solver::nhood_swap_earl_late;
+    return &Solver::nhood_ls_swap_earl_late;
   case Parameters::Neighborhood::SWAP_RAND:
-    return &Solver::nhood_swap_random;
+    return &Solver::nhood_ls_swap_random;
   case Parameters::Neighborhood::INSERT_RAND:
-    return &Solver::nhood_rm_insert_random;
+    return &Solver::nhood_ls_rm_insert_random;
   case Parameters::Neighborhood::INSERT_PENAL:
-    return &Solver::nhood_insert_earl_late;
+    return &Solver::nhood_ls_insert_earl_late;
   case Parameters::Neighborhood::CRITICAL_OPER:
-    return &Solver::nhood_oper_critical;
+    return &Solver::nhood_ls_oper_critical;
   case Parameters::Neighborhood::CRITICAL_OPER_ALT:
-    return &Solver::nhood_oper_critical_alt;
+    return &Solver::nhood_ls_oper_critical_alt;
   }
+  return NULL;
+}
 
+Solver::NHoodTabuPtr Solver::get_nhood_tabu_by_param() const {
+
+  Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
+
+  switch (paramNHood) {
+  case Parameters::Neighborhood::SWAP_ADJ:
+    return &Solver::nhood_tabu_swap_adjacent;
+  case Parameters::Neighborhood::SWAP_PENAL:
+    return &Solver::nhood_tabu_swap_earl_late;
+  case Parameters::Neighborhood::SWAP_RAND:
+    return &Solver::nhood_tabu_swap_random;
+  case Parameters::Neighborhood::INSERT_RAND:
+    return &Solver::nhood_tabu_rm_insert_random;
+  case Parameters::Neighborhood::INSERT_PENAL:
+    return &Solver::nhood_tabu_insert_earl_late;
+  case Parameters::Neighborhood::CRITICAL_OPER:
+    return &Solver::nhood_tabu_oper_critical;
+  case Parameters::Neighborhood::CRITICAL_OPER_ALT:
+    return &Solver::nhood_tabu_oper_critical_alt;
+  }
   return NULL;
 }
