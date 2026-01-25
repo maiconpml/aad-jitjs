@@ -86,6 +86,48 @@ void Solver::rm_insert_oper_befor(State &state, const unsigned op1,
 
 void Solver::nhood_swap_adjacent(State &state,
                                  pair<unsigned, unsigned> &chosenMove) const {
+double Solver::evaluate_swap(State &state,
+                             pair<unsigned, unsigned> &move) const {
+  SchedPtr sched = get_sched_by_param();
+
+  unsigned i = move.first, j = move.second;
+  double cost = DBL_MAX;
+  swap_opers(state, i, j);
+  if (!(this->*sched)(state)) {
+    cost = state.penalties;
+  }
+  swap_opers(state, j, i);
+  return cost;
+}
+
+double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
+                               Solver::InsertType type) const {
+  SchedPtr sched = get_sched_by_param();
+  unsigned i = move.first, j = move.second;
+  unsigned _machOp1 = state._mach[i], machOp1 = state.mach[i];
+  double cost = DBL_MAX;
+
+  // do move
+  switch (type) {
+  case Solver::InsertType::BEFORE:
+    rm_insert_oper_befor(state, i, j);
+    break;
+  case Solver::InsertType::AFTER:
+    rm_insert_oper_after(state, i, j);
+  }
+  // if valid, get cost
+  if (!(this->*sched)(state)) {
+    cost = state.penalties;
+  }
+  // undo move
+  if (_machOp1)
+    rm_insert_oper_after(state, i, _machOp1);
+  else
+    rm_insert_oper_befor(state, i, machOp1);
+
+  return cost;
+}
+
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 

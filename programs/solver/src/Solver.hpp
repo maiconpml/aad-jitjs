@@ -107,4 +107,12 @@ private:
   // fills topo with topological sort and returns a boolean indicating if the
   // current graph has one or more cycles
   static bool topo_sort(const State &state);
+  // return cost of state if swap of operation move.first with operation
+  // move.second was applied
+  double evaluate_swap(State &state, pair<unsigned, unsigned> &move) const;
+
+  // return cost of state if insertion of operation move.first after (or before
+  // depending on type) move.second was applied
+  double evaluate_insert(State &state, pair<unsigned, unsigned> &move,
+                         Solver::InsertType type) const;
 };
