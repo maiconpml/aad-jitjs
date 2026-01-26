@@ -129,9 +129,11 @@ int Solver::get_insert_tabu_age(TabuList &tList, State &state,
 void Solver::update_tabulist_swap(TabuList &tList, State &state,
                                   pair<unsigned, unsigned> &move,
                                   bool areAllMovesTabu) const {
+  SchedPtr sched = get_sched_by_param();
   unsigned _machFirst = state._mach[move.first],
            _machSecond = state._mach[move.second];
   swap_opers(state, move.first, move.second);
+  (this->*sched)(state);
   if (areAllMovesTabu) {
     tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
     tList.passTime(tList.timeToLeave(state._mach[move.second], move.second));
@@ -143,6 +145,7 @@ void Solver::update_tabulist_swap(TabuList &tList, State &state,
 void Solver::update_tabulist_insert(TabuList &tList, State &state,
                                     pair<unsigned, unsigned> &move,
                                     MoveType type, bool areAllMovesTabu) const {
+  SchedPtr sched = get_sched_by_param();
   unsigned _machFirst = state._mach[move.first],
            _machSecond = state._mach[move.second];
   switch (type) {
@@ -152,6 +155,7 @@ void Solver::update_tabulist_insert(TabuList &tList, State &state,
   case Solver::MoveType::AFTER:
     rm_insert_oper_after(state, move.first, move.second);
   }
+  (this->*sched)(state);
 
   if (areAllMovesTabu)
     tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
