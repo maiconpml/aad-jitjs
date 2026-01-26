@@ -59,7 +59,7 @@ private:
 
   void cands_swap_adjacent(State &state) const;
 
-  void cands_swap_random(State &state);
+  void cands_swap_random(State &state) const;
 
   void cands_rm_insert_random(State &state) const;
 

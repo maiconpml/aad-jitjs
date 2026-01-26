@@ -325,7 +325,7 @@ void Solver::nhood_tabu_swap_adjacent(State &state, TabuList &tList) const {
   run_tabu_search_swap(state, tList);
 }
 
-void Solver::cands_swap_random(State &state) {
+void Solver::cands_swap_random(State &state) const {
   const Instance &inst = Instance::getInstance();
   _cands.clear();
   unsigned op1, op2;
