@@ -179,6 +179,7 @@ double Solver::evaluate_swap(State &state,
   double cost = DBL_MAX;
   swap_opers(state, i, j);
   if (!(this->*sched)(state)) {
+    assert(validate_state(state));
     cost = state.penalties;
   }
   swap_opers(state, j, i);
@@ -202,6 +203,7 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   }
   // if valid, get cost
   if (!(this->*sched)(state)) {
+    assert(validate_state(state));
     cost = state.penalties;
   }
   // undo move
@@ -261,11 +263,11 @@ void Solver::run_tabu_search_swap(State &state, TabuList &tList) const {
     }
     assert(state == debugState);
   }
-
+  assert(state == debugState);
   if (bestMovePenalties == DBL_MAX)
-    update_tabulist_swap(tList, state, oldestTabuMove, false);
+    update_tabulist_swap(tList, state, oldestTabuMove, true);
   else
-    update_tabulist_swap(tList, state, bestMove, true);
+    update_tabulist_swap(tList, state, bestMove, false);
 
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
@@ -324,10 +326,11 @@ void Solver::run_tabu_search_insert(State &state, TabuList &tList) const {
     assert(state == debugState);
   }
 
+  assert(state == debugState);
   if (bestMovePenalties == DBL_MAX)
-    update_tabulist_insert(tList, state, oldestTabuMove, oldestMoveType, false);
+    update_tabulist_insert(tList, state, oldestTabuMove, oldestMoveType, true);
   else
-    update_tabulist_insert(tList, state, bestMove, bestMoveType, true);
+    update_tabulist_insert(tList, state, bestMove, bestMoveType, false);
 
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
