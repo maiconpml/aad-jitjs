@@ -13,7 +13,8 @@ public:
   void push(const TabuTrio &tt);
 
   // replace this->cands with cands
-  void updateCands(const vector<pair<unsigned, unsigned>> &cands);
+  void
+  updateCands(const vector<tuple<unsigned, unsigned, Solver::MoveType>> &cands);
 
   // if stack is not empty, remove top element of stack
   TabuTrio pop();

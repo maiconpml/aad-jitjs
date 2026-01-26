@@ -11,6 +11,8 @@ public:
 
   State solve();
 
+  enum class MoveType { SWAP, BEFORE, AFTER };
+
 private:
   // current execution parameters
   Parameters params;
@@ -27,7 +29,6 @@ private:
 
   using SchedPtr = bool (Solver::*)(State &) const;
 
-  enum class MoveType { SWAP, BEFORE, AFTER };
 
   static vector<tuple<unsigned, unsigned, MoveType>> _cands;
   // --------------------------- DISPATCHING RULES -----------------------------

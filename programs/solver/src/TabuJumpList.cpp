@@ -25,15 +25,18 @@ void TabuJumpList::push(const TabuTrio &tt) {
   ttList[top] = tt;
 }
 
-void TabuJumpList::updateCands(const vector<pair<unsigned, unsigned>> &cands) {
+void TabuJumpList::updateCands(
+    const vector<tuple<unsigned, unsigned, Solver::MoveType>> &cands) {
   assert(!isEmpty);
 
 #ifndef NDEBUG
   bool found;
-  for (const pair<unsigned, unsigned> &p1 : cands) {
+  for (const tuple<unsigned, unsigned, Solver::MoveType> &p1 : cands) {
     found = false;
-    for (const pair<unsigned, unsigned> &p2 : ttList[top].nhoodMoves) {
-      if (p1.first == p2.first && p1.second == p2.second)
+    for (const tuple<unsigned, unsigned, Solver::MoveType> &p2 :
+         ttList[top].nhoodMoves) {
+      if (get<0>(p1) == get<0>(p2) && get<1>(p1) == get<1>(p2) &&
+          get<2>(p1) == get<2>(p2))
         found = true;
     }
     assert(found);
