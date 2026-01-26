@@ -145,7 +145,13 @@ void Solver::update_tabulist_insert(TabuList &tList, State &state,
                                     MoveType type, bool areAllMovesTabu) const {
   unsigned _machFirst = state._mach[move.first],
            _machSecond = state._mach[move.second];
-  swap_opers(state, move.first, move.second);
+  switch (type) {
+  case Solver::MoveType::BEFORE:
+    rm_insert_oper_befor(state, move.first, move.second);
+    break;
+  case Solver::MoveType::AFTER:
+    rm_insert_oper_after(state, move.first, move.second);
+  }
 
   if (areAllMovesTabu)
     tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
