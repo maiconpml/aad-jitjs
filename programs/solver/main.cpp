@@ -36,7 +36,19 @@ int main(int argc, char *argv[]) {
         "sched", po::value<string>()->default_value("EARLY"),
         "scheduler (EARLY, CPLEX)")(
         "autoConfig", po::bool_switch()->default_value(false),
-        "print only the result for automatic configuration");
+        "print only the result for automatic configuration")(
+        "maxD", po::value<unsigned>()->default_value(5),
+        "Maximum size of cycle during tabu search")(
+        "maxC", po::value<unsigned>()->default_value(3),
+        "Maximum number of repetitions of same cycle during tabu search")(
+        "tenure", po::value<unsigned>()->default_value(20),
+        "number of tabu iterations a move remains tabu")(
+        "jumpListSz", po::value<unsigned>()->default_value(20),
+        "number of past elite states to be stored to backjump")(
+        "initJumpLimit", po::value<unsigned>()->default_value(10),
+        "number of iterations without improvement to trigger a backjump")(
+        "decreaseDivisor", po::value<unsigned>()->default_value(2),
+        "each jump made reduces the jumpLimit by decreaseDivisor times");
     po::positional_options_description pod;
     pod.add("instPath", 1); // instance is positional as well
     po::variables_map vm;
@@ -59,6 +71,12 @@ int main(int argc, char *argv[]) {
     param.maxMilli = vm["maxMilli"].as<unsigned>();
     param.seed = vm["seed"].as<unsigned>();
     param.autoConfig = vm["autoConfig"].as<bool>();
+    param.maxD = vm["maxD"].as<unsigned>();
+    param.maxC = vm["maxC"].as<unsigned>();
+    param.tenure = vm["tenure"].as<unsigned>();
+    param.jumpListSize = vm["jumpListSz"].as<unsigned>();
+    param.initialJumpLimit = vm["initJumpLimit"].as<unsigned>();
+    param.decreaseDivisor = vm["decreaseDivisor"].as<unsigned>();
 
     string initSolStr = vm["initSol"].as<string>();
     if (initSolStr == "GT") {

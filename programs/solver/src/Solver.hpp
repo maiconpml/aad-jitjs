@@ -27,8 +27,9 @@ private:
 
   using NHoodTabuPtr = void (Solver::*)(State &, TabuList &) const;
 
-  using SchedPtr = bool (Solver::*)(State &) const;
+  using CandsPtr = void (Solver::*)(State &) const;
 
+  using SchedPtr = bool (Solver::*)(State &) const;
 
   static vector<tuple<unsigned, unsigned, MoveType>> _cands;
   // --------------------------- DISPATCHING RULES -----------------------------
@@ -104,6 +105,8 @@ private:
 
   // ------------------------------ SEARCH METHODS -----------------------------
 
+  void search_tabu(State &initialSol);
+
   void search_ls(State &initialSol);
 
   // -------------------------------- SCHEDULERS -------------------------------
@@ -123,6 +126,7 @@ private:
 
   NHoodTabuPtr get_nhood_tabu_by_param() const;
 
+  CandsPtr get_cands_by_param() const;
   // --------------------------------- EXTRAS ----------------------------------
 
   // verify if state satisfy the problem's constraints
@@ -167,7 +171,7 @@ private:
                       pair<unsigned, unsigned> &move, MoveType type) const;
 
   int get_swap_tabu_age(TabuList &tList, State &state,
-                         pair<unsigned, unsigned> &move) const;
+                        pair<unsigned, unsigned> &move) const;
 
   int get_insert_tabu_age(TabuList &tList, State &state,
                           pair<unsigned, unsigned> &move, MoveType type) const;

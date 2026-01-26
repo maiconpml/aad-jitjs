@@ -56,6 +56,7 @@ State Solver::solve() {
   case Parameters::SearchMethod::ILS:
     break;
   case Parameters::SearchMethod::TABU:
+    search_tabu(best);
     break;
   }
 
@@ -160,6 +161,28 @@ Solver::NHoodTabuPtr Solver::get_nhood_tabu_by_param() const {
     return &Solver::nhood_tabu_oper_critical;
   case Parameters::Neighborhood::CRITICAL_OPER_ALT:
     return &Solver::nhood_tabu_oper_critical_alt;
+  }
+  return NULL;
+}
+
+Solver::CandsPtr Solver::get_cands_by_param() const {
+  Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
+
+  switch (paramNHood) {
+  case Parameters::Neighborhood::SWAP_ADJ:
+    return &Solver::cands_swap_adjacent;
+  case Parameters::Neighborhood::SWAP_PENAL:
+    return &Solver::cands_swap_earl_late;
+  case Parameters::Neighborhood::SWAP_RAND:
+    return &Solver::cands_swap_random;
+  case Parameters::Neighborhood::INSERT_RAND:
+    return &Solver::cands_rm_insert_random;
+  case Parameters::Neighborhood::INSERT_PENAL:
+    return &Solver::cands_insert_earl_late;
+  case Parameters::Neighborhood::CRITICAL_OPER:
+    return &Solver::cands_oper_critical;
+  case Parameters::Neighborhood::CRITICAL_OPER_ALT:
+    return &Solver::cands_oper_critical_alt;
   }
   return NULL;
 }
