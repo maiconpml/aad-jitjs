@@ -232,14 +232,18 @@ void Solver::run_tabu_search_swap(State &state, TabuList &tList) const {
   if (paramTraversing == Parameters::NHoodTraversing::FI)
     shuffle(_cands.begin(), _cands.end(), Random::getEngine());
 
+  bool isTabu = false, isAspiration = false;
+  int curMoveTabuAge = -1;
   for (unsigned i = 0; i < _cands.size(); ++i) {
     move = make_pair(get<0>(_cands[i]), get<1>(_cands[i]));
     double curPenal = evaluate_swap(state, move);
 
     if (curPenal < bestMovePenalties) {
-      bool isTabu = is_swap_tabu(tList, state, move);
-      int curMoveTabuAge = get_swap_tabu_age(tList, state, move);
-      bool isAspiration = curPenal < best.penalties;
+      isTabu = is_swap_tabu(tList, state, move);
+      if (isTabu) {
+        curMoveTabuAge = get_swap_tabu_age(tList, state, move);
+        isAspiration = curPenal < best.penalties;
+      }
 
       if (!isTabu || isAspiration) {
         bestMove = move;
@@ -287,15 +291,20 @@ void Solver::run_tabu_search_insert(State &state, TabuList &tList) const {
   if (paramTraversing == Parameters::NHoodTraversing::FI)
     shuffle(_cands.begin(), _cands.end(), Random::getEngine());
 
+  bool isTabu = false, isAspiration = false;
+  int curMoveTabuAge = -1;
   for (unsigned i = 0; i < _cands.size(); ++i) {
     move = make_pair(get<0>(_cands[i]), get<1>(_cands[i]));
     MoveType type = get<2>(_cands[i]);
+
     double curPenal = evaluate_insert(state, move, type);
 
     if (curPenal < bestMovePenalties) {
-      bool isTabu = is_insert_tabu(tList, state, move, type);
-      int curMoveTabuAge = get_insert_tabu_age(tList, state, move, type);
-      bool isAspiration = curPenal < best.penalties;
+      isTabu = is_insert_tabu(tList, state, move, type);
+      if (isTabu) {
+        curMoveTabuAge = get_insert_tabu_age(tList, state, move, type);
+        isAspiration = curPenal < best.penalties;
+      }
 
       if (!isTabu || isAspiration) {
         bestMove = move;
