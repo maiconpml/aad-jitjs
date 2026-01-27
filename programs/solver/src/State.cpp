@@ -10,7 +10,7 @@ double State::calc_penalties() {
   tPenalty = 0;
   ePenalty = 0;
   for (unsigned o = 1; o < starts.size(); ++o) {
-    curEarl = inst.deadlines[o] - starts[o] + inst.P[o];
+    curEarl = inst.deadlines[o] - (starts[o] + inst.P[o]);
     curTard = starts[o] + inst.P[o] - inst.deadlines[o];
     if (curEarl > 0)
       ePenalty += curEarl * inst.earlCoefs[o];
