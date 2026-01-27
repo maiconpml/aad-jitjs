@@ -135,8 +135,10 @@ void Solver::update_tabulist_swap(TabuList &tList, State &state,
   swap_opers(state, move.first, move.second);
   (this->*sched)(state);
   if (areAllMovesTabu) {
-    tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
-    tList.passTime(tList.timeToLeave(state._mach[move.second], move.second));
+    if (tList.isTabu(state._mach[move.first], move.first))
+      tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
+    if (tList.isTabu(state._mach[move.second], move.second))
+      tList.passTime(tList.timeToLeave(state._mach[move.second], move.second));
   }
   tList.insert(_machFirst, move.first);
   tList.insert(_machSecond, move.second);
