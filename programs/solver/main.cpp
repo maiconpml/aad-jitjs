@@ -46,8 +46,13 @@ int main(int argc, char *argv[]) {
         "neighborhood structure 6")(
         "nhood7", po::value<string>()->default_value("SWAP_ADJ"),
         "neighborhood structure 7")(
-        "nHoodTravers", po::value<string>()->default_value("BI"),
-        "neighborhood traversing (BI, FI, ELT_LIST)")(
+        "nHoodTravers1", po::value<string>()->default_value("BI"), "neighborhood traversing 1 (BI, FI, ELT_LIST)")(
+        "nHoodTravers2", po::value<string>()->default_value("BI"), "neighborhood traversing 2 (BI, FI, ELT_LIST)")(
+        "nHoodTravers3", po::value<string>()->default_value("BI"), "neighborhood traversing 3 (BI, FI, ELT_LIST)")(
+        "nHoodTravers4", po::value<string>()->default_value("BI"), "neighborhood traversing 4 (BI, FI, ELT_LIST)")(
+        "nHoodTravers5", po::value<string>()->default_value("BI"), "neighborhood traversing 5 (BI, FI, ELT_LIST)")(
+        "nHoodTravers6", po::value<string>()->default_value("BI"), "neighborhood traversing 6 (BI, FI, ELT_LIST)")(
+        "nHoodTravers7", po::value<string>()->default_value("BI"), "neighborhood traversing 7 (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
         "scheduler (EARLY, CPLEX)")(
         "autoConfig", po::bool_switch()->default_value(false),
@@ -161,19 +166,18 @@ int main(int argc, char *argv[]) {
     }
     param.currentNHood = 0;
 
-    string nhoodTravStr = vm["nHoodTravers"].as<string>();
-    Parameters::NHoodTraversing trav;
-    if (nhoodTravStr == "BI") {
-      trav = Parameters::NHoodTraversing::BI;
-    } else if (nhoodTravStr == "FI") {
-      trav = Parameters::NHoodTraversing::FI;
-    } else if (nhoodTravStr == "ELT_LIST") {
-      trav = Parameters::NHoodTraversing::ELT_LIST;
-    } else {
-      throw string("Invalid neighborhood traversing: " + nhoodTravStr);
-    }
-    for (unsigned i = 0; i < numNHoods; ++i) {
-      param.nHoodsTraversings.push_back(trav);
+    for (unsigned i = 1; i <= numNHoods; ++i) {
+      string key = "nHoodTravers" + to_string(i);
+      string nhoodTravStr = vm[key].as<string>();
+      if (nhoodTravStr == "BI") {
+        param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::BI);
+      } else if (nhoodTravStr == "FI") {
+        param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::FI);
+      } else if (nhoodTravStr == "ELT_LIST") {
+        param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::ELT_LIST);
+      } else {
+        throw string("Invalid neighborhood traversing: " + nhoodTravStr);
+      }
     }
 
     string sched = vm["sched"].as<string>();
