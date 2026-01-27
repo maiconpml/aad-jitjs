@@ -88,6 +88,10 @@ private:
   void nhood_ls_oper_critical(State &state) const;
 
   void nhood_ls_oper_critical_alt(State &state) const;
+  // ------------------------------- PERTUBATIONS ------------------------------
+
+
+  void pert_swap_adj_random(State &state, unsigned strength);
 
   // ------------------------------ SEARCH METHODS -----------------------------
 
