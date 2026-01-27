@@ -1,5 +1,5 @@
-build_release/
-build_debug/
+release_build/
+debug_build/
 .cache/
 compile_commands.json
 .vscode/
