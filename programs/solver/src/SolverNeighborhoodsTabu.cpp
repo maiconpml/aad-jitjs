@@ -266,10 +266,12 @@ void Solver::run_ns_tabu_swap(State &state, TabuList &tList) const {
     assert(state == debugState);
   }
   assert(state == debugState);
-  if (bestMovePenalties == DBL_MAX)
-    update_tabulist_swap(tList, state, oldestTabuMove, true);
-  else
+  if (bestMovePenalties == DBL_MAX) {
+    if (oldestTabuMoveAge != -1)
+      update_tabulist_swap(tList, state, oldestTabuMove, true);
+  } else {
     update_tabulist_swap(tList, state, bestMove, false);
+  }
 
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
@@ -329,11 +331,13 @@ void Solver::run_ns_tabu_insert(State &state, TabuList &tList) const {
   }
 
   assert(state == debugState);
-  if (bestMovePenalties == DBL_MAX)
-    update_tabulist_insert(tList, state, oldestTabuMove, oldestMoveType, true);
-  else
+  if (bestMovePenalties == DBL_MAX) {
+    if (oldestTabuMoveAge != -1)
+      update_tabulist_insert(tList, state, oldestTabuMove, oldestMoveType,
+                             true);
+  } else {
     update_tabulist_insert(tList, state, bestMove, bestMoveType, false);
-
+  }
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
 
