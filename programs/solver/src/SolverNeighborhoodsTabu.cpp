@@ -500,16 +500,17 @@ void Solver::cands_oper_critical(State &state) const {
 
   state.find_blocks(machBlocks, opToBlock);
 
+  unsigned curOp;
   vector<bool> isOpChecked(inst.O, false);
   for (unsigned o = 1; o < inst.O; ++o) {
     if (state.starts[o] + inst.P[o] <= inst.deadlines[o])
       continue;
-
+    curOp = o;
     unsigned curBlock;
     unsigned curOpPos;
-    while (state._mach[o] || inst._job[o]) {
-      curBlock = opToBlock[o].first;
-      curOpPos = opToBlock[o].second;
+    while (state._mach[curOp] || inst._job[curOp]) {
+      curBlock = opToBlock[curOp].first;
+      curOpPos = opToBlock[curOp].second;
       if (isOpChecked[machBlocks[curBlock][curOpPos]])
         break;
       if (curOpPos > 0) {
@@ -527,7 +528,7 @@ void Solver::cands_oper_critical(State &state) const {
         isOpChecked[machBlocks[curBlock][1]] = true;
       }
 
-      o = inst._job[machBlocks[curBlock][0]];
+      curOp = inst._job[machBlocks[curBlock][0]];
     }
   }
 }
@@ -540,17 +541,19 @@ void Solver::cands_oper_critical_alt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
   _cands.clear();
+  unsigned curOp;
   for (unsigned o = 1; o < inst.O; ++o) {
     vector<unsigned> opCritic;
 
+    curOp = o;
     opCritic.push_back(o);
-    while (inst._job[o] != 0 || state._mach[o] != 0) {
+    while (inst._job[curOp] != 0 || state._mach[curOp] != 0) {
 
-      while (state._mach[o] &&
-             state.starts[state._mach[o]] + inst.P[state._mach[o]] >
-                 state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
-        opCritic.push_back(state._mach[o]);
-        o = state._mach[o];
+      while (state._mach[curOp] &&
+             state.starts[state._mach[curOp]] + inst.P[state._mach[curOp]] >
+                 state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
+        opCritic.push_back(state._mach[curOp]);
+        curOp = state._mach[curOp];
       }
       if (opCritic.size() > 1)
         _cands.push_back(make_tuple(opCritic[0], opCritic[1], MoveType::SWAP));
@@ -559,7 +562,7 @@ void Solver::cands_oper_critical_alt(State &state) const {
                                     opCritic[opCritic.size() - 2],
                                     MoveType::SWAP));
 
-      o = inst._job[o];
+      curOp = inst._job[curOp];
       opCritic.clear();
     }
   }
