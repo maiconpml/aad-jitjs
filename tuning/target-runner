@@ -1,19 +1,24 @@
 #!/bin/bash
-EXE="../build_release/programs/solver/solver"
+# Get the directory of the current script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+EXE="$DIR/../release_build/programs/solver/solver"
+
 # Ensure the executable exists
 if [ ! -f "$EXE" ]; then
     echo "Executable $EXE not found" >&2
     exit 1
 fi
 
-INSTANCE=$4
+# Resolve the instance path relative to the script directory
+# The paths in train-instances.txt are relative to the tuning directory
+INSTANCE="$DIR/$4"
 SEED=$3
 CONFIG_PARAMS=${@:5}
 
 # Run the solver and capture output
 # The output is formatted like: penalties tPenalty ePenalty millisecsFound elapsedMs instPath
 # We only want the penalties (the first value)
-RESULT=$($EXE "$INSTANCE" --seed "$SEED" --maxMilli 1000 --autoConfig $CONFIG_PARAMS)
+RESULT=$($EXE "$INSTANCE" --seed "$SEED" --maxMilli 30000 --autoConfig $CONFIG_PARAMS)
 
 if [ $? -ne 0 ]; then
     echo "Solver failed" >&2
