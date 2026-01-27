@@ -107,17 +107,29 @@ void Solver::search_tabu(State &state) {
 
 void Solver::search_ils(State &state) {
 
+  if (params.searchMethods[params.currentSearchMethod] ==
+      Parameters::SearchMethod::ILS) {
+    params.currentSearchMethod++;
+  }
   SearchPtr search = get_search_by_param();
+  State curState;
 
-  State curState = state;
+  unsigned paramPertStr = params.perturbationStrength;
+  int n = params.nHoods.size();
 
-  while (!Timer::isTimeExceeded(params.maxMilli)) {
+  while (!Timer::isTimeExceeded(params.maxMilli) && params.currentNHood < n) {
 
-    pert_swap_adj_random(curState, 30);
+    curState = state;
+
+    pert_swap_adj_random(curState, paramPertStr);
+
     (this->*search)(curState);
 
     if (curState.penalties < state.penalties) {
       state = curState;
+      params.currentNHood = 0;
+    } else if (n > 1) {
+      ++params.currentNHood;
     }
   }
 }

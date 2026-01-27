@@ -67,6 +67,10 @@ public:
 
   unsigned decreaseDivisor;
 
+  // ---------------------- currentSearchMethod == ILS -------------------------
+
+  unsigned perturbationStrength;
+
   // ------------------------------ EXTRAS -------------------------------------
   // print only objective value for irace
   bool autoConfig;
