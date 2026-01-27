@@ -86,7 +86,6 @@ bool Solver::topo_sort(const State &state) {
       q.push_back(o);
     }
   }
-  assert(!q.empty());
 
   while (head < q.size()) {
     curOp = q[head++];
@@ -185,6 +184,8 @@ Solver::SearchPtr Solver::get_search_by_param() const {
     return &Solver::search_ls;
   case Parameters::SearchMethod::TABU:
     return &Solver::search_tabu;
+  case Parameters::SearchMethod::ILS:
+    return &Solver::search_ils;
   }
   return NULL;
 }

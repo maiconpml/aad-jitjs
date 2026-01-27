@@ -26,8 +26,10 @@ int main(int argc, char *argv[]) {
         "initial solution algorithm (GT, CONSTR)")(
         "dispatchRule", po::value<string>()->default_value("EDD"),
         "dispatching rule (EDD, ACS, RAND)")(
-        "searchMethod", po::value<string>()->default_value("LS"),
-        "search method (LS, ILS, TABU)")(
+        "search1", po::value<string>()->default_value("LS"),
+        "main search method (LS, ILS, TABU)")(
+        "search2", po::value<string>()->default_value("LS"),
+        "internal search method if ILS is chosen on search1 (LS, TABU)")(
         "nhood", po::value<string>()->default_value("SWAP_ADJ"),
         "neighborhood structure (SWAP_ADJS, WAP_RAND, INSERT_RAND, SWAP_PENAL, "
         "INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT)")(
@@ -98,11 +100,19 @@ int main(int argc, char *argv[]) {
       throw string("Invalid dispatching rule: " + dispRuleStr);
     }
 
-    string searchMethodStr = vm["searchMethod"].as<string>();
+    string searchMethodStr = vm["search1"].as<string>();
     if (searchMethodStr == "LS") {
       param.searchMethods.push_back(Parameters::SearchMethod::LS);
     } else if (searchMethodStr == "ILS") {
       param.searchMethods.push_back(Parameters::SearchMethod::ILS);
+    } else if (searchMethodStr == "TABU") {
+      param.searchMethods.push_back(Parameters::SearchMethod::TABU);
+    } else {
+      throw string("Invalid search method: " + searchMethodStr);
+    }
+    searchMethodStr = vm["search2"].as<string>();
+    if (searchMethodStr == "LS") {
+      param.searchMethods.push_back(Parameters::SearchMethod::LS);
     } else if (searchMethodStr == "TABU") {
       param.searchMethods.push_back(Parameters::SearchMethod::TABU);
     } else {
