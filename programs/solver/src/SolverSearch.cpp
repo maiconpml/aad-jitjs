@@ -33,7 +33,7 @@ void Solver::search_ls(State &initialSol) {
 void Solver::search_tabu(State &initialSol) {
   const Instance &inst = Instance::getInstance();
 
-  NHoodTabuPtr nhood = get_nhood_tabu_by_param();
+  NSTabuPtr nsp = get_ns_tabu_by_param();
 
   CandsPtr cands = get_cands_by_param();
 
@@ -85,7 +85,7 @@ void Solver::search_tabu(State &initialSol) {
     }
 
     if (!_cands.empty())
-      (this->*nhood)(curState, tList);
+      (this->*nsp)(curState, tList);
     else
       emptyNHood = true;
 

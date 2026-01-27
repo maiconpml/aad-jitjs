@@ -217,7 +217,7 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   return cost;
 }
 
-void Solver::run_tabu_search_swap(State &state, TabuList &tList) const {
+void Solver::run_ns_tabu_swap(State &state, TabuList &tList) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
@@ -274,7 +274,7 @@ void Solver::run_tabu_search_swap(State &state, TabuList &tList) const {
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
 
-void Solver::run_tabu_search_insert(State &state, TabuList &tList) const {
+void Solver::run_ns_tabu_insert(State &state, TabuList &tList) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
@@ -345,10 +345,6 @@ void Solver::cands_swap_adjacent(State &state) const {
   }
 }
 
-void Solver::nhood_tabu_swap_adjacent(State &state, TabuList &tList) const {
-  run_tabu_search_swap(state, tList);
-}
-
 void Solver::cands_swap_random(State &state) const {
   const Instance &inst = Instance::getInstance();
   _cands.clear();
@@ -360,10 +356,6 @@ void Solver::cands_swap_random(State &state) const {
   }
 }
 
-void Solver::nhood_tabu_swap_random(State &state, TabuList &tList) const {
-  run_tabu_search_swap(state, tList);
-}
-
 void Solver::cands_rm_insert_random(State &state) const {
   const Instance &inst = Instance::getInstance();
   _cands.clear();
@@ -373,10 +365,6 @@ void Solver::cands_rm_insert_random(State &state) const {
     op2 = inst.machOpers[inst.operToM[op1]][Random::get(inst.J)];
     _cands.push_back(make_tuple(op1, op2, MoveType::AFTER));
   }
-}
-
-void Solver::nhood_tabu_rm_insert_random(State &state, TabuList &tList) const {
-  run_tabu_search_insert(state, tList);
 }
 
 void Solver::cands_swap_earl_late(State &state) const {
@@ -418,10 +406,6 @@ void Solver::cands_swap_earl_late(State &state) const {
       }
     }
   }
-}
-
-void Solver::nhood_tabu_swap_earl_late(State &state, TabuList &tList) const {
-  run_tabu_search_swap(state, tList);
 }
 
 void Solver::cands_insert_earl_late(State &state) const {
@@ -486,10 +470,6 @@ void Solver::cands_insert_earl_late(State &state) const {
   }
 }
 
-void Solver::nhood_tabu_insert_earl_late(State &state, TabuList &tList) const {
-  run_tabu_search_insert(state, tList);
-}
-
 void Solver::cands_oper_critical(State &state) const {
   const Instance &inst = Instance::getInstance();
 
@@ -533,10 +513,6 @@ void Solver::cands_oper_critical(State &state) const {
   }
 }
 
-void Solver::nhood_tabu_oper_critical(State &state, TabuList &tList) const {
-  run_tabu_search_swap(state, tList);
-}
-
 void Solver::cands_oper_critical_alt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
@@ -573,8 +549,4 @@ void Solver::cands_oper_critical_alt(State &state) const {
       opCritic.clear();
     }
   }
-}
-
-void Solver::nhood_tabu_oper_critical_alt(State &state, TabuList &tList) const {
-  run_tabu_search_swap(state, tList);
 }

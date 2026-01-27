@@ -25,7 +25,7 @@ private:
 
   using NHoodLSPtr = void (Solver::*)(State &) const;
 
-  using NHoodTabuPtr = void (Solver::*)(State &, TabuList &) const;
+  using NSTabuPtr = void (Solver::*)(State &, TabuList &) const;
 
   using CandsPtr = void (Solver::*)(State &) const;
 
@@ -73,20 +73,6 @@ private:
 
   void cands_oper_critical_alt(State &state) const;
 
-  void nhood_tabu_swap_adjacent(State &state, TabuList &tList) const;
-
-  void nhood_tabu_swap_random(State &state, TabuList &tList) const;
-
-  void nhood_tabu_rm_insert_random(State &state, TabuList &tList) const;
-
-  void nhood_tabu_swap_earl_late(State &state, TabuList &tList) const;
-
-  void nhood_tabu_insert_earl_late(State &state, TabuList &tList) const;
-
-  void nhood_tabu_oper_critical(State &state, TabuList &tList) const;
-
-  void nhood_tabu_oper_critical_alt(State &state, TabuList &tList) const;
-
   void nhood_ls_swap_adjacent(State &state) const;
 
   void nhood_ls_swap_random(State &state) const;
@@ -124,7 +110,7 @@ private:
 
   NHoodLSPtr get_nhood_ls_by_param() const;
 
-  NHoodTabuPtr get_nhood_tabu_by_param() const;
+  NSTabuPtr get_ns_tabu_by_param() const;
 
   CandsPtr get_cands_by_param() const;
   // --------------------------------- EXTRAS ----------------------------------
@@ -176,6 +162,6 @@ private:
   int get_insert_tabu_age(TabuList &tList, State &state,
                           pair<unsigned, unsigned> &move, MoveType type) const;
 
-  void run_tabu_search_swap(State &state, TabuList &tList) const;
-  void run_tabu_search_insert(State &state, TabuList &tList) const;
+  void run_ns_tabu_swap(State &state, TabuList &tList) const;
+  void run_ns_tabu_insert(State &state, TabuList &tList) const;
 };

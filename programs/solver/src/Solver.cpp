@@ -142,25 +142,20 @@ Solver::NHoodLSPtr Solver::get_nhood_ls_by_param() const {
   return NULL;
 }
 
-Solver::NHoodTabuPtr Solver::get_nhood_tabu_by_param() const {
+Solver::NSTabuPtr Solver::get_ns_tabu_by_param() const {
 
   Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
 
   switch (paramNHood) {
   case Parameters::Neighborhood::SWAP_ADJ:
-    return &Solver::nhood_tabu_swap_adjacent;
   case Parameters::Neighborhood::SWAP_PENAL:
-    return &Solver::nhood_tabu_swap_earl_late;
   case Parameters::Neighborhood::SWAP_RAND:
-    return &Solver::nhood_tabu_swap_random;
-  case Parameters::Neighborhood::INSERT_RAND:
-    return &Solver::nhood_tabu_rm_insert_random;
-  case Parameters::Neighborhood::INSERT_PENAL:
-    return &Solver::nhood_tabu_insert_earl_late;
   case Parameters::Neighborhood::CRITICAL_OPER:
-    return &Solver::nhood_tabu_oper_critical;
   case Parameters::Neighborhood::CRITICAL_OPER_ALT:
-    return &Solver::nhood_tabu_oper_critical_alt;
+    return &Solver::run_ns_tabu_swap;
+  case Parameters::Neighborhood::INSERT_RAND:
+  case Parameters::Neighborhood::INSERT_PENAL:
+    return &Solver::run_ns_tabu_insert;
   }
   return NULL;
 }
