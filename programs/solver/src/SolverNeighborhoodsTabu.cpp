@@ -540,6 +540,7 @@ void Solver::nhood_tabu_oper_critical(State &state, TabuList &tList) const {
 void Solver::cands_oper_critical_alt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
+  vector<bool> isOpChecked(inst.O, false);
   _cands.clear();
   unsigned curOp;
   for (unsigned o = 1; o < inst.O; ++o) {
@@ -555,12 +556,18 @@ void Solver::cands_oper_critical_alt(State &state) const {
         opCritic.push_back(state._mach[curOp]);
         curOp = state._mach[curOp];
       }
-      if (opCritic.size() > 1)
+      if (!isOpChecked[opCritic[0]] && opCritic.size() > 1) {
         _cands.push_back(make_tuple(opCritic[0], opCritic[1], MoveType::SWAP));
-      if (opCritic.size() > 2)
+        isOpChecked[opCritic[0]] = true;
+      }
+      if (isOpChecked[opCritic[opCritic.size() - 1]])
+        break;
+      if (opCritic.size() > 2) {
         _cands.push_back(make_tuple(opCritic[opCritic.size() - 1],
                                     opCritic[opCritic.size() - 2],
                                     MoveType::SWAP));
+        isOpChecked[opCritic[opCritic.size() - 1]] = true;
+      }
 
       curOp = inst._job[curOp];
       opCritic.clear();
