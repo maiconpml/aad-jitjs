@@ -30,9 +30,22 @@ int main(int argc, char *argv[]) {
         "main search method (LS, ILS, TABU)")(
         "search2", po::value<string>()->default_value("LS"),
         "internal search method if ILS is chosen on search1 (LS, TABU)")(
-        "nhood", po::value<string>()->default_value("SWAP_ADJ"),
-        "neighborhood structure (SWAP_ADJS, WAP_RAND, INSERT_RAND, SWAP_PENAL, "
-        "INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT)")(
+        "numNHoods", po::value<unsigned>()->default_value(1),
+        "number of neighborhoods")(
+        "nhood1", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 1")(
+        "nhood2", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 2")(
+        "nhood3", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 3")(
+        "nhood4", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 4")(
+        "nhood5", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 5")(
+        "nhood6", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 6")(
+        "nhood7", po::value<string>()->default_value("SWAP_ADJ"),
+        "neighborhood structure 7")(
         "nHoodTravers", po::value<string>()->default_value("BI"),
         "neighborhood traversing (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
@@ -50,7 +63,9 @@ int main(int argc, char *argv[]) {
         "initJumpLimit", po::value<unsigned>()->default_value(10),
         "number of iterations without improvement to trigger a backjump")(
         "decreaseDivisor", po::value<unsigned>()->default_value(2),
-        "each jump made reduces the jumpLimit by decreaseDivisor times");
+        "each jump made reduces the jumpLimit by decreaseDivisor times")(
+        "perturbationStrength", po::value<unsigned>()->default_value(30),
+        "perturbation strength for ILS (1-100)");
     po::positional_options_description pod;
     pod.add("instPath", 1); // instance is positional as well
     po::variables_map vm;
@@ -79,6 +94,7 @@ int main(int argc, char *argv[]) {
     param.jumpListSize = vm["jumpListSz"].as<unsigned>();
     param.initialJumpLimit = vm["initJumpLimit"].as<unsigned>();
     param.decreaseDivisor = vm["decreaseDivisor"].as<unsigned>();
+    param.perturbationStrength = vm["perturbationStrength"].as<unsigned>();
 
     string initSolStr = vm["initSol"].as<string>();
     if (initSolStr == "GT") {
@@ -120,35 +136,44 @@ int main(int argc, char *argv[]) {
     }
     param.currentSearchMethod = 0;
 
-    string nhoodStr = vm["nhood"].as<string>();
-    if (nhoodStr == "SWAP_ADJ") {
-      param.nHoods.push_back(Parameters::Neighborhood::SWAP_ADJ);
-    } else if (nhoodStr == "SWAP_RAND") {
-      param.nHoods.push_back(Parameters::Neighborhood::SWAP_RAND);
-    } else if (nhoodStr == "INSERT_RAND") {
-      param.nHoods.push_back(Parameters::Neighborhood::INSERT_RAND);
-    } else if (nhoodStr == "SWAP_PENAL") {
-      param.nHoods.push_back(Parameters::Neighborhood::SWAP_PENAL);
-    } else if (nhoodStr == "INSERT_PENAL") {
-      param.nHoods.push_back(Parameters::Neighborhood::INSERT_PENAL);
-    } else if (nhoodStr == "CRITICAL_OPER") {
-      param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER);
-    } else if (nhoodStr == "CRITICAL_OPER_ALT") {
-      param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER_ALT);
-    } else {
-      throw string("Invalid neighborhood: " + nhoodStr);
+    unsigned numNHoods = vm["numNHoods"].as<unsigned>();
+
+    for (unsigned i = 1; i <= numNHoods; ++i) {
+      string key = "nhood" + to_string(i);
+      string nhoodStr = vm[key].as<string>();
+      if (nhoodStr == "SWAP_ADJ") {
+        param.nHoods.push_back(Parameters::Neighborhood::SWAP_ADJ);
+      } else if (nhoodStr == "SWAP_RAND") {
+        param.nHoods.push_back(Parameters::Neighborhood::SWAP_RAND);
+      } else if (nhoodStr == "INSERT_RAND") {
+        param.nHoods.push_back(Parameters::Neighborhood::INSERT_RAND);
+      } else if (nhoodStr == "SWAP_PENAL") {
+        param.nHoods.push_back(Parameters::Neighborhood::SWAP_PENAL);
+      } else if (nhoodStr == "INSERT_PENAL") {
+        param.nHoods.push_back(Parameters::Neighborhood::INSERT_PENAL);
+      } else if (nhoodStr == "CRITICAL_OPER") {
+        param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER);
+      } else if (nhoodStr == "CRITICAL_OPER_ALT") {
+        param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER_ALT);
+      } else {
+        throw string("Invalid neighborhood: " + nhoodStr);
+      }
     }
     param.currentNHood = 0;
 
     string nhoodTravStr = vm["nHoodTravers"].as<string>();
+    Parameters::NHoodTraversing trav;
     if (nhoodTravStr == "BI") {
-      param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::BI);
+      trav = Parameters::NHoodTraversing::BI;
     } else if (nhoodTravStr == "FI") {
-      param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::FI);
+      trav = Parameters::NHoodTraversing::FI;
     } else if (nhoodTravStr == "ELT_LIST") {
-      param.nHoodsTraversings.push_back(Parameters::NHoodTraversing::ELT_LIST);
+      trav = Parameters::NHoodTraversing::ELT_LIST;
     } else {
       throw string("Invalid neighborhood traversing: " + nhoodTravStr);
+    }
+    for (unsigned i = 0; i < numNHoods; ++i) {
+      param.nHoodsTraversings.push_back(trav);
     }
 
     string sched = vm["sched"].as<string>();
