@@ -48,6 +48,7 @@ void Solver::nhood_ls_swap_adjacent(State &state) const {
     }
   }
   swap_opers(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_swap_random(State &state) const {
@@ -83,6 +84,7 @@ void Solver::nhood_ls_swap_random(State &state) const {
     assert(state == debugState);
   }
   swap_opers(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_rm_insert_random(State &state) const {
@@ -117,7 +119,8 @@ void Solver::nhood_ls_rm_insert_random(State &state) const {
     }
     assert(state == debugState);
   }
-  swap_opers(state, bestMove.first, bestMove.second);
+  rm_insert_oper_after(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_swap_earl_late(State &state) const {
@@ -188,6 +191,7 @@ void Solver::nhood_ls_swap_earl_late(State &state) const {
           if (paramTraversing == Parameters::NHoodTraversing::FI &&
               curPenal < initStatePenalties) {
             swap_opers(state, bestMove.first, bestMove.second);
+            (this->*get_sched_by_param())(state);
             return;
           }
           bestMovePenalties = curPenal;
@@ -205,6 +209,7 @@ void Solver::nhood_ls_swap_earl_late(State &state) const {
     }
   }
   swap_opers(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_insert_earl_late(State &state) const {
@@ -222,6 +227,7 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
   // best move found do far. For BI search
   pair<unsigned, unsigned> bestMove(0, 0);
   double bestMovePenalties = DBL_MAX;
+  MoveType bestMoveType, curMoveType;
   // machBlocks[b] are operations of block b sorted by start time
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
@@ -270,7 +276,8 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
         }
       }
       move = make_pair(curOp, insertOpCand);
-      curPenal = evaluate_insert(state, move, MoveType::AFTER);
+      curMoveType = MoveType::AFTER;
+      curPenal = evaluate_insert(state, move, curMoveType);
     } else {
       insertOpCand = machBlocks[opToBlock[curOp].first].front();
       // if operation has a job predecessor and the first operation of current
@@ -289,7 +296,8 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
         }
       }
       move = make_pair(curOp, insertOpCand);
-      curPenal = evaluate_insert(state, move, MoveType::BEFORE);
+      curMoveType = MoveType::BEFORE;
+      curPenal = evaluate_insert(state, move, curMoveType);
     }
 
     if (curOp == insertOpCand)
@@ -298,6 +306,7 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
     // verify improvement on neighbor and undo remove/insertion
     if (curPenal < bestMovePenalties) {
       bestMove = make_pair(curOp, insertOpCand);
+      bestMoveType = curMoveType;
       if (paramTraversing == Parameters::NHoodTraversing::FI &&
           curPenal < initStatePenalties)
         break;
@@ -305,7 +314,15 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
     }
     assert(state == debugState);
   }
-  swap_opers(state, bestMove.first, bestMove.second);
+  switch (bestMoveType) {
+  case MoveType::AFTER:
+    rm_insert_oper_after(state, bestMove.first, bestMove.second);
+    break;
+  case MoveType::BEFORE:
+    rm_insert_oper_befor(state, bestMove.first, bestMove.second);
+    break;
+  }
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_oper_critical(State &state) const {
@@ -376,6 +393,7 @@ void Solver::nhood_ls_oper_critical(State &state) const {
           if (paramTraversing == Parameters::NHoodTraversing::FI ||
               curPenal < initStatePenalties) {
             swap_opers(state, bestMove.first, bestMove.second);
+            (this->*get_sched_by_param())(state);
             return;
           }
           bestMovePenalties = curPenal;
@@ -388,6 +406,7 @@ void Solver::nhood_ls_oper_critical(State &state) const {
     }
   }
   swap_opers(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
 
 void Solver::nhood_ls_oper_critical_alt(State &state) const {
@@ -452,6 +471,7 @@ void Solver::nhood_ls_oper_critical_alt(State &state) const {
           if (paramTraversing == Parameters::NHoodTraversing::FI &&
               curPenal < initStatePenalties) {
             swap_opers(state, bestMove.first, bestMove.second);
+            (this->*get_sched_by_param())(state);
             return;
           }
           bestMovePenalties = curPenal;
@@ -465,4 +485,5 @@ void Solver::nhood_ls_oper_critical_alt(State &state) const {
     }
   }
   swap_opers(state, bestMove.first, bestMove.second);
+  (this->*get_sched_by_param())(state);
 }
