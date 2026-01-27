@@ -382,6 +382,7 @@ void Solver::nhood_tabu_rm_insert_random(State &state, TabuList &tList) const {
 void Solver::cands_swap_earl_late(State &state) const {
   const Instance &inst = Instance::getInstance();
 
+  _cands.clear();
   vector<bool> checked(inst.O, false);
   for (unsigned o = 1; o < inst.O; ++o) {
     if (state.starts[o] + inst.P[o] == inst.deadlines[o])
@@ -492,6 +493,7 @@ void Solver::nhood_tabu_insert_earl_late(State &state, TabuList &tList) const {
 void Solver::cands_oper_critical(State &state) const {
   const Instance &inst = Instance::getInstance();
 
+  _cands.clear();
   vector<vector<unsigned>> machBlocks;
   // opToBlock[o] is block wich contain operation o
   vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
@@ -537,6 +539,7 @@ void Solver::nhood_tabu_oper_critical(State &state, TabuList &tList) const {
 void Solver::cands_oper_critical_alt(State &state) const {
   const Instance &inst = Instance::getInstance();
 
+  _cands.clear();
   for (unsigned o = 1; o < inst.O; ++o) {
     vector<unsigned> opCritic;
 
