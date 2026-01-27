@@ -1,4 +1,3 @@
-#include "Instance.hpp"
 #include "Parameters.hpp"
 #include "Solver.hpp"
 #include "TabuCycleDetector.hpp"
@@ -7,32 +6,27 @@
 #include "TabuTrio.hpp"
 #include "Timer.hpp"
 #include <cassert>
-#include <utility>
+#include <iostream>
 
-void Solver::search_ls(State &initialSol) {
-  Parameters::Neighborhood paramNHood = params.nHoods[params.currentNHood];
-
+void Solver::search_ls(State &state) {
   NHoodLSPtr nhood = get_nhood_ls_by_param();
 
-  best = initialSol;
-  State curState = initialSol, neighbor;
-  pair<unsigned, unsigned> move;
+  State curState = state;
   while (!Timer::isTimeExceeded(params.maxMilli)) {
 
     (this->*nhood)(curState);
 
-    if (neighbor.penalties < best.penalties) {
-      best = neighbor;
-      best.millisecsFound = Timer::elapsedMs();
+    if (curState.penalties < state.penalties) {
+      state = curState;
+      state.millisecsFound = Timer::elapsedMs();
     } else {
       break;
     }
   }
 }
 
-void Solver::search_tabu(State &initialSol) {
-  const Instance &inst = Instance::getInstance();
 
+void Solver::search_tabu(State &state) {
   NSTabuPtr nsp = get_ns_tabu_by_param();
 
   CandsPtr cands = get_cands_by_param();
@@ -51,13 +45,12 @@ void Solver::search_tabu(State &initialSol) {
   unsigned curJumpLimit = params.initialJumpLimit;
   unsigned noImproveIters = 0;
 
-  best = initialSol;
-  State curState = initialSol;
+  State curState = state;
   State auxState;
 
   while (!Timer::isTimeExceeded(params.maxMilli)) {
 
-    cycling = cycleDetector.detect(initialSol.penalties, isNewBest);
+    cycling = cycleDetector.detect(curState.penalties, isNewBest);
 
     if (noImproveIters > curJumpLimit || cycling || emptyNHood) {
 
@@ -99,13 +92,32 @@ void Solver::search_tabu(State &initialSol) {
       tJumpL.updateCands(_cands);
     }
 
-    if (curState.penalties < best.penalties) {
+    if (curState.penalties < state.penalties) {
+      assert(validate_state(curState));
       isNewBest = true;
-      best = curState;
+      state = curState;
+      state.millisecsFound = Timer::elapsedMs();
 
       curJumpLimit = params.initialJumpLimit;
     } else {
       ++noImproveIters;
+    }
+  }
+}
+
+void Solver::search_ils(State &state) {
+
+  SearchPtr search = get_search_by_param();
+
+  State curState = state;
+
+  while (!Timer::isTimeExceeded(params.maxMilli)) {
+
+    pert_swap_adj_random(curState, 30);
+    (this->*search)(curState);
+
+    if (curState.penalties < state.penalties) {
+      state = curState;
     }
   }
 }

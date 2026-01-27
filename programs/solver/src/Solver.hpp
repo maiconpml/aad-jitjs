@@ -23,6 +23,8 @@ private:
   static vector<unsigned> q;
   static vector<unsigned> _ops;
 
+  using SearchPtr = void (Solver::*)(State &);
+
   using NHoodLSPtr = void (Solver::*)(State &) const;
 
   using NSTabuPtr = void (Solver::*)(State &, TabuList &) const;
@@ -95,6 +97,8 @@ private:
 
   // ------------------------------ SEARCH METHODS -----------------------------
 
+  void search_ils(State &initialSol);
+
   void search_tabu(State &initialSol);
 
   void search_ls(State &initialSol);
@@ -109,6 +113,8 @@ private:
   bool sched_cplex(State &state) const;
 
   // ---------------------- METHOD GETTERS BY PARAMETERS -----------------------
+
+  SearchPtr get_search_by_param() const;
 
   SchedPtr get_sched_by_param() const;
 

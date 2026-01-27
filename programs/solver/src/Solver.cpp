@@ -49,17 +49,11 @@ State Solver::solve() {
   }
 #endif // NDEBUG
 
-  switch (params.searchMethods[params.currentSearchMethod]) {
-  case Parameters::SearchMethod::LS:
-    search_ls(best);
-    break;
-  case Parameters::SearchMethod::ILS:
-    break;
-  case Parameters::SearchMethod::TABU:
-    search_tabu(best);
-    break;
-  }
+  SearchPtr search = get_search_by_param();
 
+  (this->*search)(best);
+
+  sched_cplex(best);
   if (!validate_state(best)) {
     throw runtime_error("Invalid State!!!");
   }
@@ -178,6 +172,19 @@ Solver::CandsPtr Solver::get_cands_by_param() const {
     return &Solver::cands_oper_critical;
   case Parameters::Neighborhood::CRITICAL_OPER_ALT:
     return &Solver::cands_oper_critical_alt;
+  }
+  return NULL;
+}
+
+Solver::SearchPtr Solver::get_search_by_param() const {
+  Parameters::SearchMethod paramSearch =
+      params.searchMethods[params.currentSearchMethod];
+
+  switch (paramSearch) {
+  case Parameters::SearchMethod::LS:
+    return &Solver::search_ls;
+  case Parameters::SearchMethod::TABU:
+    return &Solver::search_tabu;
   }
   return NULL;
 }
