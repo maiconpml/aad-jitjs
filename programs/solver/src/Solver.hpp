@@ -27,7 +27,8 @@ private:
 
   using NHoodLSPtr = void (Solver::*)(State &) const;
 
-  using NSTabuPtr = void (Solver::*)(State &, TabuList &) const;
+  using NSTabuPtr = void (Solver::*)(State &, TabuList &,
+                                     double aspiration) const;
 
   using CandsPtr = void (Solver::*)(State &) const;
 
@@ -172,6 +173,7 @@ private:
   int get_insert_tabu_age(TabuList &tList, State &state,
                           pair<unsigned, unsigned> &move, MoveType type) const;
 
-  void run_ns_tabu_swap(State &state, TabuList &tList) const;
-  void run_ns_tabu_insert(State &state, TabuList &tList) const;
+  void run_ns_tabu_swap(State &state, TabuList &tList, double aspiration) const;
+  void run_ns_tabu_insert(State &state, TabuList &tList,
+                          double aspiration) const;
 };

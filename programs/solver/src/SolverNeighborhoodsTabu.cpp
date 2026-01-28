@@ -217,7 +217,8 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   return cost;
 }
 
-void Solver::run_ns_tabu_swap(State &state, TabuList &tList) const {
+void Solver::run_ns_tabu_swap(State &state, TabuList &tList,
+                              double aspiration) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
@@ -246,7 +247,7 @@ void Solver::run_ns_tabu_swap(State &state, TabuList &tList) const {
       isTabu = is_swap_tabu(tList, state, move);
       if (isTabu) {
         curMoveTabuAge = get_swap_tabu_age(tList, state, move);
-        isAspiration = curPenal < best.penalties;
+        isAspiration = curPenal < aspiration;
       }
 
       if (!isTabu || isAspiration) {
@@ -276,7 +277,8 @@ void Solver::run_ns_tabu_swap(State &state, TabuList &tList) const {
   Util::rm_element_swap(_cands, chosenMoveIndex);
 }
 
-void Solver::run_ns_tabu_insert(State &state, TabuList &tList) const {
+void Solver::run_ns_tabu_insert(State &state, TabuList &tList,
+                                double aspiration) const {
   Parameters::NHoodTraversing paramTraversing =
       params.nHoodsTraversings[params.currentNHood];
 
@@ -309,7 +311,7 @@ void Solver::run_ns_tabu_insert(State &state, TabuList &tList) const {
       isTabu = is_insert_tabu(tList, state, move, type);
       if (isTabu) {
         curMoveTabuAge = get_insert_tabu_age(tList, state, move, type);
-        isAspiration = curPenal < best.penalties;
+        isAspiration = curPenal < aspiration;
       }
 
       if (!isTabu || isAspiration) {

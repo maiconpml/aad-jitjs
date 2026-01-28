@@ -78,7 +78,7 @@ void Solver::search_tabu(State &state) {
     }
 
     if (!_cands.empty())
-      (this->*nsp)(curState, tList);
+      (this->*nsp)(curState, tList, state.penalties);
     else
       emptyNHood = true;
 
