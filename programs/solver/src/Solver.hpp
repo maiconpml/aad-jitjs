@@ -113,6 +113,11 @@ private:
   // schedule operations using MIP solver Cplex. Optimal scheduling.
   bool sched_cplex(State &state) const;
 
+  // scheduler helper. Shift early operations making its completion time closer
+  // of its due date without delaying any operation. In worst case, it doesn't
+  // change the schedule
+  void shift_operations(State &state) const;
+
   // ---------------------- METHOD GETTERS BY PARAMETERS -----------------------
 
   SearchPtr get_search_by_param() const;

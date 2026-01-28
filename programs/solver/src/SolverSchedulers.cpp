@@ -4,6 +4,43 @@
 #include <ilcplex/cplex.h>
 #include <ilcplex/ilocplex.h>
 
+void Solver::shift_operations(State &state) const {
+  const Instance &inst = Instance::getInstance();
+
+  vector<unsigned> newStarts(inst.O, 0);
+  vector<unsigned> startJobSuccessor(inst.J, UINT_MAX);
+  vector<unsigned> startMachSuccessor(inst.M, UINT_MAX);
+
+  unsigned curOp;
+  unsigned newMakes = 0;
+
+  unsigned tail = q.size();
+  while (tail > 0) {
+
+    curOp = q[--tail];
+
+    if (!curOp)
+      continue;
+
+    unsigned sMS = startMachSuccessor[inst.operToM[curOp]];
+    unsigned sJS = startJobSuccessor[inst.operToJ[curOp]];
+
+    unsigned shiftLimit = min(sJS, sMS);
+
+    unsigned shiftTarget = min(inst.deadlines[curOp], shiftLimit);
+    shiftTarget = shiftTarget - inst.P[curOp];
+
+    newStarts[curOp] = max(state.starts[curOp], shiftTarget);
+
+    newMakes = max(newStarts[curOp] + inst.P[curOp], newMakes);
+
+    startJobSuccessor[inst.operToJ[curOp]] = newStarts[curOp];
+    startMachSuccessor[inst.operToM[curOp]] = newStarts[curOp];
+  }
+
+  state.starts = newStarts;
+}
+
 bool Solver::sched_max_early(State &state) const {
   const Instance &inst = Instance::getInstance();
 
@@ -37,8 +74,6 @@ bool Solver::sched_max_early(State &state) const {
     }
   }
 
-  assert(!q.empty());
-
   while (head < q.size()) {
     curOp = q[head++];
 
@@ -71,9 +106,21 @@ bool Solver::sched_max_early(State &state) const {
     }
   }
 
-  state.calc_penalties();
+  if (head == inst.O - 1) {
 
-  return head < inst.O - 1;
+#ifndef NDEBUG
+    state.calc_penalties();
+    double testPenalties = state.penalties;
+#endif // NDEBUG
+
+    shift_operations(state);
+
+    state.calc_penalties();
+    assert(state.penalties <= testPenalties);
+    return false;
+  }
+
+  return true;
 }
 
 bool Solver::sched_cplex(State &state) const {
