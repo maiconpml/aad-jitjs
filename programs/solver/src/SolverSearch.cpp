@@ -111,8 +111,16 @@ void Solver::search_ils(State &state) {
       Parameters::SearchMethod::ILS) {
     params.currentSearchMethod++;
   }
+
   SearchPtr search = get_search_by_param();
-  State curState;
+  State curState = state;
+
+  (this->*search)(curState);
+
+  if (curState.penalties < state.penalties) {
+    state = curState;
+    params.currentNHood = 0;
+  }
 
   unsigned paramPertStr = params.perturbationStrength;
   int n = params.nHoods.size();
