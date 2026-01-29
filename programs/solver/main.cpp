@@ -70,7 +70,9 @@ int main(int argc, char *argv[]) {
         "decreaseDivisor", po::value<unsigned>()->default_value(2),
         "each jump made reduces the jumpLimit by decreaseDivisor times")(
         "perturbationStrength", po::value<unsigned>()->default_value(30),
-        "perturbation strength for ILS (1-100)");
+        "perturbation strength for ILS (1-100)")(
+        "ilsIterMaxMilli", po::value<unsigned>()->default_value(1000000000),
+        "maximum time in milliseconds of search iteration on ILS");
     po::positional_options_description pod;
     pod.add("instPath", 1); // instance is positional as well
     po::variables_map vm;
@@ -100,6 +102,7 @@ int main(int argc, char *argv[]) {
     param.initialJumpLimit = vm["initJumpLimit"].as<unsigned>();
     param.decreaseDivisor = vm["decreaseDivisor"].as<unsigned>();
     param.perturbationStrength = vm["perturbationStrength"].as<unsigned>();
+    param.internalSearchTime = vm["ilsIterMaxMilli"].as<unsigned>();
 
     string initSolStr = vm["initSol"].as<string>();
     if (initSolStr == "GT") {

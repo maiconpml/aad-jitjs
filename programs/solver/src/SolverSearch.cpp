@@ -11,8 +11,10 @@
 void Solver::search_ls(State &state) {
   NHoodLSPtr nhood = get_nhood_ls_by_param();
 
+  unsigned stTime = Timer::elapsedMs();
   State curState = state;
-  while (!Timer::isTimeExceeded(params.maxMilli)) {
+  while (!Timer::isTimeExceeded(
+      min(stTime + params.internalSearchTime, params.maxMilli))) {
 
     (this->*nhood)(curState);
 
@@ -45,10 +47,12 @@ void Solver::search_tabu(State &state) {
   unsigned curJumpLimit = params.initialJumpLimit;
   unsigned noImproveIters = 0;
 
+  unsigned stTime = Timer::elapsedMs();
   State curState = state;
   State auxState;
 
-  while (!Timer::isTimeExceeded(params.maxMilli)) {
+  while (!Timer::isTimeExceeded(
+      min(stTime + params.internalSearchTime, params.maxMilli))) {
 
     cycling = cycleDetector.detect(curState.penalties, isNewBest);
 

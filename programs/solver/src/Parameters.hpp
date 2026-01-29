@@ -71,6 +71,8 @@ public:
 
   unsigned perturbationStrength;
 
+  unsigned internalSearchTime;
+
   // ------------------------------ EXTRAS -------------------------------------
   // print only objective value for irace
   bool autoConfig;
