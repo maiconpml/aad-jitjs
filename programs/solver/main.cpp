@@ -46,13 +46,20 @@ int main(int argc, char *argv[]) {
         "neighborhood structure 6")(
         "nhood7", po::value<string>()->default_value("SWAP_ADJ"),
         "neighborhood structure 7")(
-        "nHoodTravers1", po::value<string>()->default_value("BI"), "neighborhood traversing 1 (BI, FI, ELT_LIST)")(
-        "nHoodTravers2", po::value<string>()->default_value("BI"), "neighborhood traversing 2 (BI, FI, ELT_LIST)")(
-        "nHoodTravers3", po::value<string>()->default_value("BI"), "neighborhood traversing 3 (BI, FI, ELT_LIST)")(
-        "nHoodTravers4", po::value<string>()->default_value("BI"), "neighborhood traversing 4 (BI, FI, ELT_LIST)")(
-        "nHoodTravers5", po::value<string>()->default_value("BI"), "neighborhood traversing 5 (BI, FI, ELT_LIST)")(
-        "nHoodTravers6", po::value<string>()->default_value("BI"), "neighborhood traversing 6 (BI, FI, ELT_LIST)")(
-        "nHoodTravers7", po::value<string>()->default_value("BI"), "neighborhood traversing 7 (BI, FI, ELT_LIST)")(
+        "nHoodTravers1", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 1 (BI, FI, ELT_LIST)")(
+        "nHoodTravers2", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 2 (BI, FI, ELT_LIST)")(
+        "nHoodTravers3", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 3 (BI, FI, ELT_LIST)")(
+        "nHoodTravers4", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 4 (BI, FI, ELT_LIST)")(
+        "nHoodTravers5", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 5 (BI, FI, ELT_LIST)")(
+        "nHoodTravers6", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 6 (BI, FI, ELT_LIST)")(
+        "nHoodTravers7", po::value<string>()->default_value("BI"),
+        "neighborhood traversing 7 (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
         "scheduler (EARLY, CPLEX)")(
         "autoConfig", po::bool_switch()->default_value(false),
