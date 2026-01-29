@@ -3,6 +3,7 @@
 
 #include <ilcplex/cplex.h>
 #include <ilcplex/ilocplex.h>
+#include <queue>
 
 void Solver::shift_operations(State &state) const {
   const Instance &inst = Instance::getInstance();
@@ -217,5 +218,229 @@ Solver::SchedPtr Solver::get_sched_by_param() const {
     return &Solver::sched_max_early;
   case Parameters::Scheduler::CPLEX:
     return &Solver::sched_cplex;
+  case Parameters::Scheduler::DELAYING:
+    return &Solver::sched_delaying;
+  }
+
+  return NULL;
+}
+
+bool Solver::sched_delaying(State &state) const {
+  const Instance &inst = Instance::getInstance();
+
+  unsigned delayTime = 0;
+  vector<unsigned> limited(inst.O, 0);
+  vector<unsigned> heads;
+  vector<unsigned> ops;
+  vector<unsigned> lateCands(inst.O, 0);
+  vector<unsigned> indeg(inst.O);
+  vector<unsigned> Q(inst.O);
+  double pushStrength, holdStrength;
+
+  fill(state.starts.begin(), state.starts.end(), 0);
+
+  if (Solver::topo_sort(state))
+    return true;
+  ops = q;
+  reverse(ops.begin(), ops.end());
+
+  for (unsigned i = 0; i < ops.size(); i++) {
+    lateCands[ops[i]] = 1;
+    heads.push_back(ops[i]);
+
+    if ((inst.job[ops[i]] && (state.starts[inst.job[ops[i]]] < inst.P[ops[i]] ||
+                              state.starts[inst.job[ops[i]]] == 0)) ||
+        (state.mach[ops[i]] &&
+         (state.starts[state.mach[ops[i]]] < inst.P[ops[i]] ||
+          state.starts[state.mach[ops[i]]] == 0))) {
+      forced_delay(state, lateCands, ops[i]);
+    }
+
+    update_strength(lateCands, pushStrength, holdStrength);
+
+    while (pushStrength > holdStrength) {
+      delayTime = calc_delay_time(state, lateCands, limited, inst.P);
+      delay_opers(state.starts, lateCands, delayTime);
+      update_structures(lateCands, limited, heads, state, inst.P);
+      update_strength(lateCands, pushStrength, holdStrength);
+    }
+
+    fill(lateCands.begin(), lateCands.end(), 0);
+    fill(limited.begin(), limited.end(), 0);
+    heads.clear();
+  }
+
+  state.calc_penalties();
+
+  return false;
+}
+
+void Solver::update_strength(vector<unsigned> &lateCands, double &pS,
+                             double &hS) const {
+  const Instance &inst = Instance::getInstance();
+  pS = 0;
+  hS = 0;
+  for (unsigned i = 1; i < lateCands.size(); i++) {
+    if (lateCands[i] == 1)
+      pS += inst.earlCoefs[i];
+    else if (lateCands[i] == 2)
+      hS += inst.tardCoefs[i];
   }
 }
+
+unsigned Solver::calc_delay_time(State &state, vector<unsigned> &lateCands,
+                                 vector<unsigned> &limited,
+                                 const vector<unsigned> &tmpP) const {
+  const Instance &inst = Instance::getInstance();
+  unsigned t = UINT_MAX;
+  unsigned m;
+  vector<unsigned> limitedAux;
+  for (unsigned i = 1; i < lateCands.size(); i++) {
+    if (!lateCands[i])
+      continue;
+    m = UINT_MAX;
+    unsigned aux = state.starts[i] + tmpP[i];
+    if (inst.deadlines[i] > aux && inst.deadlines[i] - aux < m)
+      m = inst.deadlines[i] - aux;
+    if (state.mach[i] &&
+        (state.starts[state.mach[i]] > aux || !lateCands[state.mach[i]]) &&
+        state.starts[state.mach[i]] - aux < m)
+      m = state.starts[state.mach[i]] - aux;
+    if (inst.job[i] &&
+        (state.starts[inst.job[i]] > aux || !lateCands[inst.job[i]]) &&
+        state.starts[inst.job[i]] - aux < m)
+      m = state.starts[inst.job[i]] - aux;
+    if (m < t) {
+      t = m;
+      limitedAux.clear();
+      limitedAux.push_back(i);
+    } else if (m == t)
+      limitedAux.push_back(i);
+    ;
+  }
+  fill(limited.begin(), limited.end(), 0);
+  for (unsigned i = 0; i < limitedAux.size(); ++i) {
+    limited[limitedAux[i]] = 1;
+  }
+  return t;
+}
+
+void Solver::delay_opers(vector<unsigned> &starts, vector<unsigned> &lateCands,
+                         unsigned &t) const {
+  for (unsigned i = 1; i < lateCands.size(); i++) {
+    if (lateCands[i]) {
+      starts[i] = starts[i] + t;
+    }
+  }
+}
+
+void Solver::update_structures(vector<unsigned> &lateCands, vector<unsigned> &limited,
+                    vector<unsigned> &heads, State &state,
+                    const vector<unsigned> &tmpP) const {
+  const Instance &inst = Instance::getInstance();
+  queue<unsigned> remove;
+  queue<unsigned> auxL;
+  vector<unsigned> headsCpy(heads);
+  vector<unsigned> headsRmv(inst.O, 0);
+  unsigned iterations = heads.size();
+  heads.clear();
+  for (unsigned o = 0; o < iterations; ++o) {
+    if (tmpP[headsCpy[o]] + state.starts[headsCpy[o]] ==
+        inst.deadlines[headsCpy[o]]) {
+      headsRmv[headsCpy[o]] = 1;
+      remove.push(o);
+
+      while (!remove.empty()) {
+        unsigned c = remove.front();
+        remove.pop();
+
+        if (lateCands[state.mach[c]] &&
+            tmpP[state.mach[c]] + state.starts[state.mach[c]] >=
+                inst.deadlines[state.mach[c]])
+          remove.push(state.mach[c]);
+        else if (lateCands[state.mach[c]])
+          headsCpy.push_back(state.mach[c]);
+
+        if (lateCands[inst.job[c]] &&
+            tmpP[inst.job[c]] + state.starts[inst.job[c]] >=
+                inst.deadlines[inst.job[c]])
+          remove.push(inst.job[c]);
+        else if (lateCands[inst.job[c]])
+          headsCpy.push_back(inst.job[c]);
+
+        if (limited[c])
+          limited[c] = 0;
+        lateCands[c] = 0;
+      }
+    }
+  }
+  for (unsigned i = 0; i < headsCpy.size(); ++i) {
+    if (!headsRmv[headsCpy[i]])
+      heads.push_back(headsCpy[i]);
+  }
+
+  for (unsigned i = 1; i < inst.O; i++) {
+    if (limited[i])
+      auxL.push(i);
+  }
+
+  while (!auxL.empty()) {
+    unsigned o = auxL.front();
+    auxL.pop();
+    if (tmpP[o] + state.starts[o] == inst.deadlines[o] && lateCands[o] == 1)
+      lateCands[o] = 2;
+    if (inst.job[o] && tmpP[o] + state.starts[o] == state.starts[inst.job[o]]) {
+      auxL.push(inst.job[o]);
+      if (tmpP[inst.job[o]] + state.starts[inst.job[o]] >=
+          inst.deadlines[inst.job[o]])
+        lateCands[inst.job[o]] = 2;
+      else
+        lateCands[inst.job[o]] = 1;
+    }
+
+    if (state.mach[o] &&
+        tmpP[o] + state.starts[o] == state.starts[state.mach[o]]) {
+      auxL.push(state.mach[o]);
+      if (tmpP[state.mach[o]] + state.starts[state.mach[o]] >=
+          inst.deadlines[state.mach[o]])
+        lateCands[state.mach[o]] = 2;
+      else
+        lateCands[state.mach[o]] = 1;
+    }
+  }
+}
+
+void Solver::forced_delay(State &state, vector<unsigned> &lateCands,
+                          unsigned &op) const {
+  const Instance &inst = Instance::getInstance();
+  vector<unsigned> auxP = inst.P;
+  unsigned co = UINT_MAX;
+  unsigned objDelay;
+  vector<unsigned> heads;
+  vector<unsigned> limited(inst.O, 0);
+  if (inst.job[op])
+    co = state.starts[inst.job[op]];
+  if (state.mach[op] && state.starts[state.mach[op]] < co)
+    co = state.starts[state.mach[op]];
+
+  objDelay = auxP[op] - co;
+  state.starts[op] = 0;
+  auxP[op] = co;
+  heads.push_back(op);
+  limited[op] = 1;
+  update_structures(lateCands, limited, heads, state, auxP);
+
+  while (objDelay > 0) {
+
+    unsigned t = calc_delay_time(state, lateCands, limited, auxP);
+    if (objDelay < t)
+      t = objDelay;
+
+    delay_opers(state.starts, lateCands, t);
+    update_structures(lateCands, limited, heads, state, auxP);
+    objDelay -= t;
+  }
+
+  state.starts[op] = 0;
+}
+

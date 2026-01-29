@@ -24,7 +24,7 @@ public:
 
   enum class SearchMethod { LS, ILS, TABU };
 
-  enum class Scheduler { EARLY, CPLEX };
+  enum class Scheduler { EARLY, CPLEX, DELAYING };
 
   // instance path
   string instPath;

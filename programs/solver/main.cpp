@@ -185,6 +185,8 @@ int main(int argc, char *argv[]) {
       param.sched = Parameters::Scheduler::EARLY;
     } else if (sched == "CPLEX") {
       param.sched = Parameters::Scheduler::CPLEX;
+    } else if (sched == "DELAYING") {
+      param.sched = Parameters::Scheduler::DELAYING;
     } else {
       throw string("Invalid scheduler: " + sched);
     }

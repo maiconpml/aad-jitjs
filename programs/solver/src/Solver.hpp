@@ -113,10 +113,33 @@ private:
   // schedule operations using MIP solver Cplex. Optimal scheduling.
   bool sched_cplex(State &state) const;
 
+  // schedule operations delaying when is possible to decrease penalties based
+  // on current sequence, return true if current sequence has a cycle
+  bool sched_delaying(State &state) const;
+
   // scheduler helper. Shift early operations making its completion time closer
   // of its due date without delaying any operation. In worst case, it doesn't
   // change the schedule
   void shift_operations(State &state) const;
+
+  // ------------------------ SCHEDULER DELAYING HELPERS -----------------------
+
+  void update_strength(vector<unsigned> &lateCands, double &pS,
+                       double &hS) const;
+
+  unsigned calc_delay_time(State &state, vector<unsigned> &lateCands,
+                           vector<unsigned> &limited,
+                           const vector<unsigned> &tmpP) const;
+
+  void delay_opers(vector<unsigned> &starts, vector<unsigned> &lateCands,
+                   unsigned &t) const;
+
+  void update_structures(vector<unsigned> &lateCands, vector<unsigned> &limited,
+                         vector<unsigned> &heads, State &starts,
+                         const vector<unsigned> &tmpP) const;
+
+  void forced_delay(State &state, vector<unsigned> &lateCands,
+                    unsigned &op) const;
 
   // ---------------------- METHOD GETTERS BY PARAMETERS -----------------------
 
