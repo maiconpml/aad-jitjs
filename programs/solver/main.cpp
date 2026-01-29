@@ -62,6 +62,8 @@ int main(int argc, char *argv[]) {
         "neighborhood traversing 7 (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
         "scheduler (EARLY, CPLEX)")(
+        "solveExact", po::bool_switch()->default_value(false),
+        "solve using CPLEX exact method (overrides other search methods)")(
         "autoConfig", po::bool_switch()->default_value(false),
         "print only the result for automatic configuration")(
         "maxD", po::value<unsigned>()->default_value(5),
@@ -102,6 +104,7 @@ int main(int argc, char *argv[]) {
     param.maxMilli = vm["maxMilli"].as<unsigned>();
     param.seed = vm["seed"].as<unsigned>();
     param.autoConfig = vm["autoConfig"].as<bool>();
+    param.solveExact = vm["solveExact"].as<bool>();
     param.maxD = vm["maxD"].as<unsigned>();
     param.maxC = vm["maxC"].as<unsigned>();
     param.tenure = vm["tenure"].as<unsigned>();
@@ -206,7 +209,12 @@ int main(int argc, char *argv[]) {
     Instance::getInstance().parse(param.instPath);
 
     Solver solver(param);
-    State sol = solver.solve();
+    State sol;
+    if (param.solveExact) {
+      solver.solve_cplex(sol);
+    } else {
+      sol = solver.solve();
+    }
 
     if (param.autoConfig) {
       cout << sol.penalties << endl;

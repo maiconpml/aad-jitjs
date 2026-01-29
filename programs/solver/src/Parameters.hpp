@@ -76,4 +76,7 @@ public:
   // ------------------------------ EXTRAS -------------------------------------
   // print only objective value for irace
   bool autoConfig;
+  
+  // solve using CPLEX exact method
+  bool solveExact = false;
 };

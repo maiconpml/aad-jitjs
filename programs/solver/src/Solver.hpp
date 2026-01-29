@@ -11,6 +11,10 @@ public:
 
   State solve();
 
+  // solve the problem completely using MIP solver Cplex. Optimal scheduling and
+  // sequencing.
+  void solve_cplex(State &state) const;
+
   enum class MoveType { SWAP, BEFORE, AFTER };
 
 private:
