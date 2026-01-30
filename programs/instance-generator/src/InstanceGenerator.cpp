@@ -20,6 +20,7 @@ void InstanceGenerator::generate() {
 
   cout << n << " " << m << endl;
   for (unsigned i = 0; i < n; ++i) {
+    unsigned auxDd = ddOffs;
     for (unsigned j = 0; j < m; ++j) {
       // machine initialization
       mach[i][j] = j;
@@ -30,12 +31,12 @@ void InstanceGenerator::generate() {
       // due date def
       switch (dd) {
       case DD::TIGHT:
-        ddOffs += p[i][j];
-        dueD[i][j] = ddOffs;
+        auxDd += p[i][j];
+        dueD[i][j] = auxDd;
         break;
       case DD::LOOSE:
-        ddOffs += p[i][j];
-        dueD[i][j] = ddOffs + Random::get(0, 10);
+        auxDd += p[i][j];
+        dueD[i][j] = auxDd + Random::get(0, 10);
         break;
       }
 
