@@ -216,13 +216,30 @@ int main(int argc, char *argv[]) {
       sol = solver.solve();
     }
 
+    const Instance &inst = Instance::getInstance();
+
     if (param.autoConfig) {
       cout << sol.penalties << endl;
     } else {
+      if (param.instPath.find("loose") != string::npos)
+        cout << "l";
+      if (param.instPath.find("tight") != string::npos)
+        cout << "t";
+      if (param.instPath.find("equal") != string::npos)
+        cout << "e ";
+      if (param.instPath.find("tard") != string::npos)
+        cout << "t ";
+      if (param.instPath.find("test1") != string::npos)
+        cout << "1 ";
+      if (param.instPath.find("test2") != string::npos)
+        cout << "2 ";
+
+      cout << left << setw(4) << inst.J << " " << left << setw(4) << inst.M
+           << " ";
       cout << left << setw(10) << sol.penalties << left << setw(10)
            << sol.tPenalty << left << setw(10) << sol.ePenalty << left
            << setw(10) << sol.millisecsFound << left << setw(10)
-           << Timer::elapsedMs() << param.instPath << endl;
+           << Timer::elapsedMs() << endl;
     }
 
   } catch (const string &e) {
