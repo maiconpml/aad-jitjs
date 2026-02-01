@@ -3,5 +3,4 @@ trainInstancesFile = "train-instances.txt"
 targetRunner = "./target-runner"
 maxExperiments = 50000
 testNbElites = 1
-deterministic = 1
 parallel = 8
