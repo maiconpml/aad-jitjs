@@ -184,6 +184,8 @@ int main(int argc, char *argv[]) {
         param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER);
       } else if (nhoodStr == "CRITICAL_OPER_ALT") {
         param.nHoods.push_back(Parameters::Neighborhood::CRITICAL_OPER_ALT);
+      } else if (nhoodStr == "RELAX_2") {
+        param.nHoods.push_back(Parameters::Neighborhood::RELAX_2);
       } else {
         throw string("Invalid neighborhood: " + nhoodStr);
       }

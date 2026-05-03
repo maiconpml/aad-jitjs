@@ -131,6 +131,8 @@ Solver::NHoodLSPtr Solver::get_nhood_ls_by_param() const {
     return &Solver::nhood_ls_oper_critical;
   case Parameters::Neighborhood::CRITICAL_OPER_ALT:
     return &Solver::nhood_ls_oper_critical_alt;
+  case Parameters::Neighborhood::RELAX_2:
+    return &Solver::nhood_ls_relax_2;
   }
   return NULL;
 }

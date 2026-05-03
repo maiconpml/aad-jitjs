@@ -17,7 +17,8 @@ public:
     SWAP_PENAL,
     INSERT_PENAL,
     CRITICAL_OPER,
-    CRITICAL_OPER_ALT
+    CRITICAL_OPER_ALT,
+    RELAX_2
   };
 
   enum class NHoodTraversing { BI, FI, ELT_LIST };
