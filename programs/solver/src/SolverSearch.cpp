@@ -59,6 +59,10 @@ void Solver::search_tabu(State &state) {
   State curState = state;
   State auxState;
 
+  if (curState.penalties < state.penalties) {
+    state = curState;
+    state.millisecsFound = Timer::elapsedMs();
+  }
   while (!Timer::isTimeExceeded(
       min(stTime + params.internalSearchTime, params.maxMilli))) {
 
