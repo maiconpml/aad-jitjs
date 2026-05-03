@@ -3,27 +3,21 @@ initSol                "--initSol "         c     (GT, CONSTR)
 dispatchRule           "--dispatchRule "    c     (EDD, ACS, RAND)
 search1                "--search1 "         c     (LS, ILS, TABU)
 search2                "--search2 "         c     (LS, TABU)              | search1 == "ILS"
-perturbationStrength   "--perturbationStrength " c (20, 30, 40, 50)       | search1 == "ILS"
-ilsIterMaxMilli        "--ilsIterMaxMilli " c     (5000, 10000, 20000)    | search1 == "ILS"
-numNHoods              "--numNHoods "       i     (1, 7)                  | search1 == "ILS"
-nhood1                 "--nhood1 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) 
+ilsIterMaxMilli        "--ilsIterMaxMilli " i     (1000, 30000)           | search1 == "ILS"
+numNHoods              "--numNHoods "       i     (1, 3)                  | search1 == "ILS"
+nhood1                 "--nhood1 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT, RELAX_2) | search1 == "LS" | (search1 == "ILS" & search2 == "LS")
+nhood1_tabu            "--nhood1 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT)          | search1 == "TABU" | (search1 == "ILS" & search2 == "TABU")
 nHoodTravers1          "--nHoodTravers1 "   c     (BI, FI)
-nhood2                 "--nhood2 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 2
+nhood2                 "--nhood2 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT, RELAX_2) | numNHoods >= 2 & search1 == "ILS" & search2 == "LS"
+nhood2_tabu            "--nhood2 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT)          | numNHoods >= 2 & search1 == "ILS" & search2 == "TABU"
 nHoodTravers2          "--nHoodTravers2 "   c     (BI, FI)                | numNHoods >= 2
-nhood3                 "--nhood3 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 3
+nhood3                 "--nhood3 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT, RELAX_2) | numNHoods >= 3 & search1 == "ILS" & search2 == "LS"
+nhood3_tabu            "--nhood3 "          c     (SWAP_ADJ, SWAP_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER_ALT)          | numNHoods >= 3 & search1 == "ILS" & search2 == "TABU"
 nHoodTravers3          "--nHoodTravers3 "   c     (BI, FI)                | numNHoods >= 3
-nhood4                 "--nhood4 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 4
-nHoodTravers4          "--nHoodTravers4 "   c     (BI, FI)                | numNHoods >= 4
-nhood5                 "--nhood5 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 5
-nHoodTravers5          "--nHoodTravers5 "   c     (BI, FI)                | numNHoods >= 5
-nhood6                 "--nhood6 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 6
-nHoodTravers6          "--nHoodTravers6 "   c     (BI, FI)                | numNHoods >= 6
-nhood7                 "--nhood7 "          c     (SWAP_ADJ, SWAP_RAND, INSERT_RAND, SWAP_PENAL, INSERT_PENAL, CRITICAL_OPER, CRITICAL_OPER_ALT) | numNHoods >= 7
-nHoodTravers7          "--nHoodTravers7 "   c     (BI, FI)                | numNHoods >= 7
 scheduler              "--sched "           c     (EARLY, CPLEX, DELAYING)
-maxD                   "--maxD "            c     (40, 50, 60)            | search1 == "TABU" | search2 == "TABU"
-maxC                   "--maxC "            c     (1,3,5)                 | search1 == "TABU" | search2 == "TABU"
-tenure                 "--tenure "          c     (35, 40, 45, 50)             | search1 == "TABU" | search2 == "TABU"
-jumpListSize           "--jumpListSz "      c     (10, 13, 15, 17, 20)            | search1 == "TABU" | search2 == "TABU"
-initialJumpLimit       "--initJumpLimit "   c     (200, 500, 1000, 1500, 2000)      | search1 == "TABU" | search2 == "TABU"
-decreaseDivisor        "--decreaseDivisor " c     (4, 7, 10, 12, 15)                | search1 == "TABU" | search2 == "TABU"
+maxD                   "--maxD "            i     (5, 100)                | search1 == "TABU" | search2 == "TABU"
+maxC                   "--maxC "            i     (1, 10)                 | search1 == "TABU" | search2 == "TABU"
+tenure                 "--tenure "          i     (10, 100)               | search1 == "TABU" | search2 == "TABU"
+jumpListSize           "--jumpListSz "      i     (5, 30)                 | search1 == "TABU" | search2 == "TABU"
+initialJumpLimit       "--initJumpLimit "   i     (100, 3000)             | search1 == "TABU" | search2 == "TABU"
+decreaseDivisor        "--decreaseDivisor " i     (2, 20)                 | search1 == "TABU" | search2 == "TABU"

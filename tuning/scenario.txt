@@ -1,6 +1,7 @@
 parameterFile = "parameters.txt"
 trainInstancesFile = "train-instances.txt"
 targetRunner = "./target-runner"
-maxExperiments = 50000
-testNbElites = 1
-parallel = 8
+maxExperiments = 20000
+parallel = 6
+recoveryFile = "./iraceBackup5.Rdata"
+
