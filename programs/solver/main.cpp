@@ -259,7 +259,8 @@ int main(int argc, char *argv[]) {
     }
 
   } catch (const string &e) {
-    cout << e << endl;
+    cerr << e << endl;
+    return 1;
   }
 
   return 0;
