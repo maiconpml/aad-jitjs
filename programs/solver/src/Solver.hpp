@@ -97,6 +97,7 @@ private:
   void nhood_ls_oper_critical_alt(State &state) const;
   // ------------------------------- PERTUBATIONS ------------------------------
 
+  void pert_relax_1(State &state, unsigned strength) const;
 
   void pert_swap_adj_random(State &state, unsigned strength);
 

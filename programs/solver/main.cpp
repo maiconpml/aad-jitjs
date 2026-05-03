@@ -80,6 +80,8 @@ int main(int argc, char *argv[]) {
         "each jump made reduces the jumpLimit by decreaseDivisor times")(
         "perturbationStrength", po::value<unsigned>()->default_value(30),
         "perturbation strength for ILS (1-100)")(
+        "perturbation", po::value<string>()->default_value("RELAX_1"),
+        "perturbation type for ILS (SWAP_ADJ, RELAX_1)")(
         "ilsIterMaxMilli", po::value<unsigned>()->default_value(1000000000),
         "maximum time in milliseconds of search iteration on ILS");
     po::positional_options_description pod;
@@ -113,6 +115,15 @@ int main(int argc, char *argv[]) {
     param.decreaseDivisor = vm["decreaseDivisor"].as<unsigned>();
     param.perturbationStrength = vm["perturbationStrength"].as<unsigned>();
     param.internalSearchTime = vm["ilsIterMaxMilli"].as<unsigned>();
+
+    string perturbationStr = vm["perturbation"].as<string>();
+    if (perturbationStr == "SWAP_ADJ") {
+      param.perturbationType = Parameters::PerturbationType::SWAP_ADJ;
+    } else if (perturbationStr == "RELAX_1") {
+      param.perturbationType = Parameters::PerturbationType::RELAX_1;
+    } else {
+      throw string("Invalid perturbation type: " + perturbationStr);
+    }
 
     string initSolStr = vm["initSol"].as<string>();
     if (initSolStr == "GT") {

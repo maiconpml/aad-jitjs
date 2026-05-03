@@ -148,7 +148,14 @@ void Solver::search_ils(State &state) {
 
     curState = state;
 
-    pert_swap_adj_random(curState, paramPertStr);
+    switch (params.perturbationType) {
+    case Parameters::PerturbationType::SWAP_ADJ:
+      pert_swap_adj_random(curState, paramPertStr);
+      break;
+    case Parameters::PerturbationType::RELAX_1:
+      pert_relax_1(curState, paramPertStr);
+      break;
+    }
 
     (this->*search)(curState);
 

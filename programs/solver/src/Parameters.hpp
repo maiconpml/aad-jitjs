@@ -26,6 +26,8 @@ public:
 
   enum class Scheduler { EARLY, CPLEX, DELAYING, HYB };
 
+  enum class PerturbationType { SWAP_ADJ, RELAX_1 };
+
   // instance path
   string instPath;
   // maximum time of execution in milliseconds
@@ -46,6 +48,9 @@ public:
   vector<SearchMethod> searchMethods;
   // current search method being used
   unsigned currentSearchMethod;
+
+  // type of perturbation to use in ILS
+  PerturbationType perturbationType;
 
   // type of scheduler to evaluate sequence quality
   Scheduler sched;
