@@ -5,12 +5,29 @@
 #include <stdexcept>
 #include <vector>
 
+vector<unsigned> Solver::jobIndeg;
 vector<unsigned> Solver::indeg;
 vector<unsigned> Solver::q;
 vector<unsigned> Solver::_ops;
 vector<tuple<unsigned, unsigned, Solver::MoveType>> Solver::_cands;
 
-Solver::Solver(const Parameters &parameters) : params(parameters) {}
+Solver::Solver(const Parameters &parameters) : params(parameters) {
+  const Instance &inst = Instance::getInstance();
+  _savedStarts.resize(inst.O);
+  _opToBlock.resize(inst.O);
+  _machBlocks.resize(inst.M);
+  _startJobSuccessor.resize(inst.J);
+  _startMachSuccessor.resize(inst.M);
+
+  // Initialize jobIndeg if not already done for this instance
+  if (jobIndeg.size() < inst.O) {
+    jobIndeg.assign(inst.O, 0);
+    for (unsigned o = 1; o < inst.O; ++o) {
+      if (inst._job[o] != 0)
+        ++jobIndeg[o];
+    }
+  }
+}
 
 bool Solver::validate_state(const State &state) const {
   const Instance &inst = Instance::getInstance();
@@ -66,7 +83,8 @@ bool Solver::topo_sort(const State &state) {
   if (indeg.size() < inst.O) {
     indeg.resize(inst.O);
   }
-  fill(indeg.begin(), indeg.end(), 0);
+  // Use pre-calculated job-based in-degrees
+  indeg = jobIndeg;
 
   if (q.capacity() < inst.O) {
     q.reserve(inst.O);
@@ -77,9 +95,8 @@ bool Solver::topo_sort(const State &state) {
   unsigned newOp;
   unsigned head = 0;
 
-  for (unsigned o = 1; o < inst.job.size(); o++) {
-    if (inst._job[o] != 0)
-      ++indeg[o];
+  // Only add machine-based in-degrees and find initial zero-in-degree nodes
+  for (unsigned o = 1; o < inst.O; o++) {
     if (state._mach[o] != 0)
       ++indeg[o];
     if (indeg[o] == 0) {

@@ -8,12 +8,10 @@
 void Solver::shift_operations(State &state) const {
   const Instance &inst = Instance::getInstance();
 
-  vector<unsigned> newStarts(inst.O, 0);
-  vector<unsigned> startJobSuccessor(inst.J, UINT_MAX);
-  vector<unsigned> startMachSuccessor(inst.M, UINT_MAX);
+  fill(_startJobSuccessor.begin(), _startJobSuccessor.end(), UINT_MAX);
+  fill(_startMachSuccessor.begin(), _startMachSuccessor.end(), UINT_MAX);
 
   unsigned curOp;
-  unsigned newMakes = 0;
 
   unsigned tail = q.size();
   while (tail > 0) {
@@ -23,23 +21,27 @@ void Solver::shift_operations(State &state) const {
     if (!curOp)
       continue;
 
-    unsigned sMS = startMachSuccessor[inst.operToM[curOp]];
-    unsigned sJS = startJobSuccessor[inst.operToJ[curOp]];
+    unsigned machine = inst.operToM[curOp];
+    unsigned job = inst.operToJ[curOp];
+
+    unsigned sMS = (machine < _startMachSuccessor.size())
+                       ? _startMachSuccessor[machine]
+                       : UINT_MAX;
+    unsigned sJS =
+        (job < _startJobSuccessor.size()) ? _startJobSuccessor[job] : UINT_MAX;
 
     unsigned shiftLimit = min(sJS, sMS);
 
     unsigned shiftTarget = min(inst.deadlines[curOp], shiftLimit);
     shiftTarget = shiftTarget - inst.P[curOp];
 
-    newStarts[curOp] = max(state.starts[curOp], shiftTarget);
+    state.starts[curOp] = max(state.starts[curOp], shiftTarget);
 
-    newMakes = max(newStarts[curOp] + inst.P[curOp], newMakes);
-
-    startJobSuccessor[inst.operToJ[curOp]] = newStarts[curOp];
-    startMachSuccessor[inst.operToM[curOp]] = newStarts[curOp];
+    if (job < _startJobSuccessor.size())
+      _startJobSuccessor[job] = state.starts[curOp];
+    if (machine < _startMachSuccessor.size())
+      _startMachSuccessor[machine] = state.starts[curOp];
   }
-
-  state.starts = newStarts;
 }
 
 bool Solver::sched_max_early(State &state) const {
@@ -50,7 +52,8 @@ bool Solver::sched_max_early(State &state) const {
   if (indeg.size() < inst.O) {
     indeg.resize(inst.O);
   }
-  fill(indeg.begin(), indeg.end(), 0);
+  // Use pre-calculated job-based in-degrees
+  indeg = jobIndeg;
 
   if (q.capacity() < inst.O) {
     q.reserve(inst.O);
@@ -65,9 +68,8 @@ bool Solver::sched_max_early(State &state) const {
 
   fill(state.starts.begin(), state.starts.end(), 0);
 
+  // Only add machine-based in-degrees and find initial zero-in-degree nodes
   for (unsigned o = 1; o < inst.O; o++) {
-    if (inst._job[o])
-      ++indeg[o];
     if (state._mach[o])
       ++indeg[o];
     if (!indeg[o]) {
@@ -80,7 +82,7 @@ bool Solver::sched_max_early(State &state) const {
 
     newMax = state.starts[curOp] + inst.P[curOp];
 
-    // from JOB
+    // from inst.job
     newOp = inst.job[curOp];
     if (newOp != 0) {
       assert(indeg[newOp]);
@@ -182,8 +184,10 @@ bool Solver::sched_cplex(State &state) const {
     jitModel.add(IloMinimize(jitEnv, objExpr));
 
     IloCplex jitCplex(jitEnv);
-    // jitCplex.setParam(IloCplex::Param::TimeLimit, 0.5);
+    jitCplex.setParam(IloCplex::Param::Threads, 1);
+    jitCplex.setParam(IloCplex::Param::TimeLimit, 1);
     jitCplex.setOut(jitEnv.getNullStream());
+    jitCplex.setWarning(jitEnv.getNullStream());
 
     jitCplex.extract(jitModel);
 
@@ -220,6 +224,8 @@ Solver::SchedPtr Solver::get_sched_by_param() const {
     return &Solver::sched_cplex;
   case Parameters::Scheduler::DELAYING:
     return &Solver::sched_delaying;
+  case Parameters::Scheduler::HYB:
+    return &Solver::sched_max_early;
   }
 
   return NULL;
@@ -233,8 +239,6 @@ bool Solver::sched_delaying(State &state) const {
   vector<unsigned> heads;
   vector<unsigned> ops;
   vector<unsigned> lateCands(inst.O, 0);
-  vector<unsigned> indeg(inst.O);
-  vector<unsigned> Q(inst.O);
   double pushStrength, holdStrength;
 
   fill(state.starts.begin(), state.starts.end(), 0);
@@ -334,9 +338,10 @@ void Solver::delay_opers(vector<unsigned> &starts, vector<unsigned> &lateCands,
   }
 }
 
-void Solver::update_structures(vector<unsigned> &lateCands, vector<unsigned> &limited,
-                    vector<unsigned> &heads, State &state,
-                    const vector<unsigned> &tmpP) const {
+void Solver::update_structures(vector<unsigned> &lateCands,
+                               vector<unsigned> &limited,
+                               vector<unsigned> &heads, State &state,
+                               const vector<unsigned> &tmpP) const {
   const Instance &inst = Instance::getInstance();
   queue<unsigned> remove;
   queue<unsigned> auxL;

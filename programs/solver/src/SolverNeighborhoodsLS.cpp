@@ -50,8 +50,10 @@ void Solver::nhood_ls_swap_adjacent(State &state) const {
       assert(state == debugState);
     }
   }
-  swap_opers(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    swap_opers(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }
 
 void Solver::nhood_ls_swap_random(State &state) const {
@@ -86,8 +88,10 @@ void Solver::nhood_ls_swap_random(State &state) const {
     }
     assert(state == debugState);
   }
-  swap_opers(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    swap_opers(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }
 
 void Solver::nhood_ls_rm_insert_random(State &state) const {
@@ -122,8 +126,10 @@ void Solver::nhood_ls_rm_insert_random(State &state) const {
     }
     assert(state == debugState);
   }
-  rm_insert_oper_after(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    rm_insert_oper_after(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }
 
 void Solver::nhood_ls_swap_earl_late(State &state) const {
@@ -211,8 +217,10 @@ void Solver::nhood_ls_swap_earl_late(State &state) const {
       }
     }
   }
-  swap_opers(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    swap_opers(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }
 
 void Solver::nhood_ls_insert_earl_late(State &state) const {
@@ -231,10 +239,6 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
   pair<unsigned, unsigned> bestMove(0, 0);
   double bestMovePenalties = DBL_MAX;
   MoveType bestMoveType, curMoveType;
-  // machBlocks[b] are operations of block b sorted by start time
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
   _ops.clear();
   for (unsigned o = 1; o < state.mach.size(); ++o) {
@@ -246,7 +250,7 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
     shuffle(_ops.begin(), _ops.end(), Random::getEngine());
   }
 
-  state.find_blocks(machBlocks, opToBlock);
+  state.find_blocks(_machBlocks, _opToBlock);
 
   unsigned curOp;
   // check each operation for remove/insertion procedure
@@ -257,32 +261,32 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
         state.starts[curOp] + inst.P[curOp] < inst.deadlines[curOp];
 
     // impossible to perform any move
-    if (machBlocks[opToBlock[curOp].first].size() == 1)
+    if (_machBlocks[_opToBlock[curOp].first].size() == 1)
       continue;
 
     double curPenal;
     unsigned insertOpCand;
     pair<unsigned, unsigned> move;
     if (isCurOpEarly) {
-      insertOpCand = machBlocks[opToBlock[curOp].first].back();
+      insertOpCand = _machBlocks[_opToBlock[curOp].first].back();
       // if operation has a job successor and the last operation of current
       // block starts after this job successor, search for first operation on
       // block that starts before JS from last until curOp
       if (inst.job[curOp] &&
           state.starts[insertOpCand] > state.starts[inst.job[curOp]]) {
-        int j = machBlocks[opToBlock[curOp].first].size() - 1;
+        int j = _machBlocks[_opToBlock[curOp].first].size() - 1;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp].first][j]] >
+        while (_machBlocks[_opToBlock[curOp].first][j] != curOp &&
+               state.starts[_machBlocks[_opToBlock[curOp].first][j]] >
                    state.starts[inst.job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp].first][j--];
+          insertOpCand = _machBlocks[_opToBlock[curOp].first][j--];
         }
       }
       move = make_pair(curOp, insertOpCand);
       curMoveType = MoveType::AFTER;
       curPenal = evaluate_insert(state, move, curMoveType);
     } else {
-      insertOpCand = machBlocks[opToBlock[curOp].first].front();
+      insertOpCand = _machBlocks[_opToBlock[curOp].first].front();
       // if operation has a job predecessor and the first operation of current
       // block ends before this job successor, search for first operation on
       // block that starts before JS from first until curOp
@@ -291,11 +295,11 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
               state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
         int j = 0;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[curOp].first][j] != curOp &&
-               state.starts[machBlocks[opToBlock[curOp].first][j]] +
-                       inst.P[machBlocks[opToBlock[curOp].first][j]] <
+        while (_machBlocks[_opToBlock[curOp].first][j] != curOp &&
+               state.starts[_machBlocks[_opToBlock[curOp].first][j]] +
+                       inst.P[_machBlocks[_opToBlock[curOp].first][j]] <
                    state.starts[inst._job[curOp]] + inst.P[inst._job[curOp]]) {
-          insertOpCand = machBlocks[opToBlock[curOp].first][j++];
+          insertOpCand = _machBlocks[_opToBlock[curOp].first][j++];
         }
       }
       move = make_pair(curOp, insertOpCand);
@@ -317,15 +321,20 @@ void Solver::nhood_ls_insert_earl_late(State &state) const {
     }
     assert(state == debugState);
   }
-  switch (bestMoveType) {
-  case MoveType::AFTER:
-    rm_insert_oper_after(state, bestMove.first, bestMove.second);
-    break;
-  case MoveType::BEFORE:
-    rm_insert_oper_befor(state, bestMove.first, bestMove.second);
-    break;
+  if (bestMove.first != 0) {
+    switch (bestMoveType) {
+    case MoveType::AFTER:
+      rm_insert_oper_after(state, bestMove.first, bestMove.second);
+      break;
+    case MoveType::BEFORE:
+      rm_insert_oper_befor(state, bestMove.first, bestMove.second);
+      break;
+    default:
+      break;
+    }
+    (this->*get_sched_by_param())(state);
   }
-  (this->*get_sched_by_param())(state);
+}
 
 void Solver::nhood_ls_relax_2(State &state) const {
   const Instance &inst = Instance::getInstance();
@@ -498,10 +507,6 @@ void Solver::nhood_ls_oper_critical(State &state) const {
   // best move found do far. For BI search
   pair<unsigned, unsigned> bestMove(0, 0);
   double bestMovePenalties = DBL_MAX;
-  // machBlocks[b] are operations of block b sorted by start time
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
   _ops.clear();
   for (unsigned o = 1; o < state.mach.size(); ++o) {
@@ -513,35 +518,35 @@ void Solver::nhood_ls_oper_critical(State &state) const {
     shuffle(_ops.begin(), _ops.end(), Random::getEngine());
   }
 
-  state.find_blocks(machBlocks, opToBlock);
+  state.find_blocks(_machBlocks, _opToBlock);
 
   vector<bool> isOpChecked(inst.O, false);
 
   unsigned curOp;
   double curPenal;
   vector<pair<unsigned, unsigned>> cands;
-  for (unsigned o = 1; o < _ops.size(); ++o) {
+  for (unsigned o = 0; o < _ops.size(); ++o) {
     curOp = _ops[o];
 
     unsigned curBlock;
     unsigned curOpPos;
     while (state._mach[curOp] || inst._job[curOp]) {
-      curBlock = opToBlock[curOp].first;
-      curOpPos = opToBlock[curOp].second;
-      if (isOpChecked[machBlocks[curBlock][curOpPos]])
+      curBlock = _opToBlock[curOp].first;
+      curOpPos = _opToBlock[curOp].second;
+      if (isOpChecked[_machBlocks[curBlock][curOpPos]])
         break;
       if (curOpPos > 0) {
-        cands.push_back(make_pair(machBlocks[curBlock][curOpPos],
-                                  machBlocks[curBlock][curOpPos - 1]));
-        isOpChecked[machBlocks[curBlock][curOpPos]] = true;
+        cands.push_back(make_pair(_machBlocks[curBlock][curOpPos],
+                                  _machBlocks[curBlock][curOpPos - 1]));
+        isOpChecked[_machBlocks[curBlock][curOpPos]] = true;
       }
-      if (machBlocks[curBlock].size() > 1 &&
-          isOpChecked[machBlocks[curBlock][1]])
+      if (_machBlocks[curBlock].size() > 1 &&
+          isOpChecked[_machBlocks[curBlock][1]])
         break;
       if (curOpPos > 1) {
         cands.push_back(
-            make_pair(machBlocks[curBlock][0], machBlocks[curBlock][1]));
-        isOpChecked[machBlocks[curBlock][1]] = true;
+            make_pair(_machBlocks[curBlock][0], _machBlocks[curBlock][1]));
+        isOpChecked[_machBlocks[curBlock][1]] = true;
       }
 
       for (pair<unsigned, unsigned> cand : cands) {
@@ -559,12 +564,14 @@ void Solver::nhood_ls_oper_critical(State &state) const {
         assert(debugState == state);
       }
 
-      curOp = inst._job[machBlocks[curBlock][0]];
+      curOp = inst._job[_machBlocks[curBlock][0]];
       cands.clear();
     }
   }
-  swap_opers(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    swap_opers(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }
 
 void Solver::nhood_ls_oper_critical_alt(State &state) const {
@@ -582,10 +589,6 @@ void Solver::nhood_ls_oper_critical_alt(State &state) const {
   // best move found do far. For BI search
   pair<unsigned, unsigned> bestMove(0, 0);
   double bestMovePenalties = DBL_MAX;
-  // machBlocks[b] are operations of block b sorted by start time
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
   _ops.clear();
   for (unsigned o = 1; o < state.mach.size(); ++o) {
@@ -597,7 +600,7 @@ void Solver::nhood_ls_oper_critical_alt(State &state) const {
     shuffle(_ops.begin(), _ops.end(), Random::getEngine());
   }
 
-  state.find_blocks(machBlocks, opToBlock);
+  state.find_blocks(_machBlocks, _opToBlock);
 
   unsigned curOp;
   double curPenal;
@@ -642,6 +645,8 @@ void Solver::nhood_ls_oper_critical_alt(State &state) const {
       cands.clear();
     }
   }
-  swap_opers(state, bestMove.first, bestMove.second);
-  (this->*get_sched_by_param())(state);
+  if (bestMove.first != 0) {
+    swap_opers(state, bestMove.first, bestMove.second);
+    (this->*get_sched_by_param())(state);
+  }
 }

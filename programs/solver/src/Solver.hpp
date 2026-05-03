@@ -23,9 +23,17 @@ private:
   // current best solution found
   State best;
 
+  static vector<unsigned> jobIndeg;
   static vector<unsigned> indeg;
   static vector<unsigned> q;
   static vector<unsigned> _ops;
+
+  // Workspace buffers to avoid reallocations
+  mutable vector<unsigned> _savedStarts;
+  mutable vector<vector<unsigned>> _machBlocks;
+  mutable vector<pair<unsigned, unsigned>> _opToBlock;
+  mutable vector<unsigned> _startJobSuccessor;
+  mutable vector<unsigned> _startMachSuccessor;
 
   using SearchPtr = void (Solver::*)(State &);
 

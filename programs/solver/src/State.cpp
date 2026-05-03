@@ -34,6 +34,9 @@ bool State::operator==(const State &s) {
 void State::find_blocks(vector<vector<unsigned>> &blocks,
                         vector<pair<unsigned, unsigned>> &opToBlock) const {
   const Instance &inst = Instance::getInstance();
+  blocks.clear();
+  if (opToBlock.size() < inst.O)
+    opToBlock.resize(inst.O);
 
   for (unsigned o = 1; o < inst.O; ++o) {
     if (!_mach[o]) {

@@ -179,12 +179,24 @@ double Solver::evaluate_swap(State &state,
 
   unsigned i = move.first, j = move.second;
   double cost = DBL_MAX;
+
+  _savedStarts = state.starts;
+  double savedPenalties = state.penalties;
+  double savedTP = state.tPenalty;
+  double savedEP = state.ePenalty;
+
   swap_opers(state, i, j);
   if (!(this->*sched)(state)) {
     assert(validate_state(state));
     cost = state.penalties;
   }
   swap_opers(state, j, i);
+
+  state.starts = _savedStarts;
+  state.penalties = savedPenalties;
+  state.tPenalty = savedTP;
+  state.ePenalty = savedEP;
+
   return cost;
 }
 
@@ -194,6 +206,11 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
   unsigned i = move.first, j = move.second;
   unsigned _machOp1 = state._mach[i], machOp1 = state.mach[i];
   double cost = DBL_MAX;
+
+  _savedStarts = state.starts;
+  double savedPenalties = state.penalties;
+  double savedTP = state.tPenalty;
+  double savedEP = state.ePenalty;
 
   // do move
   switch (type) {
@@ -213,6 +230,11 @@ double Solver::evaluate_insert(State &state, pair<unsigned, unsigned> &move,
     rm_insert_oper_after(state, i, _machOp1);
   else
     rm_insert_oper_befor(state, i, machOp1);
+
+  state.starts = _savedStarts;
+  state.penalties = savedPenalties;
+  state.tPenalty = savedTP;
+  state.ePenalty = savedEP;
 
   return cost;
 }
@@ -419,41 +441,36 @@ void Solver::cands_insert_earl_late(State &state) const {
 
   _cands.clear();
 
-  // machBlocks[b] are operations of block b sorted by start time
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
-
-  state.find_blocks(machBlocks, opToBlock);
+  state.find_blocks(_machBlocks, _opToBlock);
 
   unsigned insertOpCand;
   for (unsigned o = 1; o < inst.O; ++o) {
     bool isCurOpEarly = state.starts[o] + inst.P[o] < inst.deadlines[o];
 
     // impossible to perform any move
-    if (machBlocks[opToBlock[o].first].size() == 1)
+    if (_machBlocks[_opToBlock[o].first].size() == 1)
       continue;
 
     if (isCurOpEarly) {
-      insertOpCand = machBlocks[opToBlock[o].first].back();
+      insertOpCand = _machBlocks[_opToBlock[o].first].back();
       // if operation has a job successor and the last operation of current
       // block starts after this job successor, search for first operation on
       // block that starts before JS from last until o
       if (inst.job[o] &&
           state.starts[insertOpCand] > state.starts[inst.job[o]]) {
-        int j = machBlocks[opToBlock[o].first].size() - 1;
+        int j = _machBlocks[_opToBlock[o].first].size() - 1;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[o].first][j] != o &&
-               state.starts[machBlocks[opToBlock[o].first][j]] >
+        while (_machBlocks[_opToBlock[o].first][j] != o &&
+               state.starts[_machBlocks[_opToBlock[o].first][j]] >
                    state.starts[inst.job[o]]) {
-          insertOpCand = machBlocks[opToBlock[o].first][j--];
+          insertOpCand = _machBlocks[_opToBlock[o].first][j--];
         }
       }
       if (o == insertOpCand)
         continue;
       _cands.push_back(make_tuple(o, insertOpCand, MoveType::AFTER));
     } else {
-      insertOpCand = machBlocks[opToBlock[o].first].front();
+      insertOpCand = _machBlocks[_opToBlock[o].first].front();
       // if operation has a job predecessor and the first operation of current
       // block ends before this job successor, search for first operation on
       // block that starts before JS from first until o
@@ -462,11 +479,11 @@ void Solver::cands_insert_earl_late(State &state) const {
               state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
         int j = 0;
         // TODO: it's possible to perform binary search
-        while (machBlocks[opToBlock[o].first][j] != o &&
-               state.starts[machBlocks[opToBlock[o].first][j]] +
-                       inst.P[machBlocks[opToBlock[o].first][j]] <
+        while (_machBlocks[_opToBlock[o].first][j] != o &&
+               state.starts[_machBlocks[_opToBlock[o].first][j]] +
+                       inst.P[_machBlocks[_opToBlock[o].first][j]] <
                    state.starts[inst._job[o]] + inst.P[inst._job[o]]) {
-          insertOpCand = machBlocks[opToBlock[o].first][j++];
+          insertOpCand = _machBlocks[_opToBlock[o].first][j++];
         }
       }
       if (o == insertOpCand)
@@ -480,11 +497,8 @@ void Solver::cands_oper_critical(State &state) const {
   const Instance &inst = Instance::getInstance();
 
   _cands.clear();
-  vector<vector<unsigned>> machBlocks;
-  // opToBlock[o] is block wich contain operation o
-  vector<pair<unsigned, unsigned>> opToBlock(inst.O, make_pair(0, 0));
 
-  state.find_blocks(machBlocks, opToBlock);
+  state.find_blocks(_machBlocks, _opToBlock);
 
   unsigned curOp;
   vector<bool> isOpChecked(inst.O, false);
@@ -495,26 +509,26 @@ void Solver::cands_oper_critical(State &state) const {
     unsigned curBlock;
     unsigned curOpPos;
     while (state._mach[curOp] || inst._job[curOp]) {
-      curBlock = opToBlock[curOp].first;
-      curOpPos = opToBlock[curOp].second;
-      if (isOpChecked[machBlocks[curBlock][curOpPos]])
+      curBlock = _opToBlock[curOp].first;
+      curOpPos = _opToBlock[curOp].second;
+      if (isOpChecked[_machBlocks[curBlock][curOpPos]])
         break;
       if (curOpPos > 0) {
-        _cands.push_back(make_tuple(machBlocks[curBlock][curOpPos],
-                                    machBlocks[curBlock][curOpPos - 1],
+        _cands.push_back(make_tuple(_machBlocks[curBlock][curOpPos],
+                                    _machBlocks[curBlock][curOpPos - 1],
                                     MoveType::SWAP));
-        isOpChecked[machBlocks[curBlock][curOpPos]] = true;
+        isOpChecked[_machBlocks[curBlock][curOpPos]] = true;
       }
-      if (machBlocks[curBlock].size() > 1 &&
-          isOpChecked[machBlocks[curBlock][1]])
+      if (_machBlocks[curBlock].size() > 1 &&
+          isOpChecked[_machBlocks[curBlock][1]])
         break;
       if (curOpPos > 1) {
-        _cands.push_back(make_tuple(machBlocks[curBlock][0],
-                                    machBlocks[curBlock][1], MoveType::SWAP));
-        isOpChecked[machBlocks[curBlock][1]] = true;
+        _cands.push_back(make_tuple(_machBlocks[curBlock][0],
+                                    _machBlocks[curBlock][1], MoveType::SWAP));
+        isOpChecked[_machBlocks[curBlock][1]] = true;
       }
 
-      curOp = inst._job[machBlocks[curBlock][0]];
+      curOp = inst._job[_machBlocks[curBlock][0]];
     }
   }
 }
