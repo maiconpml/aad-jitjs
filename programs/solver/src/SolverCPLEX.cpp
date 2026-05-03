@@ -79,10 +79,14 @@ void Solver::solve_cplex(State &state) const {
 
     // Solve
     IloCplex cplex(model);
-    cplex.setParam(IloCplex::Param::Threads, 0);
+    cplex.setParam(IloCplex::Param::Threads, 4);
     cplex.setParam(IloCplex::Param::TimeLimit, params.maxMilli / 1000.0);
+    cplex.setOut(env.getNullStream());
+    cplex.setWarning(env.getNullStream());
 
     if (cplex.solve()) {
+      if (!params.autoConfig)
+        cout << "CPLEX Status: " << cplex.getStatus() << endl;
       state.penalties = cplex.getObjValue();
       state.starts.clear();
       state.starts.resize(inst.O);
