@@ -166,8 +166,8 @@ void Solver::search_ils(State &state) {
     if (curState.penalties < state.penalties) {
       state = curState;
       params.currentNHood = 0;
-    } else if (n > 1) {
-      ++params.currentNHood;
+    } else {
+      params.currentNHood = (params.currentNHood + 1) % n;
     }
   }
 }
