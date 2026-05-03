@@ -24,7 +24,7 @@ public:
 
   enum class SearchMethod { LS, ILS, TABU };
 
-  enum class Scheduler { EARLY, CPLEX, DELAYING };
+  enum class Scheduler { EARLY, CPLEX, DELAYING, HYB };
 
   // instance path
   string instPath;
@@ -76,7 +76,9 @@ public:
   // ------------------------------ EXTRAS -------------------------------------
   // print only objective value for irace
   bool autoConfig;
-  
+
   // solve using CPLEX exact method
   bool solveExact = false;
+
+  bool hyb_sched = false;
 };

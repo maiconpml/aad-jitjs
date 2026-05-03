@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         "nHoodTravers7", po::value<string>()->default_value("BI"),
         "neighborhood traversing 7 (BI, FI, ELT_LIST)")(
         "sched", po::value<string>()->default_value("EARLY"),
-        "scheduler (EARLY, CPLEX)")(
+        "scheduler (EARLY, CPLEX, DELAYING, HYB)")(
         "solveExact", po::bool_switch()->default_value(false),
         "solve using CPLEX exact method (overrides other search methods)")(
         "autoConfig", po::bool_switch()->default_value(false),
@@ -200,6 +200,9 @@ int main(int argc, char *argv[]) {
       param.sched = Parameters::Scheduler::CPLEX;
     } else if (sched == "DELAYING") {
       param.sched = Parameters::Scheduler::DELAYING;
+    } else if (sched == "HYB") {
+      param.sched = Parameters::Scheduler::EARLY;
+      param.hyb_sched = true;
     } else {
       throw string("Invalid scheduler: " + sched);
     }

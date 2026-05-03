@@ -16,6 +16,14 @@ void Solver::search_ls(State &state) {
   while (!Timer::isTimeExceeded(
       min(stTime + params.internalSearchTime, params.maxMilli))) {
 
+    if (params.hyb_sched) {
+      if (curState.ePenalty > 0 &&
+          ((curState.tPenalty - curState.ePenalty) / curState.ePenalty) > 0.1)
+        params.sched = Parameters::Scheduler::DELAYING;
+      else
+        params.sched = Parameters::Scheduler::EARLY;
+    }
+
     (this->*nhood)(curState);
 
     if (curState.penalties < state.penalties) {
@@ -81,6 +89,13 @@ void Solver::search_tabu(State &state) {
       auxTL = tList;
     }
 
+    if (params.hyb_sched) {
+      if (curState.ePenalty > 0 &&
+          ((curState.tPenalty - curState.ePenalty) / curState.ePenalty) > 0.1)
+        params.sched = Parameters::Scheduler::DELAYING;
+      else
+        params.sched = Parameters::Scheduler::EARLY;
+    }
     if (!_cands.empty())
       (this->*nsp)(curState, tList, state.penalties);
     else
