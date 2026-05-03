@@ -1,11 +1,13 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 class Parameters {
 public:
+  friend std::ostream &operator<<(std::ostream &os, const Parameters &param);
   enum class InitialSolution { GT, CONSTR };
 
   enum class DispatchingRule { EDD, ACS, RAND };
