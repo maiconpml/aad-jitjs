@@ -1,0 +1,35 @@
+# 2026-05-07 17:46:00 -03: Reading parameter file '/home/mike/Work/aad-jitjs/tuning/parameters.txt'.
+# 2026-05-07 17:46:00 -03: Initialization
+# Elitist race
+# Elitist new instances: 1
+# Elitist limit: 2
+# nbIterations: 6
+# minNbSurvival: 6
+# nbParameters: 22
+# seed: 1942939100
+# confidence level: 0.95
+# budget: 25000
+# mu: 5
+# deterministic: FALSE
+
+# 2026-05-07 17:46:00 -03: Iteration 1 of 6
+# experimentsUsed: 0
+# remainingBudget: 25000
+# currentBudget: 4166
+# nbConfigurations: 694
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|          1|        690|         10|     288.4600000|        690|00:49:56|   NA|  NA|    NA|
+|x|          2|        690|        393|     936.9850000|       1380|01:06:07|+0.61|0.80|0.3950|
+|x|          3|        690|         66|     872.2333333|       2070|00:59:18|+0.68|0.78|0.3309|
+|x|          4|        690|        393|     911.5975000|       2760|01:05:44|+0.70|0.78|0.3236|

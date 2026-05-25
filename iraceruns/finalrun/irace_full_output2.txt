@@ -1,0 +1,171 @@
+# 2026-05-08 01:08:07 -03: Reading parameter file '/home/mike/Work/aad-jitjs/tuning/parameters.txt'.
+# 2026-05-08 01:08:07 -03: Recovering from file: '/home/mike/Work/aad-jitjs/tuning/iraceBackup.Rdata'
+# 2026-05-08 01:08:07 -03: Initialization
+# Elitist race
+# Elitist new instances: 1
+# Elitist limit: 2
+# nbIterations: 6
+# minNbSurvival: 6
+# nbParameters: 22
+# seed: 1942939100
+# confidence level: 0.95
+# budget: 25000
+# mu: 5
+# deterministic: FALSE
+
+# 2026-05-08 01:08:07 -03: Iteration 1 of 6
+# experimentsUsed: 0
+# remainingBudget: 25000
+# currentBudget: 4166
+# nbConfigurations: 694
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|          1|        690|         10|     288.4600000|        690|00:00:00|   NA|  NA|    NA|
+|x|          2|        690|        393|     936.9850000|       1380|00:00:00|+0.61|0.80|0.3950|
+|x|          3|        690|         66|     872.2333333|       2070|00:00:00|+0.68|0.78|0.3309|
+# 2026-05-08 01:08:08 -03: Recovery completed.
+|x|          4|        690|        393|     911.5975000|       2760|00:00:00|+0.70|0.78|0.3236|
+|-|          5|        172|        393|     1398.310000|       3450|01:19:39|+0.00|0.20|1.0232|
+|-|          6|         80|        393|     1243.881667|       3622|00:27:02|-0.12|0.07|1.0671|
+|=|          7|         80|        393|     1235.011429|       3702|00:13:10|-0.08|0.07|1.0490|
+|=|          8|         80|        123|     1132.086250|       3782|00:13:10|-0.04|0.09|1.0341|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:         123    mean value:      1132.086250
+Description of the best-so-far configuration:
+    .ID. initSol dispatchRule search1 search2 ilsIterMaxMilli numNHoods
+123  123      GT          EDD     ILS      LS           24557         3
+      nhood1 nhood1_tabu nHoodTravers1    nhood2 nhood2_tabu nHoodTravers2
+123 SWAP_ADJ        <NA>            FI SWAP_RAND        <NA>            BI
+     nhood3 nhood3_tabu nHoodTravers3 scheduler maxD maxC tenure jumpListSize
+123 RELAX_2        <NA>            BI  DELAYING   NA   NA     NA           NA
+    initialJumpLimit decreaseDivisor .PARENT.
+123               NA              NA       NA
+
+# 2026-05-08 03:21:11 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+    initSol dispatchRule search1 search2 ilsIterMaxMilli numNHoods       nhood1
+123      GT          EDD     ILS      LS           24557         3     SWAP_ADJ
+393      GT          EDD     ILS      LS           24387         2 INSERT_PENAL
+247      GT          EDD     ILS      LS            7734         3   SWAP_PENAL
+49       GT          EDD     ILS    TABU            2466         2         <NA>
+99   CONSTR          EDD     ILS    TABU           21272         3         <NA>
+675      GT          EDD     ILS      LS           19714         3    SWAP_RAND
+    nhood1_tabu nHoodTravers1    nhood2  nhood2_tabu nHoodTravers2       nhood3
+123        <NA>            FI SWAP_RAND         <NA>            BI      RELAX_2
+393        <NA>            FI   RELAX_2         <NA>            FI         <NA>
+247        <NA>            BI  SWAP_ADJ         <NA>            FI      RELAX_2
+49    SWAP_RAND            BI      <NA>     SWAP_ADJ            BI         <NA>
+99   SWAP_PENAL            FI      <NA> INSERT_PENAL            FI         <NA>
+675        <NA>            BI   RELAX_2         <NA>            BI INSERT_PENAL
+          nhood3_tabu nHoodTravers3 scheduler maxD maxC tenure jumpListSize
+123              <NA>            BI  DELAYING   NA   NA     NA           NA
+393              <NA>          <NA>  DELAYING   NA   NA     NA           NA
+247              <NA>            FI     EARLY   NA   NA     NA           NA
+49               <NA>          <NA>     EARLY   40    4     77           19
+99  CRITICAL_OPER_ALT            BI     EARLY   43    1     20           14
+675              <NA>            BI  DELAYING   NA   NA     NA           NA
+    initialJumpLimit decreaseDivisor
+123               NA              NA
+393               NA              NA
+247               NA              NA
+49              1415              17
+99               214              14
+675               NA              NA
+# 2026-05-08 03:21:11 -03: Iteration 2 of 6
+# experimentsUsed: 3782
+# remainingBudget: 21218
+# currentBudget: 4243
+# nbConfigurations: 476
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|          9|        476|       1012|     2900.240000|        476|00:48:03|   NA|  NA|    NA|
+|x|          6|        476|        956|     1686.400000|        946|00:39:37|+0.66|0.83|0.4867|
+|x|          5|        476|        745|     2172.713333|       1416|00:51:19|+0.63|0.75|0.4599|
+|x|          2|        476|        956|     2043.000000|       1886|00:43:16|+0.69|0.77|0.3986|
+|-|          7|         97|         49|     1876.822000|       2356|00:39:00|+0.00|0.20|0.9968|
+|=|          1|         97|         49|     1612.095000|       2447|00:14:07|+0.03|0.19|0.9545|
+|=|          4|         97|         49|     1536.921429|       2538|00:15:02|+0.03|0.16|0.9151|
+|-|          3|         50|        754|     1455.341250|       2629|00:14:30|-0.05|0.09|1.0271|
+|=|          8|         50|        754|     1328.667778|       2673|00:08:01|-0.02|0.09|1.0176|
+|=|         10|         50|        123|     1243.865000|       2723|00:09:04|-0.02|0.08|1.0196|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:         123    mean value:      1243.865000
+Description of the best-so-far configuration:
+    .ID. initSol dispatchRule search1 search2 ilsIterMaxMilli numNHoods
+123  123      GT          EDD     ILS      LS           24557         3
+      nhood1 nhood1_tabu nHoodTravers1    nhood2 nhood2_tabu nHoodTravers2
+123 SWAP_ADJ        <NA>            FI SWAP_RAND        <NA>            BI
+     nhood3 nhood3_tabu nHoodTravers3 scheduler maxD maxC tenure jumpListSize
+123 RELAX_2        <NA>            BI  DELAYING   NA   NA     NA           NA
+    initialJumpLimit decreaseDivisor .PARENT.
+123               NA              NA       NA
+
+# 2026-05-08 08:03:14 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+    initSol dispatchRule search1 search2 ilsIterMaxMilli numNHoods       nhood1
+123      GT          EDD     ILS      LS           24557         3     SWAP_ADJ
+49       GT          EDD     ILS    TABU            2466         2         <NA>
+754      GT          EDD     ILS      LS           27203         3 INSERT_PENAL
+956  CONSTR          EDD     ILS    TABU           11906         2         <NA>
+786  CONSTR          EDD     ILS      LS           29486         3     SWAP_ADJ
+788  CONSTR          EDD     ILS    TABU           13059         3         <NA>
+          nhood1_tabu nHoodTravers1    nhood2 nhood2_tabu nHoodTravers2
+123              <NA>            FI SWAP_RAND        <NA>            BI
+49          SWAP_RAND            BI      <NA>    SWAP_ADJ            BI
+754              <NA>            BI  SWAP_ADJ        <NA>            BI
+956        SWAP_PENAL            FI      <NA>   SWAP_RAND            BI
+786              <NA>            FI   RELAX_2        <NA>            BI
+788 CRITICAL_OPER_ALT            FI      <NA>    SWAP_ADJ            BI
+       nhood3 nhood3_tabu nHoodTravers3 scheduler maxD maxC tenure jumpListSize
+123   RELAX_2        <NA>            BI  DELAYING   NA   NA     NA           NA
+49       <NA>        <NA>          <NA>     EARLY   40    4     77           19
+754   RELAX_2        <NA>            FI  DELAYING   NA   NA     NA           NA
+956      <NA>        <NA>          <NA>     EARLY    6    4    100           15
+786 SWAP_RAND        <NA>            BI     EARLY   NA   NA     NA           NA
+788      <NA>  SWAP_PENAL            BI     EARLY   63    3     64           29
+    initialJumpLimit decreaseDivisor
+123               NA              NA
+49              1415              17
+754               NA              NA
+956             2870               7
+786               NA              NA
+788             2906               3
+# 2026-05-08 08:03:14 -03: Iteration 3 of 6
+# experimentsUsed: 6505
+# remainingBudget: 18495
+# currentBudget: 4623
+# nbConfigurations: 425
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         11|        425|        123|     952.4600000|        425|00:44:58|   NA|  NA|    NA|
+|x|          4|        425|        123|     992.6250000|        844|00:45:51|+0.63|0.82|0.3216|
+|x|          7|        425|       1249|     1037.670000|       1263|00:43:37|+0.55|0.70|0.3905|
+|x|          3|        425|       1340|     967.8475000|       1682|00:43:47|+0.61|0.71|0.3721|

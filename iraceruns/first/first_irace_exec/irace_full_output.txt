@@ -1,0 +1,1120 @@
+# 2026-04-18 10:30:50 -03: Reading parameter file '/home/mike/Work/aad-jitjs/tuning/parameters.txt'.
+# 2026-04-18 10:30:50 -03: Initialization
+# Elitist race
+# Elitist new instances: 1
+# Elitist limit: 2
+# nbIterations: 6
+# minNbSurvival: 6
+# nbParameters: 24
+# seed: 1092609629
+# confidence level: 0.95
+# budget: 40000
+# mu: 5
+# deterministic: FALSE
+
+# 2026-04-18 10:30:50 -03: Iteration 1 of 6
+# experimentsUsed: 0
+# remainingBudget: 40000
+# currentBudget: 6666
+# nbConfigurations: 1024
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|          1|       1006|         12|     1032.790000|       1006|00:57:28|   NA|  NA|    NA|
+|x|          2|       1006|        740|     925.9600000|       2012|00:52:46|+0.22|0.61|0.8011|
+|x|          3|       1006|        607|     753.5766667|       3018|00:42:32|+0.47|0.65|0.6102|
+|x|          4|       1006|         37|     782.6525000|       4024|00:46:22|+0.55|0.66|0.5422|
+|-|          5|        245|         37|     13454.62200|       5030|02:21:33|-0.03|0.17|1.0381|
+|=|          6|        245|         37|     11486.43167|       5275|00:30:21|+0.02|0.18|0.9854|
+|-|          7|        100|         37|     9871.165714|       5520|00:19:00|-0.07|0.09|1.0316|
+|=|          8|        100|         37|     8912.516250|       5620|00:13:26|-0.05|0.08|1.0225|
+|=|          9|        100|         37|     8035.142222|       5720|00:14:53|-0.01|0.10|0.9928|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:          37    mean value:      8035.142222
+Description of the best-so-far configuration:
+   .ID. initSol dispatchRule search1 search2 perturbation perturbationStrength
+37   37  CONSTR          EDD     ILS    TABU      RELAX_1                   33
+   ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+37           15205         1   <NA>   SWAP_RAND            FI   <NA>
+   nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+37        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   78
+   maxC tenure jumpListSize initialJumpLimit decreaseDivisor .PARENT.
+37    1     91           11             1972              12       NA
+
+# 2026-04-18 17:29:17 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+    initSol dispatchRule search1 search2 perturbation perturbationStrength
+37   CONSTR          EDD     ILS    TABU      RELAX_1                   33
+906      GT          EDD     ILS      LS      RELAX_1                   57
+128  CONSTR          EDD     ILS    TABU     SWAP_ADJ                   50
+348  CONSTR          EDD     ILS    TABU      RELAX_1                   12
+607      GT          EDD     ILS    TABU      RELAX_1                   40
+777  CONSTR          EDD     ILS    TABU      RELAX_1                   44
+    ilsIterMaxMilli numNHoods    nhood1  nhood1_tabu nHoodTravers1 nhood2
+37            15205         1      <NA>    SWAP_RAND            FI   <NA>
+906           11240         1 SWAP_RAND         <NA>            BI   <NA>
+128           12033         1      <NA>     SWAP_ADJ            FI   <NA>
+348           11213         1      <NA>     SWAP_ADJ            FI   <NA>
+607            4842         1      <NA>    SWAP_RAND            BI   <NA>
+777           11568         1      <NA> INSERT_PENAL            BI   <NA>
+    nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+37         <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   78
+906        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   NA
+128        <NA>          <NA>   <NA>        <NA>          <NA>  DELAYING   28
+348        <NA>          <NA>   <NA>        <NA>          <NA>  DELAYING    5
+607        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   92
+777        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   52
+    maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+37     1     91           11             1972              12
+906   NA     NA           NA               NA              NA
+128    6     56            6             2777               9
+348    4     77            8             1264              15
+607   10     76           10             2547               2
+777    1     74           25             2303              14
+# 2026-04-18 17:29:17 -03: Iteration 2 of 6
+# experimentsUsed: 5720
+# remainingBudget: 34280
+# currentBudget: 6856
+# nbConfigurations: 691
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         10|        691|        607|     1936.890000|        691|00:45:05|   NA|  NA|    NA|
+|x|          3|        691|       1169|     1162.525000|       1376|00:38:44|+0.71|0.85|0.4672|
+|x|          1|        691|       1464|     1124.193333|       2061|00:44:38|+0.58|0.72|0.6120|
+|x|          6|        691|       1464|     1240.290000|       2746|00:45:36|+0.64|0.73|0.5176|
+|-|          7|        148|       1464|     1028.146000|       3431|00:34:45|+0.07|0.25|0.9796|
+|-|          9|         50|       1043|     1022.925000|       3573|00:21:33|-0.00|0.17|1.0040|
+|=|          4|         50|       1464|     997.3671429|       3617|00:07:00|+0.03|0.17|0.9747|
+|=|          2|         50|       1464|     977.5112500|       3661|00:07:02|+0.04|0.16|0.9608|
+|-|          8|         26|       1043|     1109.683333|       3705|00:07:08|-0.06|0.06|0.9930|
+|=|          5|         26|       1043|     7782.755000|       3725|00:04:01|-0.03|0.07|0.9779|
+|=|         11|         26|       1043|     7090.480000|       3751|00:04:03|-0.03|0.06|0.8875|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        1043    mean value:      7090.480000
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+1043 1043      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+1043                   41            6646         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+1043            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+1043          <NA>     EARLY   63    1     83           24             1114
+     decreaseDivisor .PARENT.
+1043               6      906
+
+# 2026-04-18 21:48:58 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+1043      GT          EDD     ILS    TABU      RELAX_1                   41
+37    CONSTR          EDD     ILS    TABU      RELAX_1                   33
+1464      GT          EDD     ILS    TABU     SWAP_ADJ                   44
+906       GT          EDD     ILS      LS      RELAX_1                   57
+128   CONSTR          EDD     ILS    TABU     SWAP_ADJ                   50
+1380      GT          EDD     ILS      LS      RELAX_1                   10
+     ilsIterMaxMilli numNHoods    nhood1 nhood1_tabu nHoodTravers1 nhood2
+1043            6646         1      <NA>  SWAP_PENAL            BI   <NA>
+37             15205         1      <NA>   SWAP_RAND            FI   <NA>
+1464            4496         1      <NA>    SWAP_ADJ            FI   <NA>
+906            11240         1 SWAP_RAND        <NA>            BI   <NA>
+128            12033         1      <NA>    SWAP_ADJ            FI   <NA>
+1380           12565         1  SWAP_ADJ        <NA>            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+1043        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   63
+37          <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   78
+1464        <NA>          <NA>   <NA>        <NA>          <NA>  DELAYING   17
+906         <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   NA
+128         <NA>          <NA>   <NA>        <NA>          <NA>  DELAYING   28
+1380        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   NA
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+1043    1     83           24             1114               6
+37      1     91           11             1972              12
+1464    9     35           19             2492               7
+906    NA     NA           NA               NA              NA
+128     6     56            6             2777               9
+1380   NA     NA           NA               NA              NA
+# 2026-04-18 21:48:58 -03: Iteration 3 of 6
+# experimentsUsed: 9471
+# remainingBudget: 30529
+# currentBudget: 7632
+# nbConfigurations: 641
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         12|        641|       2049|     3033.990000|        641|01:01:55|   NA|  NA|    NA|
+|x|          7|        641|       2049|     1606.780000|       1276|00:42:44|+0.54|0.77|0.4386|
+|x|          2|        641|       2078|     1346.450000|       1911|00:49:19|+0.55|0.70|0.4313|
+|x|          1|        641|       2326|     1281.172500|       2546|00:52:23|+0.53|0.64|0.4887|
+|-|          8|        195|       1809|     1465.934000|       3181|00:51:27|-0.07|0.14|1.0690|
+|=|          6|        195|       1809|     1489.740000|       3370|00:29:00|+0.01|0.17|1.0102|
+|-|          5|         84|       1809|     10500.74857|       3559|00:31:49|-0.07|0.08|1.0645|
+|=|         11|         84|       1809|     9209.121250|       3637|00:11:12|-0.06|0.07|1.0360|
+|=|          9|         84|       1809|     8298.153333|       3715|00:12:10|-0.04|0.07|1.0302|
+|=|          4|         84|       1809|     7550.037000|       3793|00:11:54|-0.03|0.07|1.0041|
+|=|          3|         84|       1809|     6898.957273|       3871|00:11:37|-0.00|0.09|0.9709|
+|=|         10|         84|       1809|     6485.612500|       3949|00:11:45|-0.00|0.08|0.9701|
+|=|         13|         84|       1809|     6027.842308|       4033|00:12:24|+0.00|0.08|0.9667|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        1809    mean value:      6027.842308
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+1809 1809      GT          EDD     ILS      LS      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods    nhood1 nhood1_tabu
+1809                   53            9650         1 SWAP_RAND        <NA>
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+1809            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+1809          <NA>     EARLY   NA   NA     NA           NA               NA
+     decreaseDivisor .PARENT.
+1809              NA      906
+
+# 2026-04-19 04:18:44 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+1809      GT          EDD     ILS      LS      RELAX_1                   53
+1043      GT          EDD     ILS    TABU      RELAX_1                   41
+1837  CONSTR          EDD     ILS    TABU      RELAX_1                   27
+1971      GT          EDD     ILS    TABU      RELAX_1                   46
+2326      GT          EDD     ILS    TABU      RELAX_1                   47
+2217      GT          EDD     ILS    TABU      RELAX_1                   37
+     ilsIterMaxMilli numNHoods    nhood1       nhood1_tabu nHoodTravers1 nhood2
+1809            9650         1 SWAP_RAND              <NA>            BI   <NA>
+1043            6646         1      <NA>        SWAP_PENAL            BI   <NA>
+1837            7550         1      <NA> CRITICAL_OPER_ALT            FI   <NA>
+1971            3904         1      <NA>        SWAP_PENAL            FI   <NA>
+2326           21550         1      <NA>         SWAP_RAND            FI   <NA>
+2217           22854         1      <NA>         SWAP_RAND            FI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+1809        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   NA
+1043        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   63
+1837        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   92
+1971        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+2326        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   84
+2217        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   61
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+1809   NA     NA           NA               NA              NA
+1043    1     83           24             1114               6
+1837    2     82           22             2974              20
+1971    8     48           13             2815               4
+2326    2     58           20             2784              17
+2217    4     79           15             2120              14
+# 2026-04-19 04:18:44 -03: Iteration 4 of 6
+# experimentsUsed: 13504
+# remainingBudget: 26496
+# currentBudget: 8832
+# nbConfigurations: 636
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         14|        636|       2603|     2821.680000|        636|01:05:40|   NA|  NA|    NA|
+|x|          1|        636|       2829|     1976.320000|       1266|00:56:23|+0.47|0.74|0.4240|
+|x|         13|        636|       2955|     1499.326667|       1896|00:55:40|+0.53|0.68|0.5000|
+|x|         11|        636|       2955|     1166.427500|       2526|00:53:40|+0.57|0.68|0.4566|
+|-|          6|        189|       1971|     1258.448000|       3156|00:58:20|-0.07|0.14|1.0462|
+|=|          9|        189|       1971|     1209.496667|       3339|00:30:32|-0.02|0.15|1.0073|
+|=|          4|        189|       2829|     1142.278571|       3522|00:30:03|-0.00|0.14|0.9883|
+|-|         10|         47|       2829|     1241.605000|       3705|00:30:22|-0.03|0.10|0.9157|
+|=|          3|         47|       2442|     1151.218889|       3746|00:07:04|-0.04|0.08|0.9187|
+|=|         12|         47|       2442|     1342.406000|       3787|00:07:03|-0.02|0.08|0.9081|
+|=|          8|         47|       2442|     1420.810000|       3828|00:07:03|-0.02|0.08|0.8991|
+|=|          2|         47|       2442|     1372.285833|       3869|00:07:04|-0.02|0.07|0.9060|
+|=|          5|         47|       2442|     6443.425385|       3910|00:07:04|-0.01|0.07|0.8985|
+|=|          7|         47|       2442|     5996.007143|       3951|00:07:03|-0.01|0.06|0.9070|
+|=|         15|         47|       2442|     5741.722000|       3998|00:08:03|+0.00|0.07|0.9020|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        2442    mean value:      5741.722000
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+2442 2442      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+2442                   52            7299         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+2442            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+2442          <NA>     EARLY   58    3     97           30             1940
+     decreaseDivisor .PARENT.
+2442               4     1043
+
+# 2026-04-19 11:29:55 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+2442      GT          EDD     ILS    TABU      RELAX_1                   52
+2829      GT          EDD     ILS    TABU      RELAX_1                   17
+2956      GT          EDD     ILS    TABU      RELAX_1                   48
+2721  CONSTR          EDD     ILS    TABU      RELAX_1                   16
+1971      GT          EDD     ILS    TABU      RELAX_1                   46
+1043      GT          EDD     ILS    TABU      RELAX_1                   41
+     ilsIterMaxMilli numNHoods nhood1       nhood1_tabu nHoodTravers1 nhood2
+2442            7299         1   <NA>        SWAP_PENAL            BI   <NA>
+2829            5290         1   <NA>        SWAP_PENAL            BI   <NA>
+2956           29241         1   <NA> CRITICAL_OPER_ALT            BI   <NA>
+2721           21057         1   <NA>        SWAP_PENAL            FI   <NA>
+1971            3904         1   <NA>        SWAP_PENAL            FI   <NA>
+1043            6646         1   <NA>        SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+2442        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   58
+2829        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   54
+2956        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   10
+2721        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   96
+1971        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+1043        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   63
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+2442    3     97           30             1940               4
+2829    2     97           23             1876               7
+2956    1     86           15             2384               9
+2721    3     63           18             2651              19
+1971    8     48           13             2815               4
+1043    1     83           24             1114               6
+# 2026-04-19 11:29:55 -03: Iteration 5 of 6
+# experimentsUsed: 17502
+# remainingBudget: 22498
+# currentBudget: 11249
+# nbConfigurations: 708
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         16|        708|       3657|     6437.250000|        708|01:22:01|   NA|  NA|    NA|
+|x|          8|        708|       3657|     4318.940000|       1410|01:12:45|+0.63|0.81|0.5030|
+|x|         13|        708|       3290|     3202.643333|       2112|01:09:33|+0.56|0.70|0.4422|
+|x|          9|        708|       3290|     2643.167500|       2814|01:13:39|+0.61|0.71|0.3900|
+|-|         11|        188|       3290|     2148.080000|       3516|01:07:34|-0.09|0.13|1.1094|
+|=|         14|        188|       3290|     2289.935000|       3698|00:30:09|-0.03|0.15|1.0532|
+|=|          7|        188|       3290|     1988.454286|       3880|00:30:12|-0.03|0.11|1.0430|
+|=|          4|        188|       2956|     1857.540000|       4062|00:30:02|-0.02|0.11|1.0126|
+|=|          6|        188|       3512|     1828.530000|       4244|00:30:08|+0.01|0.12|0.9899|
+|=|         10|        188|       3488|     1833.999000|       4426|00:30:13|+0.01|0.11|0.9830|
+|=|          5|        188|       3488|     7774.608182|       4608|00:31:03|+0.01|0.10|0.9684|
+|-|          1|         74|       3488|     7213.540000|       4790|00:30:01|-0.04|0.05|1.0148|
+|=|         12|         74|       3488|     6892.388462|       4858|00:12:04|-0.03|0.05|1.0139|
+|=|          3|         74|       3488|     6427.838571|       4926|00:12:05|-0.02|0.05|0.9966|
+|=|          2|         74|       3488|     6055.217333|       4994|00:12:06|-0.02|0.04|1.0083|
+|=|         15|         74|       3488|     5812.623125|       5062|00:12:04|-0.02|0.04|1.0116|
+|=|         17|         74|       3488|     5515.095882|       5136|00:13:04|-0.02|0.04|1.0110|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        3488    mean value:      5515.095882
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+3488 3488      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+3488                   27            6208         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+3488            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+3488          <NA>     EARLY   66    1     93           12             2985
+     decreaseDivisor .PARENT.
+3488              10     2829
+
+# 2026-04-19 22:08:46 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+3488      GT          EDD     ILS    TABU      RELAX_1                   27
+3393  CONSTR          EDD     ILS    TABU      RELAX_1                   35
+3178      GT          EDD     ILS    TABU      RELAX_1                   11
+2442      GT          EDD     ILS    TABU      RELAX_1                   52
+3451      GT          EDD     ILS    TABU      RELAX_1                   35
+2829      GT          EDD     ILS    TABU      RELAX_1                   17
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+3488            6208         1   <NA>  SWAP_PENAL            BI   <NA>
+3393           11118         1   <NA>  SWAP_PENAL            FI   <NA>
+3178            4041         1   <NA>  SWAP_PENAL            BI   <NA>
+2442            7299         1   <NA>  SWAP_PENAL            BI   <NA>
+3451           13788         1   <NA>  SWAP_PENAL            BI   <NA>
+2829            5290         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+3488        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   66
+3393        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   27
+3178        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   87
+2442        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   58
+3451        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   35
+2829        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   54
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+3488    1     93           12             2985              10
+3393    2     74           12             2183              12
+3178    3     73           27             2874              13
+2442    3     97           30             1940               4
+3451    3     93           16             1494               3
+2829    2     97           23             1876               7
+# 2026-04-19 22:08:46 -03: Iteration 6 of 6
+# experimentsUsed: 22638
+# remainingBudget: 17362
+# currentBudget: 17362
+# nbConfigurations: 970
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         18|        970|       3920|     1473.740000|        970|01:40:35|   NA|  NA|    NA|
+|x|          9|        970|       4435|     1227.465000|       1934|01:41:46|+0.62|0.81|0.2750|
+|x|          2|        970|       3788|     1083.116667|       2898|01:39:56|+0.41|0.61|0.3722|
+|x|          1|        970|       3795|     1076.015000|       3862|01:36:57|+0.40|0.55|0.3972|
+|-|         15|        384|       3736|     1300.402000|       4826|01:46:30|-0.09|0.13|1.1085|
+|=|          3|        384|       3393|     1159.611667|       5204|00:58:58|-0.06|0.12|1.0511|
+|=|         10|        384|       3800|     1262.452857|       5582|00:59:26|-0.02|0.13|1.0230|
+|=|         14|        384|       3800|     1464.443750|       5960|00:59:50|+0.01|0.13|1.0039|
+|-|         16|        204|       3800|     2088.660000|       6338|00:59:56|-0.07|0.05|1.0585|
+|=|          4|        204|       3800|     1957.744000|       6536|00:33:02|-0.05|0.05|1.0412|
+|=|          7|        204|       3800|     1796.091818|       6734|00:33:15|-0.05|0.05|1.0201|
+|=|          8|        204|       3800|     1830.130000|       6932|00:33:16|-0.04|0.04|1.0264|
+|=|         11|        204|       3800|     1702.253077|       7130|00:33:15|-0.04|0.04|1.0030|
+|=|         12|        204|       4518|     1810.331429|       7328|00:33:12|-0.03|0.04|1.0038|
+|=|          6|        204|       4518|     1796.134667|       7526|00:33:08|-0.01|0.05|0.9877|
+|=|         17|        204|       4518|     1730.821875|       7724|00:33:16|-0.02|0.05|0.9888|
+|=|          5|        204|       3877|     5600.332941|       7922|00:33:05|-0.02|0.04|0.9915|
+|=|         13|        204|       3393|     5477.212222|       8120|00:33:16|-0.01|0.04|0.9923|
+|=|         19|        204|       3488|     5130.257368|       8324|00:34:02|-0.01|0.04|0.9873|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        3488    mean value:      5130.257368
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+3488 3488      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+3488                   27            6208         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+3488            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+3488          <NA>     EARLY   66    1     93           12             2985
+     decreaseDivisor .PARENT.
+3488              10     2829
+
+# 2026-04-20 16:05:37 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+3488      GT          EDD     ILS    TABU      RELAX_1                   27
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+4546      GT          EDD     ILS    TABU      RELAX_1                   41
+3393  CONSTR          EDD     ILS    TABU      RELAX_1                   35
+3717      GT          EDD     ILS    TABU      RELAX_1                   20
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+3488            6208         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+4546           11071         1   <NA>  SWAP_PENAL            BI   <NA>
+3393           11118         1   <NA>  SWAP_PENAL            FI   <NA>
+3717           15747         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+3488        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   66
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+4546        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   83
+3393        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   27
+3717        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   32
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+3488    1     93           12             2985              10
+4620    1     67           10             2442              10
+4257    2     67           10             2320               7
+4546    3     93           18             2847              12
+3393    2     74           12             2183              12
+3717    7     87           13             2749               4
+# 2026-04-20 16:05:37 -03: Iteration 7 of 7
+# experimentsUsed: 30962
+# remainingBudget: 9038
+# currentBudget: 9038
+# nbConfigurations: 457
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         20|        457|       4634|     735.5400000|        457|00:56:26|   NA|  NA|    NA|
+|x|         12|        457|       4634|     1885.920000|        908|00:58:13|+0.27|0.63|0.5014|
+|x|          1|        457|       4834|     1601.286667|       1359|00:55:37|+0.35|0.57|0.4918|
+|x|         18|        457|       5044|     1576.972500|       1810|00:56:46|+0.35|0.51|0.4572|
+|-|         10|        145|       5044|     1648.962000|       2261|00:56:57|-0.11|0.11|1.1129|
+|=|          3|        145|       4834|     1438.888333|       2400|00:24:08|-0.07|0.11|1.0676|
+|=|         15|        145|       4834|     1543.322857|       2539|00:24:06|-0.06|0.09|1.0386|
+|=|          4|        145|       4744|     1450.076250|       2678|00:24:01|-0.03|0.10|1.0166|
+|=|          9|        145|       4744|     1396.205556|       2817|00:24:03|-0.02|0.10|1.0021|
+|=|         16|        145|       4744|     1964.824000|       2956|00:24:00|-0.00|0.10|0.9814|
+|=|          7|        145|       4744|     1802.528182|       3095|00:24:11|-0.00|0.09|0.8932|
+|=|         11|        145|       4744|     1666.295000|       3234|00:24:09|-0.00|0.08|0.8196|
+|=|          5|        145|       4744|     6738.095385|       3373|00:24:01|+0.01|0.09|0.8178|
+|-|         14|         80|       4937|     6465.468571|       3512|00:24:04|-0.03|0.04|0.8687|
+|=|          8|         80|       4937|     6181.168667|       3586|00:13:06|-0.02|0.04|0.8718|
+|=|          2|         80|       4937|     5847.253125|       3660|00:13:06|-0.02|0.04|0.8846|
+|=|         13|         80|       4937|     5534.780588|       3734|00:13:05|-0.02|0.04|0.8898|
+|=|         17|         80|       4937|     5269.218333|       3808|00:13:05|-0.02|0.03|0.8960|
+|=|         19|         80|       5044|     5123.211053|       3882|00:13:00|-0.02|0.04|0.8991|
+|=|          6|         80|       5044|     4946.551000|       3956|00:13:02|-0.01|0.04|0.8996|
+|=|         21|         80|       4620|     4688.633333|       4036|00:14:00|-0.01|0.04|0.9034|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4620    mean value:      4688.633333
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4620 4620      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4620                   15            2820         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4620            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4620          <NA>     EARLY   43    1     67           10             2442
+     decreaseDivisor .PARENT.
+4620              10     2829
+
+# 2026-04-21 01:58:54 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+5044      GT          EDD     ILS    TABU      RELAX_1                   21
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+4708      GT          EDD     ILS    TABU      RELAX_1                   23
+3393  CONSTR          EDD     ILS    TABU      RELAX_1                   35
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+5044            2056         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+4708            9858         1   <NA>  SWAP_PENAL            BI   <NA>
+3393           11118         1   <NA>  SWAP_PENAL            FI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+5044        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   73
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+4708        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   87
+3393        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   27
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4620    1     67           10             2442              10
+4732    6     67            7             2861               4
+5044    2     91           23             2221              16
+4257    2     67           10             2320               7
+4708    3     67           20             2802              15
+3393    2     74           12             2183              12
+# 2026-04-21 01:58:54 -03: Iteration 8 of 8
+# experimentsUsed: 34998
+# remainingBudget: 5002
+# currentBudget: 5002
+# nbConfigurations: 233
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         22|        233|       5167|     4131.510000|        233|00:34:11|   NA|  NA|    NA|
+|x|          7|        233|       5167|     2155.540000|        460|00:32:32|+0.13|0.57|0.7329|
+|x|         16|        233|       5081|     3760.573333|        687|00:33:18|+0.26|0.51|0.6929|
+|x|         21|        233|       5081|     2946.197500|        914|00:32:11|+0.09|0.32|0.8297|
+|-|         11|        124|       5081|     2390.504000|       1141|00:32:40|-0.04|0.16|1.0256|
+|=|         17|        124|       5081|     2117.275000|       1259|00:20:10|-0.05|0.12|1.0332|
+|=|         19|        124|       5183|     2145.532857|       1377|00:20:00|-0.04|0.11|1.0266|
+|=|         18|        124|       5081|     2065.445000|       1495|00:20:06|-0.02|0.11|1.0041|
+|=|         12|        124|       5081|     2172.908889|       1613|00:20:06|-0.01|0.11|0.9998|
+|=|         20|        124|       5081|     2029.608000|       1731|00:20:00|-0.00|0.10|1.0030|
+|=|          5|        124|       5081|     8298.616364|       1849|00:20:02|-0.01|0.08|1.0195|
+|=|          9|        124|       5081|     7687.501667|       1967|00:20:05|+0.00|0.08|1.0163|
+|=|          4|        124|       5081|     7158.460769|       2085|00:20:01|+0.00|0.08|1.0086|
+|=|          3|        124|       5271|     6445.157857|       2203|00:20:08|-0.00|0.07|0.9982|
+|=|         14|        124|       5286|     6223.730000|       2321|00:20:06|-0.00|0.06|0.9975|
+|=|          2|        124|       5286|     5887.154375|       2439|00:20:09|-0.00|0.06|0.9981|
+|=|         13|        124|       5081|     5754.597059|       2557|00:20:09|-0.00|0.06|0.9971|
+|=|         10|        124|       5081|     5542.502222|       2675|00:20:10|-0.00|0.06|1.0005|
+|=|          1|        124|       5286|     5142.073684|       2793|00:20:00|+0.00|0.06|0.9945|
+|=|          8|        124|       5286|     4995.109500|       2911|00:20:10|+0.01|0.06|0.9912|
+|=|          6|        124|       5271|     4828.650476|       3029|00:20:04|+0.01|0.06|0.9897|
+|=|         15|        124|       5271|     4707.666364|       3147|00:20:06|+0.01|0.05|0.9937|
+|=|         23|        124|       4732|     7014.666087|       3271|00:21:02|+0.01|0.05|0.9973|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      7014.666087
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 10:46:31 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+5286      GT          EDD     ILS    TABU      RELAX_1                   21
+4708      GT          EDD     ILS    TABU      RELAX_1                   23
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+5286           16462         1   <NA>  SWAP_PENAL            BI   <NA>
+4708            9858         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+5286        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   26
+4708        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   87
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+4620    1     67           10             2442              10
+5271    7     67            7             2562               3
+4257    2     67           10             2320               7
+5286    3     91           11             2755               4
+4708    3     67           20             2802              15
+# 2026-04-21 10:46:31 -03: Iteration 9 of 9
+# experimentsUsed: 38269
+# remainingBudget: 1731
+# currentBudget: 1731
+# nbConfigurations: 77
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         24|         77|       5348|     92655.20000|         77|00:13:00|   NA|  NA|    NA|
+|x|         14|         77|       5301|     48311.78000|        148|00:10:20|-0.12|0.44|1.0845|
+|x|         18|         77|       5319|     32622.47000|        219|00:10:13|+0.11|0.40|0.8300|
+|x|         13|         77|       5319|     24600.65750|        290|00:10:15|+0.20|0.40|0.7689|
+|-|          7|         49|       5319|     19716.44000|        361|00:10:12|-0.06|0.15|0.6224|
+|=|         12|         49|       5301|     16979.83167|        404|00:08:01|-0.05|0.13|0.6755|
+|=|         22|         49|       5301|     15178.17857|        447|00:08:00|+0.02|0.16|0.6858|
+|=|          5|         49|       5335|     21633.38750|        490|00:08:00|-0.01|0.12|0.7339|
+|=|         17|         49|       5308|     19447.41889|        533|00:08:03|-0.03|0.09|0.7665|
+|=|         19|         49|       5308|     17728.44900|        576|00:08:00|-0.02|0.09|0.7847|
+|=|          6|         49|       5308|     16262.57636|        619|00:08:00|-0.01|0.08|0.8015|
+|=|         21|         49|       5308|     14951.01917|        662|00:08:00|-0.03|0.05|0.8346|
+|=|          2|         49|       5308|     13865.44231|        705|00:08:04|-0.03|0.05|0.8555|
+|=|          8|         49|       5317|     13021.41500|        748|00:08:02|-0.02|0.05|0.8563|
+|=|         23|         49|       5335|     15968.46333|        791|00:08:00|-0.02|0.05|0.8646|
+|=|         20|         49|       4732|     15021.11250|        834|00:08:00|-0.02|0.04|0.8751|
+|=|          1|         49|       4732|     14198.27000|        877|00:08:00|-0.02|0.04|0.8804|
+|=|         15|         49|       4732|     13529.86611|        920|00:08:01|-0.01|0.04|0.8842|
+|=|          4|         49|       4732|     12859.23684|        963|00:08:00|-0.00|0.05|0.8828|
+|=|         16|         49|       4732|     12563.21550|       1006|00:08:00|+0.00|0.05|0.8837|
+|=|          9|         49|       4732|     12010.93095|       1049|00:08:01|+0.01|0.06|0.8834|
+|=|         10|         49|       4732|     11553.02227|       1092|00:08:02|+0.01|0.06|0.8843|
+|=|         11|         49|       4732|     11058.00957|       1135|00:08:02|+0.01|0.06|0.8461|
+|=|          3|         49|       4732|     10613.44250|       1178|00:08:02|+0.01|0.06|0.8500|
+|-|         25|         28|       4732|     10203.51800|       1227|00:09:03|-0.01|0.03|0.8189|
+|=|         26|         28|       4732|     9980.031923|       1255|00:05:02|-0.02|0.02|0.8267|
+|=|         27|         28|       4732|     16816.69741|       1283|00:05:00|-0.01|0.02|0.8283|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      16816.69741
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 14:32:06 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+5315      GT          EDD     ILS    TABU      RELAX_1                   41
+4708      GT          EDD     ILS    TABU      RELAX_1                   23
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+5315            7799         1   <NA>  SWAP_PENAL            BI   <NA>
+4708            9858         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+5315        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   89
+4708        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   87
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+4620    1     67           10             2442              10
+4257    2     67           10             2320               7
+5271    7     67            7             2562               3
+5315    8     67            7             2328               3
+4708    3     67           20             2802              15
+# 2026-04-21 14:32:06 -03: Iteration 10 of 10
+# experimentsUsed: 39552
+# remainingBudget: 448
+# currentBudget: 448
+# nbConfigurations: 21
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         28|         21|       4732|     1174.330000|         21|00:04:00|   NA|  NA|    NA|
+|x|          4|         21|       4732|     981.1200000|         36|00:03:00|+0.61|0.81|0.5943|
+|x|         11|         21|       4732|     709.9900000|         51|00:03:01|+0.40|0.60|0.5949|
+|x|         20|         21|       4732|     717.0575000|         66|00:03:00|+0.39|0.54|0.5618|
+|-|         13|         13|       4732|     680.6900000|         81|00:03:01|-0.05|0.16|0.5334|
+|=|         15|         13|       4257|     928.1483333|         88|00:02:00|-0.01|0.16|0.5629|
+|=|         10|         13|       4257|     1072.254286|         95|00:02:00|+0.02|0.16|0.6208|
+|=|         27|         13|       4257|     25274.97250|        102|00:02:01|+0.02|0.14|0.6696|
+|=|         21|         13|       4257|     22524.14667|        109|00:02:00|-0.04|0.08|0.7342|
+|=|         19|         13|       4257|     20497.58800|        116|00:02:00|-0.04|0.07|0.7632|
+|=|         24|         13|       4257|     27121.71636|        123|00:02:00|-0.03|0.06|0.7699|
+|=|         16|         13|       4257|     25439.95417|        130|00:02:00|-0.02|0.07|0.7650|
+|=|         18|         13|       4257|     23599.76308|        137|00:02:00|-0.03|0.05|0.7947|
+|=|          7|         13|       4257|     21926.89214|        144|00:02:01|-0.03|0.05|0.7370|
+|=|         25|         13|       4257|     20489.45467|        151|00:02:00|-0.01|0.06|0.7396|
+|=|         14|         13|       4257|     19398.30375|        158|00:02:00|-0.01|0.05|0.7515|
+|=|          2|         13|       4257|     18306.55176|        165|00:02:00|-0.01|0.05|0.7072|
+|=|         22|         13|       4257|     17532.81389|        172|00:02:00|+0.01|0.07|0.7031|
+|=|          1|         13|       4257|     16664.39158|        179|00:02:00|+0.03|0.08|0.6949|
+|-|          9|          9|       4257|     15879.43400|        186|00:02:00|-0.01|0.04|0.5758|
+|=|          8|          9|       4732|     15222.91619|        189|00:01:00|-0.01|0.04|0.5914|
+|=|         17|          9|       4257|     14570.04409|        192|00:01:00|-0.01|0.04|0.6105|
+|=|          6|          9|       4257|     14005.79217|        195|00:01:00|-0.01|0.03|0.6142|
+|=|         23|          9|       4732|     15821.69792|        198|00:01:00|+0.00|0.04|0.6250|
+|=|          5|          9|       4732|     17896.25800|        201|00:01:01|-0.01|0.03|0.6389|
+|=|         26|          9|       4732|     17376.89731|        204|00:01:00|-0.00|0.03|0.6559|
+|=|         12|          9|       4732|     16845.80593|        207|00:01:00|-0.01|0.03|0.6593|
+|=|          3|          9|       4732|     16258.04143|        210|00:01:00|-0.01|0.03|0.6685|
+|=|         29|          9|       4732|     15767.31207|        219|00:02:00|-0.00|0.03|0.6801|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      15767.31207
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 15:28:22 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+5381      GT          EDD     ILS    TABU      RELAX_1                   26
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+5315      GT          EDD     ILS    TABU      RELAX_1                   41
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+5381            4541         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+5315            7799         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+5381        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+5315        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   89
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+4620    1     67           10             2442              10
+4257    2     67           10             2320               7
+5381    1     91           15             2408               8
+5271    7     67            7             2562               3
+5315    8     67            7             2328               3
+# 2026-04-21 15:28:22 -03: Iteration 11 of 11
+# experimentsUsed: 39771
+# remainingBudget: 229
+# currentBudget: 229
+# nbConfigurations: 13
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         30|         13|       4732|     78803.70000|         13|00:03:00|   NA|  NA|    NA|
+|x|          8|         13|       4732|     40502.33500|         20|00:02:01|+0.05|0.52|0.9944|
+|x|         20|         13|       5381|     27352.58333|         27|00:02:00|+0.03|0.36|0.9394|
+|x|         13|         13|       5381|     20648.24250|         34|00:02:01|+0.02|0.27|0.7005|
+|=|          4|         13|       4732|     16613.21200|         41|00:02:00|+0.03|0.22|0.7327|
+|=|         12|         13|       4732|     14350.58167|         48|00:02:00|+0.07|0.23|0.7040|
+|=|         17|         13|       4732|     12408.30714|         55|00:02:00|+0.01|0.15|0.8006|
+|=|         21|         13|       4732|     10921.96125|         62|00:02:00|-0.05|0.08|0.8729|
+|=|          3|         13|       4732|     9751.565556|         69|00:02:00|-0.05|0.07|0.8867|
+|=|          1|         13|       4732|     8879.688000|         76|00:02:00|-0.02|0.09|0.8756|
+|=|          7|         13|       4732|     8088.768182|         83|00:02:00|-0.01|0.08|0.7919|
+|=|         28|         13|       4732|     7512.565000|         90|00:02:00|+0.00|0.09|0.7924|
+|=|         11|         13|       4732|     6947.577692|         97|00:02:00|+0.00|0.08|0.7297|
+|=|         25|         13|       4732|     6477.417143|        104|00:02:01|+0.01|0.08|0.7328|
+|=|          5|         13|       4732|     10557.96933|        111|00:02:00|+0.04|0.10|0.7342|
+|=|          2|         13|       4732|     9950.503750|        118|00:02:00|+0.02|0.08|0.7638|
+|=|         16|         13|       4732|     9773.345294|        125|00:02:00|+0.03|0.09|0.7677|
+|-|         19|          8|       4732|     9355.841111|        132|00:02:00|-0.02|0.04|0.6456|
+|=|          9|          8|       4732|     8914.230526|        134|00:01:00|-0.00|0.05|0.6505|
+|=|         26|          8|       4732|     8688.163000|        136|00:01:00|-0.01|0.04|0.6667|
+|=|          6|          8|       4732|     8350.262381|        138|00:01:00|+0.00|0.05|0.6690|
+|=|         10|          8|       4732|     8058.747727|        140|00:01:00|+0.00|0.05|0.6778|
+|=|         29|          8|       4732|     7796.493043|        142|00:01:00|+0.01|0.05|0.6848|
+|=|         24|          8|       4732|     11362.69333|        144|00:01:00|+0.02|0.06|0.6853|
+|=|         23|          8|       4732|     13215.88960|        146|00:01:00|+0.03|0.06|0.6867|
+|=|         27|          8|       4732|     20191.04769|        148|00:01:00|+0.03|0.07|0.6866|
+|-|         22|          6|       4732|     19605.42630|        150|00:01:00|+0.01|0.05|0.6175|
+|.|         18|          6|       4732|     18959.42786|        150|00:00:00|+0.01|0.05|0.6312|
+|.|         15|          6|       4732|     18380.37862|        150|00:00:00|+0.01|0.04|0.6349|
+|.|         14|          6|       4732|     17868.52500|        150|00:00:00|+0.00|0.04|0.6478|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      17868.52500
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 16:14:34 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+5381      GT          EDD     ILS    TABU      RELAX_1                   26
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+5315      GT          EDD     ILS    TABU      RELAX_1                   41
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+5381            4541         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+5315            7799         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+5381        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+5315        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   89
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+4620    1     67           10             2442              10
+5381    1     91           15             2408               8
+4257    2     67           10             2320               7
+5315    8     67            7             2328               3
+5271    7     67            7             2562               3
+# 2026-04-21 16:14:34 -03: Iteration 12 of 12
+# experimentsUsed: 39921
+# remainingBudget: 79
+# currentBudget: 79
+# nbConfigurations: 8
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|x|         31|          8|       5271|     5662.710000|          8|00:02:00|   NA|  NA|    NA|
+|x|         27|          8|       5381|     100129.3200|         10|00:01:00|-0.17|0.42|0.8581|
+|x|         15|          8|       5395|     67108.54667|         12|00:01:00|-0.11|0.26|1.0155|
+|x|          2|          8|       5395|     50541.04000|         14|00:01:01|-0.13|0.15|1.0287|
+|=|         11|          8|       5395|     40466.37800|         16|00:01:01|-0.09|0.13|1.0047|
+|=|         14|          8|       5395|     34213.52333|         18|00:01:00|-0.02|0.15|0.9355|
+|=|         28|          8|       5395|     29491.71143|         20|00:01:00|+0.05|0.18|0.8732|
+|=|          8|          8|       5395|     26080.38625|         22|00:01:00|+0.11|0.22|0.8451|
+|=|         24|          8|       5395|     33684.59889|         24|00:01:00|+0.03|0.14|0.8759|
+|=|         10|          8|       5381|     30490.02100|         26|00:01:00|+0.04|0.13|0.8408|
+|=|          5|          8|       5381|     33821.46455|         28|00:01:00|-0.01|0.08|0.8757|
+|=|         26|          8|       5381|     31368.10167|         30|00:01:00|+0.03|0.11|0.8522|
+|=|         16|          8|       5381|     29514.03846|         32|00:01:00|+0.01|0.09|0.8530|
+|=|         21|          8|       5395|     27478.80571|         34|00:01:00|-0.01|0.06|0.8842|
+|=|         20|          8|       5381|     25662.89800|         36|00:01:00|+0.00|0.07|0.8660|
+|=|          7|          8|       5381|     24070.19000|         38|00:01:00|+0.02|0.08|0.8427|
+|=|         23|          8|       5381|     26076.99647|         40|00:01:00|+0.01|0.07|0.8661|
+|=|         13|          8|       5381|     24658.00889|         42|00:01:00|+0.02|0.07|0.8468|
+|=|         22|          8|       4732|     23592.98579|         44|00:01:00|+0.02|0.07|0.8272|
+|=|          3|          8|       5395|     22441.18850|         46|00:01:00|+0.03|0.08|0.8105|
+|=|         25|          8|       5395|     21389.95714|         48|00:01:00|+0.04|0.09|0.7900|
+|-|         17|          7|       5395|     20451.98909|         50|00:01:01|-0.03|0.02|0.6868|
+|=|          4|          7|       4732|     19589.69696|         51|00:01:00|-0.03|0.01|0.6959|
+|=|          9|          7|       4732|     18813.67792|         52|00:01:00|-0.03|0.01|0.7016|
+|=|         18|          7|       5381|     18121.61680|         53|00:01:00|-0.03|0.01|0.7103|
+|=|         29|          7|       5381|     17502.13923|         54|00:01:00|-0.02|0.02|0.7143|
+|=|         30|          7|       4732|     19773.19741|         55|00:01:00|-0.01|0.02|0.7195|
+|=|         12|          7|       4732|     19175.49143|         56|00:01:00|-0.02|0.02|0.7251|
+|=|          6|          7|       4732|     18569.17276|         57|00:01:00|-0.02|0.02|0.7286|
+|=|          1|          7|       4732|     17984.62667|         58|00:01:00|-0.02|0.02|0.7302|
+|=|         19|          7|       4732|     17477.32484|         59|00:01:00|-0.02|0.02|0.7354|
+|=|         32|          7|       4732|     16987.32063|         66|00:02:00|-0.02|0.02|0.7119|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      16987.32063
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 16:48:45 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+5381      GT          EDD     ILS    TABU      RELAX_1                   26
+5395      GT          EDD     ILS    TABU      RELAX_1                   19
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+5381            4541         1   <NA>  SWAP_PENAL            BI   <NA>
+5395            2400         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+5381        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+5395        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   52
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+5381    1     91           15             2408               8
+5395    1     77           12             2981               6
+4257    2     67           10             2320               7
+4620    1     67           10             2442              10
+5271    7     67            7             2562               3
+# 2026-04-21 16:48:45 -03: Stopped because there is not enough budget left to race more than the minimum (6).
+# You may either increase the budget or set 'minNbSurvival' to a lower value.
+# Iteration: 13
+# nbIterations: 13
+# experimentsUsed: 39987
+# timeUsed: 0
+# remainingBudget: 13
+# currentBudget: 13
+# number of elites: 6
+# nbConfigurations: 6
+# Total CPU user time: 1624357, CPU sys time: 9502.66, Wall-clock time: 281875
+# 2026-04-21 16:48:45 -03: Starting post-selection:
+# Configurations selected: 4732, 5381, 5395, 4257, 4620, 5271, 5315, 4708.
+# Pending instances: 1, 1, 1, 1, 1, 1, 1, 4.
+# 2026-04-21 16:48:45 -03: seed: 1092609629
+# Configurations: 8
+# Available experiments: 13
+# minSurvival: 1
+# Markers:
+     x No test is performed.
+     c Configurations are discarded only due to capping.
+     - The test is performed and some configurations are discarded.
+     = The test is performed but no configuration is discarded.
+     ! The test is performed and configurations could be discarded but elite configurations are preserved.
+     . Alive configurations were already evaluated on this instance and nothing is discarded.
+     : All alive configurations are elite, but some need to be evaluated on this instance.
+
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+| |   Instance|      Alive|       Best|       Mean best| Exp so far|  W time|  rho|KenW|  Qvar|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+|.|          2|          8|       4257|     838.5200000|          0|00:00:00|   NA|  NA|    NA|
+|.|         14|          8|       4257|     1934.780000|          0|00:00:00|+0.00|0.50|0.4375|
+|.|         13|          8|       4257|     1468.260000|          0|00:00:00|+0.00|0.33|0.2917|
+|.|          6|          8|       4257|     1499.257500|          0|00:00:00|-0.24|0.07|0.5040|
+|.|         22|          8|       4257|     2075.260000|          0|00:00:00|-0.14|0.09|0.6230|
+|.|         18|          8|       4257|     1982.295000|          0|00:00:00|-0.17|0.02|0.6905|
+|.|         25|          8|       4257|     1751.300000|          0|00:00:00|-0.14|0.02|0.5765|
+|.|          1|          8|       4257|     1661.486250|          0|00:00:00|-0.11|0.03|0.6079|
+|.|          5|          8|       4257|     9008.987778|          0|00:00:00|-0.07|0.05|0.6219|
+|x|         32|          8|       4620|     8194.688000|          1|00:01:00|-0.06|0.05|0.5558|
+|.|         17|          8|       4620|     7518.321818|          1|00:00:00|-0.04|0.05|0.5766|
+|.|         21|          8|       4620|     6934.923333|          1|00:00:00|-0.07|0.02|0.6225|
+|.|         28|          8|       4620|     6491.800769|          1|00:00:00|-0.07|0.01|0.6457|
+|.|          3|          8|       4620|     6055.826429|          1|00:00:00|-0.04|0.03|0.6601|
+|.|         15|          8|       4620|     5796.524000|          1|00:00:00|-0.03|0.04|0.6706|
+|.|         19|          8|       4620|     5575.401250|          1|00:00:00|-0.02|0.05|0.6733|
+|.|         27|          8|       4620|     16727.78941|          1|00:00:00|-0.01|0.05|0.6911|
+|.|         12|          8|       4620|     15967.54833|          1|00:00:00|-0.00|0.05|0.6892|
+|.|         10|          8|       4620|     15229.09526|          1|00:00:00|-0.02|0.04|0.7074|
+|.|         29|          8|       4620|     14569.31650|          1|00:00:00|-0.03|0.02|0.7268|
+|.|          7|          8|       4620|     13884.09048|          1|00:00:00|-0.03|0.02|0.6909|
+|x|         30|          8|       5395|     16797.45864|          2|00:01:00|-0.02|0.03|0.6983|
+|.|          8|          8|       5395|     16162.83478|          2|00:00:00|-0.01|0.03|0.7069|
+|.|         16|          8|       5395|     15782.87708|          2|00:00:00|-0.02|0.03|0.7086|
+|.|         20|          8|       5395|     15181.15800|          2|00:00:00|-0.02|0.02|0.7204|
+|.|         24|          8|       5395|     18232.58654|          2|00:00:00|-0.02|0.02|0.7248|
+|.|         26|          8|       5395|     17715.69000|          2|00:00:00|-0.01|0.02|0.7320|
+|.|          4|          8|       5395|     17114.76750|          2|00:00:00|-0.02|0.02|0.7359|
+|.|          9|          8|       5395|     16558.02103|          2|00:00:00|-0.02|0.02|0.7385|
+|.|         11|          8|       5395|     16011.67800|          2|00:00:00|-0.02|0.02|0.7134|
+|x|         31|          8|       4732|     15674.24710|          3|00:01:00|-0.02|0.02|0.7209|
+|.|         23|          8|       4732|     16987.32063|          3|00:00:00|-0.01|0.02|0.7253|
+|=|         33|          8|       4732|     16509.25182|         11|00:02:00|-0.01|0.02|0.7322|
++-+-----------+-----------+-----------+----------------+-----------+--------+-----+----+------+
+Best-so-far configuration:        4732    mean value:      16509.25182
+Description of the best-so-far configuration:
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+     decreaseDivisor .PARENT.
+4732               4     4257
+
+# 2026-04-21 16:53:46 -03: Elite configurations (first number is the configuration ID; listed from best to worst according to the sum of ranks):
+     initSol dispatchRule search1 search2 perturbation perturbationStrength
+4732      GT          EDD     ILS    TABU      RELAX_1                   18
+5395      GT          EDD     ILS    TABU      RELAX_1                   19
+5381      GT          EDD     ILS    TABU      RELAX_1                   26
+4257      GT          EDD     ILS    TABU      RELAX_1                   12
+5271      GT          EDD     ILS    TABU      RELAX_1                   25
+4620      GT          EDD     ILS    TABU      RELAX_1                   15
+     ilsIterMaxMilli numNHoods nhood1 nhood1_tabu nHoodTravers1 nhood2
+4732            2435         1   <NA>  SWAP_PENAL            BI   <NA>
+5395            2400         1   <NA>  SWAP_PENAL            BI   <NA>
+5381            4541         1   <NA>  SWAP_PENAL            BI   <NA>
+4257            4966         1   <NA>  SWAP_PENAL            BI   <NA>
+5271            5788         1   <NA>  SWAP_PENAL            BI   <NA>
+4620            2820         1   <NA>  SWAP_PENAL            BI   <NA>
+     nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu nHoodTravers3 scheduler maxD
+4732        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   41
+5395        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   52
+5381        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   42
+4257        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   23
+5271        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   74
+4620        <NA>          <NA>   <NA>        <NA>          <NA>     EARLY   43
+     maxC tenure jumpListSize initialJumpLimit decreaseDivisor
+4732    6     67            7             2861               4
+5395    1     77           12             2981               6
+5381    1     91           15             2408               8
+4257    2     67           10             2320               7
+5271    7     67            7             2562               3
+4620    1     67           10             2442              10
+# Total CPU user time: 1625018, CPU sys time: 9503.418, Wall-clock time: 282175.9
+     .ID. initSol dispatchRule search1 search2 perturbation
+4732 4732      GT          EDD     ILS    TABU      RELAX_1
+5395 5395      GT          EDD     ILS    TABU      RELAX_1
+5381 5381      GT          EDD     ILS    TABU      RELAX_1
+4257 4257      GT          EDD     ILS    TABU      RELAX_1
+5271 5271      GT          EDD     ILS    TABU      RELAX_1
+4620 4620      GT          EDD     ILS    TABU      RELAX_1
+     perturbationStrength ilsIterMaxMilli numNHoods nhood1 nhood1_tabu
+4732                   18            2435         1   <NA>  SWAP_PENAL
+5395                   19            2400         1   <NA>  SWAP_PENAL
+5381                   26            4541         1   <NA>  SWAP_PENAL
+4257                   12            4966         1   <NA>  SWAP_PENAL
+5271                   25            5788         1   <NA>  SWAP_PENAL
+4620                   15            2820         1   <NA>  SWAP_PENAL
+     nHoodTravers1 nhood2 nhood2_tabu nHoodTravers2 nhood3 nhood3_tabu
+4732            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+5395            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+5381            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+4257            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+5271            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+4620            BI   <NA>        <NA>          <NA>   <NA>        <NA>
+     nHoodTravers3 scheduler maxD maxC tenure jumpListSize initialJumpLimit
+4732          <NA>     EARLY   41    6     67            7             2861
+5395          <NA>     EARLY   52    1     77           12             2981
+5381          <NA>     EARLY   42    1     91           15             2408
+4257          <NA>     EARLY   23    2     67           10             2320
+5271          <NA>     EARLY   74    7     67            7             2562
+4620          <NA>     EARLY   43    1     67           10             2442
+     decreaseDivisor .PARENT. .RANK.   .WEIGHT.
+4732               4     4257  131.5 0.28571429
+5395               6     4620  142.0 0.23809524
+5381               8     4257  148.5 0.19047619
+4257               7     3451  149.0 0.14285714
+5271               3     4732  150.5 0.09523810
+4620              10     2829  151.0 0.04761905

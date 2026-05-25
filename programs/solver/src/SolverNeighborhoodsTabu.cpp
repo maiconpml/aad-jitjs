@@ -148,8 +148,7 @@ void Solver::update_tabulist_insert(TabuList &tList, State &state,
                                     pair<unsigned, unsigned> &move,
                                     MoveType type, bool areAllMovesTabu) const {
   SchedPtr sched = get_sched_by_param();
-  unsigned _machFirst = state._mach[move.first],
-           _machSecond = state._mach[move.second];
+  unsigned _machFirst = state._mach[move.first];
   switch (type) {
   case Solver::MoveType::BEFORE:
     rm_insert_oper_befor(state, move.first, move.second);
@@ -163,7 +162,7 @@ void Solver::update_tabulist_insert(TabuList &tList, State &state,
     tList.passTime(tList.timeToLeave(state._mach[move.first], move.first));
   switch (type) {
   case MoveType::BEFORE:
-    tList.insert(_machSecond, move.first);
+    tList.insert(_machFirst, move.first);
     break;
   case MoveType::AFTER:
     tList.insert(_machFirst, move.first);
